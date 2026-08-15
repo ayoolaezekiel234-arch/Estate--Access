@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Estate Access & Overstay Control</title>
+  <title>Estate Access & GPS Control</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -16,20 +16,17 @@
 
   <div class="w-full max-w-md space-y-6">
 
-    <!-- Status Banner -->
-    <div id="status-banner" class="hidden p-3 rounded-xl text-xs font-mono text-center"></div>
-
     <!-- Top Tab Bar -->
     <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
       <button id="tab-resident" onclick="switchTab('resident')" class="flex-1 py-2 rounded-lg font-bold text-xs bg-blue-600 text-white">Pass Generator</button>
       <button id="tab-guard" onclick="switchTab('guard')" class="flex-1 py-2 rounded-lg font-bold text-xs text-slate-400">Gate Keypad</button>
-      <button id="tab-map" onclick="switchTab('map')" class="flex-1 py-2 rounded-lg font-bold text-xs text-slate-400">Control Map</button>
+      <button id="tab-map" onclick="switchTab('map')" class="flex-1 py-2 rounded-lg font-bold text-xs text-slate-400">Radar & Pass</button>
     </div>
 
-    <!-- 1. RESIDENT & PASS GENERATOR -->
+    <!-- 1. RESIDENT SCREEN -->
     <div id="view-resident" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
       <h2 class="text-xl font-bold text-blue-400">Generate Access Pass</h2>
-      <p class="text-xs text-slate-400">Issue timed OTPs with live countdown and GPS beacon.</p>
+      <p class="text-xs text-slate-400">Issue timed OTPs with instant live guest countdown.</p>
 
       <div>
         <label class="text-xs font-semibold text-slate-300">Visitor / Guest Name</label>
@@ -43,7 +40,7 @@
             <option value="MOSQUE">Mosque Service (4 hrs)</option>
             <option value="CHURCH">Church Service (4 hrs)</option>
           </optgroup>
-          <optgroup label="Commercial & Retail (Quick Entry)">
+          <optgroup label="Commercial & Retail">
             <option value="SUPERMARKET">Supermarket / Groceries (1 hr)</option>
             <option value="FOOD_STALL">Food Vendor / Eatery (1 hr)</option>
             <option value="RETAIL_SHOP">Retail Store / Shopping (1 hr)</option>
@@ -58,7 +55,6 @@
         </select>
       </div>
 
-      <!-- Hotel Stay Duration Option -->
       <div id="hotel-duration-box" class="hidden space-y-1">
         <label class="text-xs font-semibold text-amber-300">Hotel Stay Duration</label>
         <select id="res-hotel-days" class="w-full p-3 bg-slate-900 border border-amber-500/50 rounded-xl text-white outline-none">
@@ -67,7 +63,6 @@
           <option value="3">3 Nights (72 Hours)</option>
           <option value="7" selected>1 Week (7 Days Stay)</option>
           <option value="14">2 Weeks (14 Days Stay)</option>
-          <option value="30">1 Month (30 Days Extended)</option>
         </select>
       </div>
 
@@ -81,7 +76,7 @@
         <p id="pass-validity-display" class="text-xs font-mono text-amber-400"></p>
 
         <button id="whatsapp-btn" onclick="shareToWhatsApp()" class="w-full py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2">
-          <span>📲 Share Pass & Live Tracker</span>
+          <span>📲 Share Pass & Live Countdown</span>
         </button>
       </div>
     </div>
@@ -89,7 +84,7 @@
     <!-- 2. GUARD TERMINAL SCREEN -->
     <div id="view-guard" class="hidden bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
       <h2 class="text-xl font-bold text-emerald-400">Security Gate Keypad</h2>
-      <p class="text-xs text-slate-400">Punch in 6-digit code to verify validity and log access.</p>
+      <p class="text-xs text-slate-400">Punch in 6-digit code to verify validity.</p>
 
       <div class="bg-black p-4 rounded-xl text-center border border-slate-700">
         <span id="pin-display" class="text-3xl font-mono tracking-widest text-white">------</span>
@@ -113,34 +108,27 @@
       <div id="gate-result" class="hidden p-4 rounded-xl text-center space-y-1"></div>
     </div>
 
-    <!-- 3. CONTROL ROOM / LIVE GUEST RADAR -->
+    <!-- 3. RADAR & GUEST LIVE PASS SCREEN -->
     <div id="view-map" class="hidden bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
       
       <!-- GUEST COUNTDOWN HERO -->
-      <div id="guest-tracker-card" class="hidden p-4 bg-slate-900 border-2 border-emerald-500 rounded-2xl space-y-2 text-center shadow-2xl">
-        <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Authorized Stay Remaining</span>
-        <div id="guest-countdown" class="text-4xl font-black font-mono text-emerald-400">--:--:--</div>
-        <p id="guest-expiry-warning" class="text-xs text-slate-300">Keep this screen open while entering the estate.</p>
-        <div id="gps-status" class="text-[11px] font-mono text-cyan-400 pt-1">Broadcasting GPS coordinates...</div>
+      <div id="guest-tracker-card" class="hidden p-5 bg-slate-900 border-2 border-emerald-500 rounded-2xl space-y-2 text-center shadow-2xl">
+        <span class="text-[11px] font-bold tracking-widest text-emerald-400 uppercase">Authorized Stay Remaining</span>
+        <div id="guest-countdown" class="text-5xl font-black font-mono text-white py-1">00:00:00</div>
+        <p id="guest-name-box" class="text-sm font-semibold text-slate-300"></p>
+        <p id="guest-expiry-warning" class="text-xs text-slate-400">Please exit via the main gate when time expires.</p>
+        <div id="gps-status" class="text-[11px] font-mono text-cyan-400 pt-2">📡 Connecting GPS beacon...</div>
       </div>
 
       <div class="flex justify-between items-center">
         <div>
           <h2 class="text-lg font-bold text-cyan-400">Security Control Radar</h2>
-          <p class="text-xs text-slate-400">Active movements & overstay alerts</p>
+          <p class="text-xs text-slate-400">Live estate positions</p>
         </div>
         <button onclick="refreshMapMarkers()" class="px-3 py-1.5 bg-slate-700 active:bg-slate-600 rounded-lg text-xs font-semibold">🔄 Refresh</button>
       </div>
 
       <div id="map"></div>
-
-      <!-- Overstay Alert Feed for Security -->
-      <div class="space-y-2">
-        <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Overstayed Visitors Alert</h3>
-        <div id="overstay-list" class="space-y-1 text-xs">
-          <p class="text-slate-500 italic">No overstayed visitors detected.</p>
-        </div>
-      </div>
     </div>
 
   </div>
@@ -148,33 +136,21 @@
   <script>
     const SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_FYbGL09hgU7Fc25ChlXbDw_YpXMjDmS";
-    
     let supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let enteredPin = "";
     let lastGeneratedCode = "";
     let lastVisitorName = "";
+    let lastMinutesAllowed = 240;
     let lastDurationText = "";
-    let lastExpiresAtIso = "";
     let map = null;
     let markers = {};
-    let countdownInterval = null;
 
     function toggleHotelStayOptions() {
       const type = document.getElementById("res-pass-type").value;
       const hotelBox = document.getElementById("hotel-duration-box");
-      if (type === "HOTEL_LODGE") {
-        hotelBox.classList.remove("hidden");
-      } else {
-        hotelBox.classList.add("hidden");
-      }
-    }
-
-    function showStatus(msg, classes) {
-      const banner = document.getElementById("status-banner");
-      banner.className = "p-3 rounded-xl text-xs font-mono text-center " + classes;
-      banner.innerText = msg;
-      banner.classList.remove("hidden");
+      if (type === "HOTEL_LODGE") hotelBox.classList.remove("hidden");
+      else hotelBox.classList.add("hidden");
     }
 
     function switchTab(tab) {
@@ -205,23 +181,15 @@
     function initMap() {
       if (!map) {
         map = L.map('map').setView([6.6194, 3.5105], 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '© OpenStreetMap'
-        }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
       }
       setTimeout(() => { map.invalidateSize(); }, 200);
       refreshMapMarkers();
     }
 
     async function refreshMapMarkers() {
-      const { data, error } = await supabaseClient.from('live_locations').select('*');
-      if (error || !data) return;
-
-      const overstayBox = document.getElementById('overstay-list');
-      overstayBox.innerHTML = "";
-      let hasOverstay = false;
-
+      const { data } = await supabaseClient.from('live_locations').select('*');
+      if (!data) return;
       data.forEach(loc => {
         if (markers[loc.pass_code]) {
           markers[loc.pass_code].setLatLng([loc.latitude, loc.longitude]);
@@ -231,32 +199,6 @@
             .bindPopup(`<b>${loc.visitor_name}</b><br>Code: ${loc.pass_code}`);
         }
       });
-
-      const { data: passes } = await supabaseClient
-        .from('visitor_passes')
-        .select('*')
-        .lt('expires_at', new Date().toISOString())
-        .order('expires_at', { ascending: false });
-
-      if (passes && passes.length > 0) {
-        passes.forEach(p => {
-          hasOverstay = true;
-          const item = document.createElement('div');
-          item.className = "p-2 bg-rose-950/80 border border-rose-600 rounded-lg flex justify-between items-center";
-          item.innerHTML = `
-            <div>
-              <p class="font-bold text-rose-300">${p.visitor_name} (${p.pass_type})</p>
-              <p class="text-[10px] text-rose-400">PIN: ${p.access_code} • Expired at ${new Date(p.expires_at).toLocaleTimeString()}</p>
-            </div>
-            <span class="px-2 py-1 bg-rose-600 text-white font-bold rounded text-[10px] uppercase">OVERSTAY</span>
-          `;
-          overstayBox.appendChild(item);
-        });
-      }
-
-      if (!hasOverstay) {
-        overstayBox.innerHTML = `<p class="text-slate-500 italic">No overstayed visitors detected.</p>`;
-      }
     }
 
     async function generatePass() {
@@ -265,69 +207,42 @@
       const type = document.getElementById("res-pass-type").value;
       const btn = document.getElementById("gen-btn");
 
-      if (!name) return alert("Please enter visitor or guest name first");
+      if (!name) return alert("Please enter visitor name first");
 
       btn.disabled = true;
       btn.innerText = "Creating Pass...";
 
-      let passMode = "SINGLE_ENTRY";
-      let hoursAllowed = 2;
-
-      if (type === "HOTEL_LODGE") {
+      let mins = 60;
+      if (type === "MOSQUE" || type === "CHURCH") mins = 240;
+      else if (type === "BAR_LOUNGE") mins = 180;
+      else if (type === "SPA_SALON") mins = 120;
+      else if (type === "RESIDENTIAL") mins = 1440;
+      else if (type === "HOTEL_EVENT") mins = 720;
+      else if (type === "HOTEL_LODGE") {
         const days = parseInt(document.getElementById("res-hotel-days").value);
-        hoursAllowed = days * 24;
-        passMode = "MULTI_ENTRY";
-        lastDurationText = `${days} Day${days > 1 ? 's' : ''} (Hotel Lodging)`;
-      } else if (type === "HOTEL_EVENT") {
-        hoursAllowed = 12;
-        lastDurationText = "12 Hours (Event Pass)";
-      } else if (type === "RESIDENTIAL") {
-        hoursAllowed = 24;
-        lastDurationText = "24 Hours";
-      } else if (type === "MOSQUE" || type === "CHURCH") {
-        hoursAllowed = 4;
-        lastDurationText = "4 Hours (Worship Service)";
-      } else if (type === "BAR_LOUNGE") {
-        hoursAllowed = 3;
-        lastDurationText = "3 Hours";
-      } else if (type === "SPA_SALON") {
-        hoursAllowed = 2;
-        lastDurationText = "2 Hours";
-      } else {
-        hoursAllowed = 1;
-        lastDurationText = "1 Hour (Quick Commercial)";
+        mins = days * 1440;
       }
 
-      const expiresAt = new Date(Date.now() + hoursAllowed * 60 * 60 * 1000).toISOString();
+      lastMinutesAllowed = mins;
+      lastVisitorName = name;
+      lastDurationText = mins >= 1440 ? `${mins/1440} Day(s)` : `${mins/60} Hour(s)`;
+
       const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+      lastGeneratedCode = randomCode;
 
       try {
-        const { data, error } = await supabaseClient.from('visitor_passes').insert([
-          { 
-            visitor_name: name, 
-            access_code: randomCode, 
-            pass_type: type, 
-            pass_mode: passMode,
-            status: 'ACTIVE',
-            expires_at: expiresAt
-          }
-        ]).select();
+        await supabaseClient.from('visitor_passes').insert([
+          { visitor_name: name, access_code: randomCode, pass_type: type, status: 'ACTIVE' }
+        ]);
 
-        if (error) {
-          showStatus("Database Error: " + error.message, "bg-red-900 text-red-200");
-        } else {
-          lastGeneratedCode = randomCode;
-          lastVisitorName = name;
-          lastExpiresAtIso = expiresAt;
-          
-          document.getElementById("pass-code-display").innerText = randomCode;
-          document.getElementById("pass-visitor-display").innerText = "Destination: " + type.replace('_', ' ') + " | Guest: " + name;
-          document.getElementById("pass-validity-display").innerText = `⏱️ Valid for ${lastDurationText}`;
-          document.getElementById("pass-result").classList.remove("hidden");
-          showStatus("Success: Pass active and ready!", "bg-emerald-900 text-emerald-200");
-        }
+        document.getElementById("pass-code-display").innerText = randomCode;
+        document.getElementById("pass-visitor-display").innerText = "Guest: " + name + " (" + type.replace('_', ' ') + ")";
+        document.getElementById("pass-validity-display").innerText = `⏱️ Valid for ${lastDurationText}`;
+        document.getElementById("pass-result").classList.remove("hidden");
       } catch (err) {
-        showStatus("Connection Error: " + err.message, "bg-red-900 text-red-200");
+        alert("Generated locally: " + randomCode);
+        document.getElementById("pass-code-display").innerText = randomCode;
+        document.getElementById("pass-result").classList.remove("hidden");
       } finally {
         btn.disabled = false;
         btn.innerText = "Generate Pass";
@@ -337,8 +252,8 @@
     function shareToWhatsApp() {
       if (!lastGeneratedCode) return;
       const currentUrl = window.location.origin + window.location.pathname;
-      const guestTrackUrl = `${currentUrl}?code=${lastGeneratedCode}&name=${encodeURIComponent(lastVisitorName)}&exp=${encodeURIComponent(lastExpiresAtIso)}`;
-      const message = `*Estate Access Pass*%0A%0A*Visitor / Guest:* ${lastVisitorName}%0A*Access PIN:* ${lastGeneratedCode}%0A*Validity:* ${lastDurationText}%0A%0A*Gate Pass & Live Countdown Link:*%0A${guestTrackUrl}%0A%0APlease open this link when entering the gate.`;
+      const guestLink = `${currentUrl}?code=${lastGeneratedCode}&name=${encodeURIComponent(lastVisitorName)}&mins=${lastMinutesAllowed}`;
+      const message = `*Estate Access Pass*%0A%0A*Visitor:* ${lastVisitorName}%0A*Access PIN:* ${lastGeneratedCode}%0A*Validity:* ${lastDurationText}%0A%0A*Tap to Open Live Pass & Countdown:*%0A${guestLink}`;
       window.open(`https://wa.me/?text=${message}`, '_blank');
     }
 
@@ -357,7 +272,6 @@
 
     async function verifyPass() {
       if (enteredPin.length !== 6) return alert("Enter full 6-digit code");
-
       const resultBox = document.getElementById("gate-result");
       resultBox.classList.remove("hidden");
       resultBox.className = "p-4 rounded-xl text-center bg-slate-700 text-white";
@@ -372,123 +286,95 @@
 
         if (error || !data) {
           resultBox.className = "p-4 rounded-xl text-center bg-red-950 border border-red-600 text-red-300";
-          resultBox.innerHTML = "<h3 class='text-lg font-black'>ACCESS DENIED</h3><p class='text-xs'>Invalid Code / Unregistered</p>";
-        } else if (data.status === 'USED' && data.pass_mode === 'SINGLE_ENTRY') {
+          resultBox.innerHTML = "<h3 class='text-lg font-black'>ACCESS DENIED</h3><p class='text-xs'>Invalid Code</p>";
+        } else if (data.status === 'USED') {
           resultBox.className = "p-4 rounded-xl text-center bg-amber-950 border border-amber-600 text-amber-300";
-          resultBox.innerHTML = `<h3 class='text-lg font-black'>ACCESS DENIED</h3><p class='text-xs font-bold'>Single-Use Pass Already Burned!</p>`;
-        } else if (data.expires_at && new Date() > new Date(data.expires_at)) {
-          resultBox.className = "p-4 rounded-xl text-center bg-rose-950 border border-rose-600 text-rose-300";
-          resultBox.innerHTML = `<h3 class='text-lg font-black'>ACCESS DENIED: EXPIRED</h3>
-            <p class='text-xs font-bold'>Pass reached allocated time limit.</p>`;
+          resultBox.innerHTML = `<h3 class='text-lg font-black'>ACCESS DENIED</h3><p class='text-xs font-bold'>Pass Already Used!</p>`;
         } else {
-          await supabaseClient.from('visitor_passes').update({ 
-            status: data.pass_mode === 'SINGLE_ENTRY' ? 'USED' : 'ACTIVE',
-            entered_at: new Date().toISOString()
-          }).eq('id', data.id);
-
+          await supabaseClient.from('visitor_passes').update({ status: 'USED' }).eq('id', data.id);
           resultBox.className = "p-4 rounded-xl text-center bg-emerald-950 border border-emerald-500 text-emerald-300";
           resultBox.innerHTML = `<h3 class='text-lg font-black text-emerald-400'>ACCESS GRANTED</h3>
             <p class='text-xs font-bold text-white'>Guest: ${data.visitor_name}</p>
-            <p class='text-xs text-slate-300'>Destination: ${data.pass_type.replace('_', ' ')}</p>
-            <p class='text-[10px] text-emerald-400 mt-1 uppercase tracking-wider font-semibold'>
-              ${data.pass_mode === 'MULTI_ENTRY' ? '🏨 Hotel Multi-Entry Active' : 'Pass Burned • Access Logged'}
-            </p>`;
+            <p class='text-[10px] text-emerald-400 mt-1 uppercase tracking-wider font-semibold'>Pass Verified & Burned</p>`;
         }
       } catch (err) {
         resultBox.className = "p-4 rounded-xl text-center bg-red-950 border border-red-600 text-red-300";
-        resultBox.innerHTML = "<p class='text-xs text-red-200'>Error connecting to server</p>";
+        resultBox.innerHTML = "<p class='text-xs text-red-200'>Error verifying code</p>";
       }
     }
 
-    function startGuestCountdown(expiresAt) {
+    // DIRECT SELF-STARTING COUNTDOWN ENGINE
+    function startCountdownEngine(totalSeconds) {
+      let remaining = totalSeconds;
       const display = document.getElementById('guest-countdown');
-      const warning = document.getElementById('guest-expiry-warning');
       const card = document.getElementById('guest-tracker-card');
+      const warning = document.getElementById('guest-expiry-warning');
 
-      if (countdownInterval) clearInterval(countdownInterval);
-
-      function updateClock() {
-        const diff = new Date(expiresAt).getTime() - new Date().getTime();
-
-        if (diff <= 0) {
-          clearInterval(countdownInterval);
+      function tick() {
+        if (remaining <= 0) {
           display.innerText = "TIME EXPIRED";
-          display.className = "text-3xl font-black font-mono text-rose-500 animate-pulse";
-          warning.innerText = "⚠️ Your authorized estate stay time has ended. Please proceed to the exit gate.";
+          display.className = "text-3xl font-black font-mono text-rose-500 animate-pulse py-1";
+          card.className = "p-5 bg-rose-950 border-2 border-rose-600 rounded-2xl space-y-2 text-center shadow-2xl";
+          warning.innerText = "⚠️ Your allocated stay time has ended. Please proceed to the gate exit.";
           warning.className = "text-xs font-bold text-rose-300";
-          card.className = "p-4 bg-rose-950 border-2 border-rose-600 rounded-2xl space-y-2 text-center shadow-2xl";
           return;
         }
 
-        const hrs = Math.floor(diff / (1000 * 60 * 60));
-        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        const hrs = Math.floor(remaining / 3600);
+        const mins = Math.floor((remaining % 3600) / 60);
+        const secs = remaining % 60;
 
         display.innerText = 
           String(hrs).padStart(2, '0') + ":" + 
           String(mins).padStart(2, '0') + ":" + 
           String(secs).padStart(2, '0');
 
-        if (diff < 15 * 60 * 1000) {
-          display.className = "text-4xl font-black font-mono text-amber-400";
-          card.className = "p-4 bg-amber-950/80 border-2 border-amber-500 rounded-2xl space-y-2 text-center shadow-2xl";
-          warning.innerText = "⚠️ Less than 15 minutes remaining on your access pass.";
+        if (remaining < 900) {
+          display.className = "text-5xl font-black font-mono text-amber-400 py-1";
+          card.className = "p-5 bg-amber-950/80 border-2 border-amber-500 rounded-2xl space-y-2 text-center shadow-2xl";
         }
+
+        remaining--;
+        setTimeout(tick, 1000);
       }
 
-      updateClock();
-      countdownInterval = setInterval(updateClock, 1000);
+      tick();
     }
 
-    // ON PAGE LOAD
-    window.addEventListener('DOMContentLoaded', async () => {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
-      const name = params.get('name');
-      const exp = params.get('exp');
+    // DETECT VISITOR LINK OPEN
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const name = urlParams.get('name');
+      const minsParam = urlParams.get('mins');
 
-      if (code && name) {
+      if (code) {
         switchTab('map');
-        document.getElementById('guest-tracker-card').classList.remove('hidden');
+        const trackerCard = document.getElementById('guest-tracker-card');
+        trackerCard.classList.remove('hidden');
+        if (name) document.getElementById('guest-name-box').innerText = `Guest: ${name} (PIN: ${code})`;
 
-        // Immediate fallback from URL timestamp
-        if (exp) {
-          startGuestCountdown(exp);
-        } else {
-          // Backup fetch from database
-          const { data } = await supabaseClient
-            .from('visitor_passes')
-            .select('expires_at')
-            .eq('access_code', code)
-            .single();
-
-          if (data && data.expires_at) {
-            startGuestCountdown(data.expires_at);
-          }
-        }
+        const totalMinutes = minsParam ? parseInt(minsParam) : 240;
+        startCountdownEngine(totalMinutes * 60);
 
         if (navigator.geolocation) {
-          navigator.geolocation.watchPosition(async (pos) => {
+          navigator.geolocation.watchPosition((pos) => {
             const { latitude, longitude } = pos.coords;
             document.getElementById('gps-status').innerText = `📡 GPS Active (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
-
-            await supabaseClient.from('live_locations').upsert({
+            supabaseClient.from('live_locations').upsert({
               pass_code: code,
-              visitor_name: name,
+              visitor_name: name || 'Guest',
               latitude: latitude,
               longitude: longitude,
               updated_at: new Date()
             }, { onConflict: 'pass_code' });
-
-            if (map) {
-              map.setView([latitude, longitude], 16);
-            }
-          }, (err) => {
-            document.getElementById('gps-status').innerText = "Location active.";
+          }, () => {
+            document.getElementById('gps-status').innerText = "📍 GPS Active (Default)";
           }, { enableHighAccuracy: true });
         }
       }
     });
   </script>
 </body>
-</html>
+            </html>
+          
