@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estate Access Control</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen p-4 flex flex-col items-center">
+
+  <div class="w-full max-w-md space-y-6">
+
+    <!-- Status Banner -->
+    <div id="status-banner" class="hidden p-3 rounded-xl text-xs font-mono text-center"></div>
+
+    <!-- Top Tab Bar -->
+    <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+      <button id="tab-resident" onclick="switchTab('resident')" class="flex-1 py-2 rounded-lg font-bold text-sm bg-blue-600 text-white">Resident Portal</button>
+      <button id="tab-guard" onclick="switchTab('guard')" class="flex-1 py-2 rounded-lg font-bold text-sm text-slate-400">Guard Keypad</button>
+    </div>
+
+    <!-- 1. RESIDENT SCREEN -->
+    <div id="view-resident" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
+      <h2 class="text-xl font-bold text-blue-400">Generate Visitor Code</h2>
+      <p class="text-xs text-slate-400">Create an instant 6-digit access OTP for your guest.</p>
+
+      <div>
+        <label class="text-xs font-semibold text-slate-300">Visitor Full Name</label>
+        <input id="res-visitor-name" type="text" placeholder="e.g. John Okoro" class="w-full mt-1 p-3 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500" />
+      </div>
+
+      <div>
+        <label class="text-xs font-semibold text-slate-300">Destination / Pass Category</label>
+        <select id="res-pass-type" class="w-full mt-1 p-3 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none">
+          <option value="RESIDENTIAL">Residential Guest</option>
+          <option value="CHURCH">Church Service Visitor</option>
+          <option value="MOSQUE">Mosque Service Visitor</option>
+          <option value="HOTEL">Hotel / Event Center Guest</option>
+        </select>
+      </div>
+
+      <button id="gen-btn" onclick="generatePass()" class="w-full py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-bold text-lg shadow-lg">Generate Pass</button>
+
+      <!-- Pass Result Display -->
+      <div id="pass-result" class="hidden mt-4 p-4 bg-blue-950 border border-blue-600 rounded-xl text-center space-y-2">
+        <span class="text-xs font-semibold uppercase tracking-wider text-blue-300">Share This PIN With Guest</span>
+        <div id="pass-code-display" class="text-4xl font-extrabold tracking-widest text-emerald-400">000000</div>
+        <p id="pass-visitor-display" class="text-sm font-medium text-slate-300"></p>
+      </div>
+    </div>
+
+    <!-- 2. GUARD TERMINAL SCREEN -->
+    <div id="view-guard" class="hidden bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
+      <h2 class="text-xl font-bold text-emerald-400">Security Gate Keypad</h2>
+      <p class="text-xs text-slate-400">Punch in 6-digit visitor code to grant access.</p>
+
+      <!-- Display Box -->
+      <div class="bg-black p-4 rounded-xl text-center border border-slate-700">
+        <span id="pin-display" class="text-3xl font-mono tracking-widest text-white">------</span>
+      </div>
+
+      <!-- Keypad -->
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="pressKey('1')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">1</button>
+        <button onclick="pressKey('2')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">2</button>
+        <button onclick="pressKey('3')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">3</button>
+        <button onclick="pressKey('4')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">4</button>
+        <button onclick="pressKey('5')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">5</button>
+        <button onclick="pressKey('6')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">6</button>
+        <button onclick="pressKey('7')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">7</button>
+        <button onclick="pressKey('8')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">8</button>
+        <button onclick="pressKey('9')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">9</button>
+        <button onclick="clearPin()" class="py-4 bg-rose-800 text-lg font-bold rounded-xl">CLR</button>
+        <button onclick="pressKey('0')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">0</button>
+        <button onclick="verifyPass()" class="py-4 bg-emerald-600 active:bg-emerald-500 text-lg font-bold rounded-xl">ENTER</button>
+      </div>
+
+      <!-- Result Card -->
+      <div id="gate-result" class="hidden p-4 rounded-xl text-center space-y-1"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_FYbGL09hgU7Fc25ChlXbDw_YpXMjDmS";
+    
+    let supabaseClient = null;
+    try {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (e) {
+      showStatus("Supabase init error: " + e.message, "bg-red-900 text-red-200");
+    }
+
+    let enteredPin = "";
+
+    function showStatus(msg, classes) {
+      const banner = document.getElementById("status-banner");
+      banner.className = "p-3 rounded-xl text-xs font-mono text-center " + classes;
+      banner.innerText = msg;
+      banner.classList.remove("hidden");
+    }
+
+    function switchTab(tab) {
+      const resView = document.getElementById("view-resident");
+      const guardView = document.getElementById("view-guard");
+      const resTab = document.getElementById("tab-resident");
+      const guardTab = document.getElementById("tab-guard");
+
+      if (tab === "resident") {
+        resView.classList.remove("hidden");
+        guardView.classList.add("hidden");
+        resTab.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-blue-600 text-white";
+        guardTab.className = "flex-1 py-2 rounded-lg font-bold text-sm text-slate-400";
+      } else {
+        resView.classList.add("hidden");
+        guardView.classList.remove("hidden");
+        guardTab.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-emerald-600 text-white";
+        resTab.className = "flex-1 py-2 rounded-lg font-bold text-sm text-slate-400";
+      }
+    }
+
+    async function generatePass() {
+      const nameInput = document.getElementById("res-visitor-name");
+      const name = nameInput.value.trim();
+      const type = document.getElementById("res-pass-type").value;
+      const btn = document.getElementById("gen-btn");
+
+      if (!name) {
+        alert("Please enter visitor name first");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Creating Code...";
+
+      const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      try {
+        const { data, error } = await supabaseClient.from('visitor_passes').insert([
+          { visitor_name: name, access_code: randomCode, pass_type: type, status: 'ACTIVE' }
+        ]).select();
+
+        if (error) {
+          showStatus("Database Error: " + error.message, "bg-red-900 text-red-200");
+          alert("Error: " + error.message);
+        } else {
+          document.getElementById("pass-code-display").innerText = randomCode;
+          document.getElementById("pass-visitor-display").innerText = "Guest: " + name + " (" + type + ")";
+          document.getElementById("pass-result").classList.remove("hidden");
+          showStatus("Success: Pass saved to database!", "bg-emerald-900 text-emerald-200");
+        }
+      } catch (err) {
+        showStatus("Connection Error: " + err.message, "bg-red-900 text-red-200");
+        alert("Catch Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Generate Pass";
+      }
+    }
+
+    function pressKey(num) {
+      if (enteredPin.length < 6) {
+        enteredPin += num;
+        document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-");
+      }
+    }
+
+    function clearPin() {
+      enteredPin = "";
+      document.getElementById("pin-display").innerText = "------";
+      document.getElementById("gate-result").classList.add("hidden");
+    }
+
+    async function verifyPass() {
+      if (enteredPin.length !== 6) return alert("Enter full 6-digit code");
+
+      const resultBox = document.getElementById("gate-result");
+      resultBox.classList.remove("hidden");
+      resultBox.innerHTML = "<p class='text-sm font-bold'>Checking gate database...</p>";
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('visitor_passes')
+          .select('*')
+          .eq('access_code', enteredPin)
+          .single();
+
+        if (error || !data) {
+          resultBox.className = "p-4 rounded-xl text-center bg-red-950 border border-red-600 text-red-300";
+          resultBox.innerHTML = "<h3 class='text-lg font-black'>ACCESS DENIED</h3><p class='text-xs'>Invalid Code / Unregistered Guest</p>";
+        } else {
+          resultBox.className = "p-4 rounded-xl text-center bg-emerald-950 border border-emerald-500 text-emerald-300";
+          resultBox.innerHTML = `<h3 class='text-lg font-black text-emerald-400'>ACCESS GRANTED</h3>
+            <p class='text-xs font-bold text-white'>Guest: ${data.visitor_name}</p>
+            <p class='text-xs text-slate-300'>Category: ${data.pass_type}</p>`;
+        }
+      } catch (err) {
+        resultBox.className = "p-4 rounded-xl text-center bg-red-950 border border-red-600 text-red-300";
+        resultBox.innerHTML = "<p class='text-xs text-red-200'>Error connecting to server</p>";
+      }
+    }
+  </script>
+</body>
+</html>
