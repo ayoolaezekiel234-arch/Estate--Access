@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NITEL Estate — Digital Access Control</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 flex flex-col items-center justify-start font-sans select-none">
+
+  <div class="w-full max-w-md space-y-3 pb-8">
+
+    <!-- Header & Hotline -->
+    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-3 shadow-xl">
+      <div class="flex items-center space-x-3">
+        <img 
+          src="nitel-logo.png" 
+          alt="NITEL Crest" 
+          class="w-12 h-12 object-contain rounded-xl"
+          onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';"
+        />
+        <div id="logo-fallback" class="hidden w-12 h-12 bg-blue-600 rounded-xl items-center justify-center font-black text-white text-base">
+          NE
+        </div>
+        <div>
+          <h1 class="text-base font-extrabold tracking-wide text-white uppercase">NITEL Estate</h1>
+          <p class="text-[10px] text-amber-400 font-semibold uppercase">Our Home • Our Community • Our Pride</p>
+        </div>
+      </div>
+
+      <div class="pt-1 border-t border-slate-800">
+        <a href="tel:08108429710" class="w-full py-2 bg-rose-950/80 border border-rose-500/50 text-rose-300 text-xs font-bold rounded-xl flex items-center justify-center gap-2">
+          <span>🚨</span>
+          <span>Security Hotline: 0810 842 9710</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div id="main-nav-bar" class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+      <button id="tab-resident" onclick="switchTab('resident')" class="flex-1 py-2 rounded-lg font-bold text-xs bg-blue-600 text-white">Pass Generator</button>
+      <button id="tab-guard" onclick="switchTab('guard')" class="flex-1 py-2 rounded-lg font-bold text-xs text-slate-400">🔒 Gate Post</button>
+      <button id="tab-pass" onclick="switchTab('pass')" class="flex-1 py-2 rounded-lg font-bold text-xs text-slate-400">My Pass</button>
+    </div>
+
+    <!-- 1. RESIDENT PASS GENERATOR -->
+    <div id="view-resident" class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3 shadow-xl">
+      <div>
+        <h2 class="text-base font-bold text-blue-400">Generate Visitor Pass</h2>
+        <p class="text-[11px] text-slate-400">Fill in details below to generate pass instantly.</p>
+      </div>
+
+      <!-- Host Name -->
+      <div>
+        <label class="text-[11px] font-semibold text-slate-300">Host Resident Name</label>
+        <input id="res-host-name" type="text" placeholder="e.g. Mr. Adeleke" class="w-full mt-1 p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-blue-500" />
+      </div>
+
+      <!-- Estate Address -->
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300">Avenue / Road</label>
+          <select id="res-zone-select" class="w-full mt-1 p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none">
+            <option value="Avenue 1">Avenue 1</option>
+            <option value="Avenue 2">Avenue 2</option>
+            <option value="Avenue 3">Avenue 3</option>
+            <option value="Avenue 4">Avenue 4</option>
+            <option value="Avenue 5">Avenue 5</option>
+            <option value="Road A">Road A</option>
+            <option value="Road B">Road B</option>
+            <option value="Road C">Road C</option>
+            <option value="Road D">Road D</option>
+            <option value="Road E">Road E</option>
+            <option value="Road F">Road F</option>
+            <option value="Road G">Road G</option>
+            <option value="Road H">Road H</option>
+            <option value="Road I">Road I</option>
+            <option value="Road J">Road J</option>
+            <option value="Road K">Road K</option>
+            <option value="Road L">Road L</option>
+            <option value="Road M">Road M</option>
+            <option value="Road N">Road N</option>
+            <option value="Road O">Road O</option>
+            <option value="Road P">Road P</option>
+            <option value="Road Q">Road Q</option>
+            <option value="Road R">Road R</option>
+            <option value="Road S">Road S</option>
+            <option value="Road T">Road T</option>
+            <option value="Road U">Road U</option>
+            <option value="Commercial Wing">Commercial Wing</option>
+            <option value="Worship Axis">Worship Center Axis</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300">Plot / Flat</label>
+          <input id="res-house-no" type="text" placeholder="e.g. Plot 12" class="w-full mt-1 p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-blue-500" />
+        </div>
+      </div>
+
+      <!-- Visitor Name -->
+      <div>
+        <label class="text-[11px] font-semibold text-slate-300">Visitor Full Name</label>
+        <input id="res-visitor-name" type="text" placeholder="e.g. Emmanuel Chukwu" class="w-full mt-1 p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-blue-500" />
+      </div>
+
+      <!-- Destination Category -->
+      <div>
+        <label class="text-[11px] font-semibold text-slate-300">Visit Category</label>
+        <select id="res-pass-type" class="w-full mt-1 p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none">
+          <option value="Residential Guest">Residential Guest (24 Hours)</option>
+          <option value="Artisan / Delivery">Artisan / Delivery (2 Hours)</option>
+          <option value="Mosque Service">Mosque Service (4 Hours)</option>
+          <option value="Church Service">Church Service (4 Hours)</option>
+          <option value="Supermarket">Supermarket / Retail (1 Hour)</option>
+          <option value="Hotel / Shortlet">Hotel / Short-let Stay (7 Days)</option>
+        </select>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        id="gen-btn" 
+        type="button" 
+        onclick="executePassGeneration()" 
+        class="w-full py-3.5 bg-blue-600 active:bg-blue-800 text-white font-black text-sm rounded-xl shadow-lg shadow-blue-600/40 uppercase tracking-wider"
+      >
+        ⚡ Generate Pass Now
+      </button>
+
+      <!-- Pass Card Output Display -->
+      <div id="pass-result" class="hidden mt-3 p-4 bg-blue-950 border-2 border-emerald-500 rounded-2xl text-center space-y-2">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Official NITEL Gate Pass</span>
+        <div id="pass-code-display" class="text-5xl font-black tracking-widest text-emerald-400 font-mono py-1">000000</div>
+        <p id="pass-visitor-display" class="text-xs font-bold text-white"></p>
+        <p id="pass-host-display" class="text-[11px] text-slate-300"></p>
+        <p id="pass-validity-display" class="text-[11px] font-mono text-amber-300"></p>
+
+        <button type="button" onclick="shareToWhatsApp()" class="w-full mt-2 py-3 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-xs text-white flex items-center justify-center gap-1.5 shadow-md">
+          <span>📲 Share Pass via WhatsApp</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. GUARD TERMINAL -->
+    <div id="view-guard" class="hidden space-y-3">
+      
+      <!-- Lock Screen -->
+      <div id="guard-auth-box" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 text-center space-y-3 shadow-xl">
+        <span class="text-3xl">🛡️</span>
+        <h2 class="text-base font-bold text-white">Security Gate Terminal</h2>
+        <p class="text-xs text-slate-400">Enter Guard PIN (NCDA / 6232)</p>
+        <input id="guard-master-pin" type="password" maxlength="4" placeholder="••••" class="w-32 mx-auto p-2 text-center tracking-widest font-mono text-xl bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500" />
+        <button type="button" onclick="unlockGuardTerminal()" class="w-full py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-xs">Unlock Terminal</button>
+      </div>
+
+      <!-- Unlocked Keypad -->
+      <div id="guard-terminal-box" class="hidden space-y-3">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3 shadow-xl">
+          <div class="flex justify-between items-center">
+            <h2 class="text-sm font-bold text-emerald-400">Security Gate Keypad</h2>
+            <button type="button" onclick="lockGuardTerminal()" class="text-[10px] text-slate-400 underline">Lock</button>
+          </div>
+
+          <div class="bg-black p-3 rounded-xl text-center border border-slate-800">
+            <span id="pin-display" class="text-3xl font-mono tracking-widest text-emerald-400">------</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="pressKey('1')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">1</button>
+            <button type="button" onclick="pressKey('2')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">2</button>
+            <button type="button" onclick="pressKey('3')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">3</button>
+            <button type="button" onclick="pressKey('4')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">4</button>
+            <button type="button" onclick="pressKey('5')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">5</button>
+            <button type="button" onclick="pressKey('6')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">6</button>
+            <button type="button" onclick="pressKey('7')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">7</button>
+            <button type="button" onclick="pressKey('8')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">8</button>
+            <button type="button" onclick="pressKey('9')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">9</button>
+            <button type="button" onclick="clearPin()" class="py-3 bg-rose-900 text-xs font-bold rounded-xl">CLR</button>
+            <button type="button" onclick="pressKey('0')" class="py-3 bg-slate-800 active:bg-slate-700 text-lg font-bold rounded-xl">0</button>
+            <button type="button" onclick="verifyPass()" class="py-3 bg-emerald-600 active:bg-emerald-500 text-xs font-bold rounded-xl">ENTER</button>
+          </div>
+
+          <div id="gate-result" class="hidden p-3 rounded-xl text-center space-y-1"></div>
+        </div>
+
+        <!-- Guard Emergency Pass -->
+        <div class="bg-slate-900 p-4 rounded-2xl border border-amber-500/30 space-y-2">
+          <h3 class="text-xs font-bold text-amber-400 uppercase">Emergency Walk-In Pass</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <input id="guard-manual-name" type="text" placeholder="Name" class="p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white outline-none" />
+            <input id="guard-manual-plot" type="text" placeholder="Plot/Purpose" class="p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white outline-none" />
+          </div>
+          <button type="button" onclick="generateGuardEmergencyPass()" class="w-full py-2 bg-amber-600 font-bold text-xs text-slate-950 rounded-lg">
+            Grant Immediate Entry
+          </button>
+        </div>
+
+        <!-- Recent Logs -->
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-[11px] font-bold text-slate-300 uppercase">Recent Entries</span>
+            <button type="button" onclick="loadRecentLogs()" class="text-[10px] text-blue-400">🔄 Refresh</button>
+          </div>
+          <div id="recent-logs-list" class="space-y-1 max-h-36 overflow-y-auto text-xs">
+            <p class="text-[11px] text-slate-500 italic">No entries yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. VISITOR LIVE PASS & STAY TIMER -->
+    <div id="view-pass" class="hidden space-y-4">
+      <div class="p-6 bg-slate-900 border border-slate-800 rounded-3xl space-y-4 text-center shadow-2xl">
+        <span class="text-[10px] font-black tracking-widest text-emerald-400 uppercase">NITEL Estate Digital Pass</span>
+        <div id="guest-code-hero" class="text-4xl font-black tracking-widest text-white font-mono py-1">------</div>
+        <div class="text-xs space-y-0.5">
+          <p id="guest-name-box" class="font-bold text-slate-200">Visitor Pass Active</p>
+          <p id="guest-dest-box" class="text-[11px] text-slate-400"></p>
+        </div>
+        
+        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1 shadow-inner">
+          <span class="text-[10px] font-mono uppercase text-slate-400">Authorized Stay Remaining</span>
+          <div id="guest-countdown" class="text-5xl font-black font-mono text-emerald-400 py-1">00:00:00</div>
+          <p id="guest-expiry-warning" class="text-[11px] text-slate-400">Present this PIN to security at the gate post.</p>
+        </div>
+
+        <button id="exit-estate-btn" type="button" onclick="leaveEstateSelf()" class="w-full py-3 bg-rose-700 active:bg-rose-800 rounded-xl font-bold text-xs text-white shadow-lg">
+          <span>🚪 I Have Left NITEL Estate</span>
+        </button>
+
+        <div id="exit-confirmed-msg" class="hidden p-3.5 bg-emerald-950 border border-emerald-500 rounded-2xl text-xs text-emerald-300 font-medium">
+          <p class="text-sm font-bold text-emerald-400">✅ Checked Out Successfully</p>
+          <p class="text-[11px]">Thank you for visiting NITEL Estate. Your pass is closed.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    var GUARD_MASTER_PIN = "6232";
+    var enteredPin = "";
+    var lastGeneratedCode = "";
+    var lastVisitorName = "";
+    var lastHostInfo = "";
+    var lastTargetExpiryTime = 0;
+    var lastDurationText = "";
+    var currentGuestCode = "";
+    var countdownTimer = null;
+
+    function getLocalPasses() {
+      try {
+        var str = localStorage.getItem("nitel_passes_data");
+        return str ? JSON.parse(str) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveLocalPass(obj) {
+      try {
+        var list = getLocalPasses();
+        list.unshift(obj);
+        localStorage.setItem("nitel_passes_data", JSON.stringify(list.slice(0, 50)));
+      } catch (e) {}
+    }
+
+    function switchTab(tab) {
+      var rV = document.getElementById("view-resident");
+      var gV = document.getElementById("view-guard");
+      var pV = document.getElementById("view-pass");
+      var rT = document.getElementById("tab-resident");
+      var gT = document.getElementById("tab-guard");
+      var pT = document.getElementById("tab-pass");
+
+      rV.style.display = "none";
+      gV.style.display = "none";
+      pV.style.display = "none";
+
+      rT.className = "flex-1 py-2 rounded-lg font-bold text-xs text-slate-400";
+      gT.className = "flex-1 py-2 rounded-lg font-bold text-xs text-slate-400";
+      pT.className = "flex-1 py-2 rounded-lg font-bold text-xs text-slate-400";
+
+      if (tab === 'resident') {
+        rV.style.display = "block";
+        rT.className = "flex-1 py-2 rounded-lg font-bold text-xs bg-blue-600 text-white";
+      } else if (tab === 'guard') {
+        gV.style.display = "block";
+        gT.className = "flex-1 py-2 rounded-lg font-bold text-xs bg-emerald-600 text-white";
+      } else if (tab === 'pass') {
+        pV.style.display = "block";
+        pT.className = "flex-1 py-2 rounded-lg font-bold text-xs bg-cyan-600 text-white";
+      }
+    }
+
+    function executePassGeneration() {
+      var visitorName = (document.getElementById("res-visitor-name").value || "").trim();
+      var hostName = (document.getElementById("res-host-name").value || "").trim();
+      var zone = document.getElementById("res-zone-select").value || "Avenue 1";
+      var houseNo = (document.getElementById("res-house-no").value || "").trim();
+      var type = document.getElementById("res-pass-type").value || "Residential Guest";
+
+      if (!visitorName) {
+        alert("Please enter the Visitor Name.");
+        return;
+      }
+
+      var code = String(Math.floor(100000 + Math.random() * 900000));
+      lastGeneratedCode = code;
+      lastVisitorName = visitorName;
+      lastHostInfo = (hostName || "Host Resident") + " (" + zone + (houseNo ? " - " + houseNo : "") + ")";
+      lastDurationText = "24 Hours";
+      lastTargetExpiryTime = Date.now() + (24 * 3600 * 1000);
+
+      // Save pass
+      saveLocalPass({
+        code: code,
+        visitor: visitorName,
+        host: lastHostInfo,
+        type: type,
+        status: "ACTIVE"
+      });
+
+      // Update UI
+      document.getElementById("pass-code-display").innerText = code;
+      document.getElementById("pass-visitor-display").innerText = "Visitor: " + visitorName;
+      document.getElementById("pass-host-display").innerText = "Destination: " + lastHostInfo;
+      document.getElementById("pass-validity-display").innerText = "⏱️ Pass Active (24 Hours)";
+
+      var resCard = document.getElementById("pass-result");
+      resCard.style.display = "block";
+      resCard.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function shareToWhatsApp() {
+      if (!lastGeneratedCode) return;
+      var baseUrl = window.location.origin + window.location.pathname;
+      var link = baseUrl + "?code=" + lastGeneratedCode + "&name=" + encodeURIComponent(lastVisitorName) + "&host=" + encodeURIComponent(lastHostInfo) + "&exp=" + lastTargetExpiryTime;
+      var msg = "*NITEL ESTATE ACCESS PASS*\n\n*Visitor:* " + lastVisitorName + "\n*Host:* " + lastHostInfo + "\n*Access Code:* " + lastGeneratedCode + "\n\n*Live Gate Pass Link:*\n" + link;
+      window.open("https://wa.me/?text=" + encodeURIComponent(msg), '_blank');
+    }
+
+    function unlockGuardTerminal() {
+      var pin = (document.getElementById("guard-master-pin").value || "").trim();
+      if (pin === GUARD_MASTER_PIN) {
+        document.getElementById("guard-auth-box").style.display = "none";
+        document.getElementById("guard-terminal-box").style.display = "block";
+        loadRecentLogs();
+      } else {
+        alert("Incorrect Guard Master PIN (6232)");
+      }
+    }
+
+    function lockGuardTerminal() {
+      document.getElementById("guard-master-pin").value = "";
+      document.getElementById("guard-auth-box").style.display = "block";
+      document.getElementById("guard-terminal-box").style.display = "none";
+    }
+
+    function pressKey(n) {
+      if (enteredPin.length < 6) {
+        enteredPin += n;
+        document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-");
+      }
+    }
+
+    function clearPin() {
+      enteredPin = "";
+      document.getElementById("pin-display").innerText = "------";
+      document.getElementById("gate-result").style.display = "none";
+    }
+
+    function verifyPass() {
+      if (enteredPin.length !== 6) {
+        alert("Enter full 6-digit code");
+        return;
+      }
+      var res = document.getElementById("gate-result");
+      res.style.display = "block";
+
+      var passes = getLocalPasses();
+      var found = null;
+      for (var i = 0; i < passes.length; i++) {
+        if (passes[i].code === enteredPin) {
+          found = passes[i];
+          break;
+        }
+      }
+
+      if (!found) {
+        res.className = "p-3 rounded-xl text-center bg-red-950 border border-red-600 text-red-300";
+        res.i
