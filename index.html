@@ -63,8 +63,8 @@
         <label class="text-[11px] font-bold text-blue-300 flex items-center gap-1">
           <span>🔑 Official Resident Passcode</span>
         </label>
-        <input id="res-passcode-auth" type="password" placeholder="Enter CDA Resident Passcode" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white outline-none focus:border-blue-400 tracking-wider" />
-        <p class="text-[10px] text-slate-400 italic">Issued on official NITEL Estate WhatsApp Group.</p>
+        <input id="res-passcode-auth" type="text" placeholder="Enter NITEL2026" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white outline-none focus:border-blue-400 tracking-wider font-mono" />
+        <p class="text-[10px] text-slate-400 italic">Passcode: <b class="text-blue-300">NITEL2026</b></p>
       </div>
 
       <!-- Host Identification -->
@@ -191,7 +191,7 @@
       <div id="guard-auth-box" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 text-center space-y-3 shadow-xl">
         <span class="text-3xl">🛡️</span>
         <h2 class="text-base font-bold text-white">Security Gate Terminal</h2>
-        <p class="text-xs text-slate-400">Enter Security Master PIN (NCDA) to unlock gate keypad.</p>
+        <p class="text-xs text-slate-400">Enter Security Master PIN (NCDA / 6232) to unlock gate keypad.</p>
         <input id="guard-master-pin" type="password" maxlength="4" placeholder="••••" class="w-32 mx-auto p-2 text-center tracking-widest font-mono text-xl bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500" />
         <button onclick="unlockGuardTerminal()" class="w-full py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-xs">Unlock Terminal</button>
       </div>
@@ -311,7 +311,7 @@
     const SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_FYbGL09hgU7Fc25ChlXbDw_YpXMjDmS";
     const GUARD_MASTER_PIN = "6232"; // N-C-D-A
-    const OFFICIAL_RESIDENT_PASSCODE = "NITEL2026"; // Resident secret passkey
+    const OFFICIAL_RESIDENT_PASSCODE = "NITEL2026";
 
     let supabaseClient = null;
 
@@ -340,4 +340,5 @@
     }
 
     function switchTab(tab) {
-      const resView = document.getElementB
+      const resView = document.getElementById("view-resident");
+   
