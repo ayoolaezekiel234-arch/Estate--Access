@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>NITEL Estate — Access Portal</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="apple-touch-icon" href="/nitel-logo.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: #020617; color: #f8fafc; padding: 12px; display: flex; justify-content: center; }
@@ -228,6 +236,17 @@
 
   </div>
 
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function(err) {
+          console.warn('Service Worker registration note:', err);
+        });
+      });
+    }
+  </script>
+
   <script>
     var GUARD_MASTER_PIN = "6232";
     var RESIDENT_PASSCODE = "NITEL2026";
@@ -364,64 +383,4 @@
         res.style.background = "#450a0a";
         res.style.color = "#fca5a5";
         res.innerHTML = "<b>ACCESS DENIED</b><br><small>Invalid Code</small>";
-      } else if (found.status === 'USED') {
-        res.style.background = "#451a03";
-        res.style.color = "#fcd34d";
-        res.innerHTML = "<b>ACCESS DENIED</b><br><small>Pass Already Used</small>";
-      } else {
-        found.status = 'USED';
-        saveStorage(records);
-        res.style.background = "#022c22";
-        res.style.color = "#6ee7b7";
-        res.innerHTML = "<b>ACCESS GRANTED</b><br><small>" + found.visitor + " — " + found.host + "</small>";
-      }
-    }
-
-    function checkoutVisitor() {
-      if (!confirm("Confirm you have exited NITEL Estate?")) return;
-      if (timerInterval) clearInterval(timerInterval);
-      document.getElementById("exit-estate-btn").style.display = "none";
-      document.getElementById("exit-confirmed-msg").style.display = "block";
-      document.getElementById("guest-countdown").innerText = "EXITED";
-    }
-
-    function runTimer(exp) {
-      var disp = document.getElementById("guest-countdown");
-      if (timerInterval) clearInterval(timerInterval);
-      function update() {
-        var diff = exp - Date.now();
-        if (diff <= 0) {
-          clearInterval(timerInterval);
-          disp.innerText = "EXPIRED";
-          disp.style.color = "#f43f5e";
-          return;
-        }
-        var s = Math.floor(diff / 1000);
-        var hrs = Math.floor(s / 3600);
-        var mins = Math.floor((s % 3600) / 60);
-        var secs = s % 60;
-        disp.innerText = (hrs < 10 ? '0' : '') + hrs + ":" + (mins < 10 ? '0' : '') + mins + ":" + (secs < 10 ? '0' : '') + secs;
-      }
-      update();
-      timerInterval = setInterval(update, 1000);
-    }
-
-    window.onload = function() {
-      var urlParams = new URLSearchParams(window.location.search);
-      var code = urlParams.get("code");
-      var name = urlParams.get("name");
-      var host = urlParams.get("host");
-      var exp = urlParams.get("exp");
-
-      if (code) {
-        document.getElementById("main-nav-bar").style.display = "none";
-        switchTab("pass");
-        document.getElementById("guest-code-hero").innerText = code;
-        if (name) document.getElementById("guest-name-box").innerText = "Visitor: " + name;
-        if (host) document.getElementById("guest-dest-box").innerText = "Host: " + host;
-        runTimer(exp ? parseInt(exp) : (Date.now() + 4 * 3600 * 1000));
-      }
-    };
-  </script>
-</body>
-</html>
+      } else
