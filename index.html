@@ -79,7 +79,7 @@
         </div>
       </div>
 
-      <!-- Estate Verified Address Selection -->
+      <!-- Estate Address -->
       <div class="grid grid-cols-2 gap-2.5">
         <div>
           <label class="text-[11px] font-semibold text-slate-300">Estate Zone / Road</label>
@@ -170,39 +170,70 @@
       </div>
 
       <!-- Unlocked Keypad Terminal -->
-      <div id="guard-terminal-box" class="hidden bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
-        <div class="flex justify-between items-center">
-          <div>
-            <h2 class="text-base font-bold text-emerald-400">Gate Verification Keypad</h2>
-            <p class="text-[10px] text-slate-400 font-mono">Main Security Terminal Active</p>
+      <div id="guard-terminal-box" class="hidden space-y-4">
+        
+        <!-- Keypad Box -->
+        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-base font-bold text-emerald-400">Gate Verification Keypad</h2>
+              <p class="text-[10px] text-slate-400 font-mono">Main Security Terminal Active</p>
+            </div>
+            <button onclick="lockGuardTerminal()" class="text-[10px] text-slate-400 underline">Lock Terminal</button>
           </div>
-          <button onclick="lockGuardTerminal()" class="text-[10px] text-slate-400 underline">Lock Terminal</button>
+
+          <div class="bg-black p-3.5 rounded-xl text-center border border-slate-800">
+            <span id="pin-display" class="text-3xl font-mono tracking-widest text-emerald-400">------</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="pressKey('1')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">1</button>
+            <button onclick="pressKey('2')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">2</button>
+            <button onclick="pressKey('3')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">3</button>
+            <button onclick="pressKey('4')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">4</button>
+            <button onclick="pressKey('5')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">5</button>
+            <button onclick="pressKey('6')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">6</button>
+            <button onclick="pressKey('7')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">7</button>
+            <button onclick="pressKey('8')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">8</button>
+            <button onclick="pressKey('9')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">9</button>
+            <button onclick="clearPin()" class="py-3.5 bg-rose-900/80 active:bg-rose-900 text-xs font-bold rounded-xl">CLR</button>
+            <button onclick="pressKey('0')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">0</button>
+            <button id="verify-btn" onclick="verifyPass()" class="py-3.5 bg-emerald-600 active:bg-emerald-500 text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30">ENTER</button>
+          </div>
+
+          <div id="gate-result" class="hidden p-3 rounded-xl text-center space-y-1"></div>
         </div>
 
-        <div class="bg-black p-3.5 rounded-xl text-center border border-slate-800">
-          <span id="pin-display" class="text-3xl font-mono tracking-widest text-emerald-400">------</span>
-        </div>
+        <!-- Guard Emergency / Manual Pass Issue Section -->
+        <div class="bg-slate-900 p-4 rounded-2xl border border-amber-500/30 space-y-2.5 shadow-xl">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+              <span>⚠️ Gate Emergency Manual Pass</span>
+            </h3>
+            <span class="text-[9px] bg-amber-950 text-amber-300 px-2 py-0.5 rounded font-mono">Guard Override</span>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-tight">
+            For residents without phones, dead batteries, or verified direct walk-ins.
+          </p>
 
-        <div class="grid grid-cols-3 gap-2">
-          <button onclick="pressKey('1')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">1</button>
-          <button onclick="pressKey('2')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">2</button>
-          <button onclick="pressKey('3')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">3</button>
-          <button onclick="pressKey('4')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">4</button>
-          <button onclick="pressKey('5')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">5</button>
-          <button onclick="pressKey('6')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">6</button>
-          <button onclick="pressKey('7')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">7</button>
-          <button onclick="pressKey('8')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">8</button>
-          <button onclick="pressKey('9')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">9</button>
-          <button onclick="clearPin()" class="py-3.5 bg-rose-900/80 active:bg-rose-900 text-xs font-bold rounded-xl">CLR</button>
-          <button onclick="pressKey('0')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">0</button>
-          <button id="verify-btn" onclick="verifyPass()" class="py-3.5 bg-emerald-600 active:bg-emerald-500 text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30">ENTER</button>
-        </div>
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <input id="guard-manual-name" type="text" placeholder="Resident / Guest Name" class="p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white outline-none focus:border-amber-400" />
+            <input id="guard-manual-plot" type="text" placeholder="Plot / Flat / Purpose" class="p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white outline-none focus:border-amber-400" />
+          </div>
 
-        <div id="gate-result" class="hidden p-3 rounded-xl text-center space-y-1"></div>
+          <button onclick="generateGuardEmergencyPass()" class="w-full py-2 bg-amber-600 active:bg-amber-700 text-slate-950 font-black text-xs rounded-lg transition shadow">
+            Issue & Grant Gate Entry
+          </button>
+
+          <div id="guard-manual-result" class="hidden p-2.5 bg-slate-950 border border-amber-500 rounded-xl text-center space-y-0.5">
+            <p class="text-[10px] text-amber-400 font-bold uppercase">Manual Pass Created & Verified</p>
+            <p id="guard-manual-code" class="text-2xl font-black text-emerald-400 font-mono tracking-widest">------</p>
+          </div>
+        </div>
 
         <!-- Recent Entry Feed -->
-        <div class="pt-2 border-t border-slate-800">
-          <div class="flex justify-between items-center mb-2">
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-xl space-y-2">
+          <div class="flex justify-between items-center">
             <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Recent Gate Entries</span>
             <button onclick="loadRecentLogs()" class="text-[10px] text-blue-400 font-semibold">🔄 Refresh Log</button>
           </div>
@@ -210,6 +241,7 @@
             <p class="text-[11px] text-slate-500 italic">No entry logs loaded.</p>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -310,267 +342,4 @@
       const pin = document.getElementById("guard-master-pin").value;
       if (pin === GUARD_MASTER_PIN) {
         document.getElementById("guard-auth-box").classList.add("hidden");
-        document.getElementById("guard-terminal-box").classList.remove("hidden");
-        loadRecentLogs();
-      } else {
-        alert("Incorrect Guard Master PIN (NCDA / 6232)");
-      }
-    }
-
-    function lockGuardTerminal() {
-      document.getElementById("guard-master-pin").value = "";
-      document.getElementById("guard-auth-box").classList.remove("hidden");
-      document.getElementById("guard-terminal-box").classList.add("hidden");
-    }
-
-    async function generatePass() {
-      const authKey = document.getElementById("res-passcode-auth").value.trim();
-      const visitorInput = document.getElementById("res-visitor-name");
-      const hostInput = document.getElementById("res-host-name");
-      const hostPhoneInput = document.getElementById("res-host-phone");
-      const zoneSelect = document.getElementById("res-zone-select");
-      const houseInput = document.getElementById("res-house-no");
-
-      // Verify Resident CDA Passcode
-      if (authKey.toUpperCase() !== OFFICIAL_RESIDENT_PASSCODE) {
-        return alert("❌ Invalid Resident Passcode. Pass creation is restricted to verified NITEL Estate residents.");
-      }
-
-      const visitorName = visitorInput ? visitorInput.value.trim() : "";
-      const hostName = hostInput ? hostInput.value.trim() : "";
-      const hostPhone = hostPhoneInput ? hostPhoneInput.value.trim() : "";
-      const zone = zoneSelect ? zoneSelect.value : "";
-      const houseNo = houseInput ? houseInput.value.trim() : "";
-      const type = document.getElementById("res-pass-type").value;
-      const btn = document.getElementById("gen-btn");
-
-      if (!visitorName) return alert("Please enter visitor's full name");
-      if (!hostName || !houseNo || !hostPhone) return alert("Please enter your name, phone number, and address");
-
-      btn.disabled = true;
-      btn.innerText = "Authorizing Pass...";
-
-      let mins = 60;
-      if (type === "MOSQUE" || type === "CHURCH") mins = 240;
-      else if (type === "BAR_LOUNGE") mins = 180;
-      else if (type === "SPA_SALON" || type === "ARTISAN_TECH") mins = 120;
-      else if (type === "RESIDENTIAL") mins = 1440;
-      else if (type === "HOTEL_EVENT") mins = 720;
-      else if (type === "HOTEL_LODGE") {
-        const days = parseInt(document.getElementById("res-hotel-days").value || "7");
-        mins = days * 1440;
-      }
-
-      lastTargetExpiryTime = Date.now() + (mins * 60 * 1000);
-      lastVisitorName = visitorName;
-      lastHostInfo = `${hostName} (${zone} - ${houseNo})`;
-      lastDurationText = mins >= 1440 ? `${mins/1440} Day(s)` : `${mins/60} Hour(s)`;
-
-      const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
-      lastGeneratedCode = randomCode;
-
-      document.getElementById("pass-code-display").innerText = randomCode;
-      document.getElementById("pass-visitor-display").innerText = "Visitor: " + visitorName;
-      document.getElementById("pass-host-display").innerText = `Host: ${hostName} • ${zone}, ${houseNo} (Tel: ${hostPhone})`;
-      document.getElementById("pass-validity-display").innerText = `⏱️ Valid for ${lastDurationText}`;
-      document.getElementById("pass-result").classList.remove("hidden");
-
-      try {
-        if (supabaseClient) {
-          await supabaseClient.from('visitor_passes').insert([
-            { 
-              visitor_name: visitorName, 
-              access_code: randomCode, 
-              pass_type: type, 
-              status: 'ACTIVE',
-              resident_name: hostName,
-              house_number: `${zone} - ${houseNo} [${hostPhone}]`
-            }
-          ]);
-        }
-      } catch (err) {
-        console.warn("Database sync notice:", err);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Authorize & Generate Pass";
-      }
-    }
-
-    function shareToWhatsApp() {
-      if (!lastGeneratedCode) return;
-      const baseUrl = window.location.origin + window.location.pathname;
-      const cleanName = encodeURIComponent(lastVisitorName);
-      const cleanHost = encodeURIComponent(lastHostInfo);
-      const guestLink = `${baseUrl}?code=${lastGeneratedCode}&name=${cleanName}&host=${cleanHost}&exp=${lastTargetExpiryTime}`;
-      
-      const fullText = `*NITEL ESTATE OFFICIAL ACCESS PASS*\n\n` +
-        `*Visitor:* ${lastVisitorName}\n` +
-        `*Host Destination:* ${lastHostInfo}\n` +
-        `*Access PIN:* ${lastGeneratedCode}\n` +
-        `*Validity:* ${lastDurationText}\n\n` +
-        `*Live Gate Pass Link:*\n` +
-        guestLink;
-
-      window.open(`https://wa.me/?text=${encodeURIComponent(fullText)}`, '_blank');
-    }
-
-    function pressKey(num) {
-      if (enteredPin.length < 6) {
-        enteredPin += num;
-        document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-");
-      }
-    }
-
-    function clearPin() {
-      enteredPin = "";
-      document.getElementById("pin-display").innerText = "------";
-      document.getElementById("gate-result").classList.add("hidden");
-    }
-
-    async function verifyPass() {
-      if (enteredPin.length !== 6) return alert("Enter full 6-digit code");
-      const resultBox = document.getElementById("gate-result");
-      resultBox.classList.remove("hidden");
-      resultBox.className = "p-3 rounded-xl text-center bg-slate-800 text-white";
-      resultBox.innerHTML = "<p class='text-xs font-bold'>Checking gate database...</p>";
-
-      try {
-        if (!supabaseClient) throw new Error("Supabase client offline");
-
-        const { data, error } = await supabaseClient
-          .from('visitor_passes')
-          .select('*')
-          .eq('access_code', enteredPin)
-          .single();
-
-        if (error || !data) {
-          resultBox.className = "p-3 rounded-xl text-center bg-red-950 border border-red-600 text-red-300";
-          resultBox.innerHTML = "<h3 class='text-base font-black'>ACCESS DENIED</h3><p class='text-[11px]'>Invalid Access PIN</p>";
-        } else if (data.status === 'USED') {
-          resultBox.className = "p-3 rounded-xl text-center bg-amber-950 border border-amber-600 text-amber-300";
-          resultBox.innerHTML = `<h3 class='text-base font-black'>ACCESS DENIED</h3><p class='text-[11px] font-bold'>Pass Already Used / Burned!</p>`;
-        } else if (data.status === 'EXITED') {
-          resultBox.className = "p-3 rounded-xl text-center bg-rose-950 border border-rose-600 text-rose-300";
-          resultBox.innerHTML = `<h3 class='text-base font-black'>ACCESS DENIED</h3><p class='text-[11px] font-bold'>Pass Checked Out / Closed</p>`;
-        } else {
-          if (data.pass_type !== 'HOTEL_LODGE') {
-            await supabaseClient.from('visitor_passes').update({ status: 'USED' }).eq('id', data.id);
-          }
-          
-          resultBox.className = "p-3 rounded-xl text-center bg-emerald-950 border border-emerald-500 text-emerald-300";
-          resultBox.innerHTML = `<h3 class='text-base font-black text-emerald-400'>ACCESS GRANTED</h3>
-            <p class='text-xs font-bold text-white'>Visitor: ${data.visitor_name}</p>
-            <p class='text-[11px] text-slate-300'>Host: ${data.resident_name || 'Resident'} (${data.house_number || 'NITEL Estate'})</p>
-            <p class='text-[10px] text-emerald-400 mt-0.5 uppercase tracking-wider font-semibold'>${data.pass_type} Pass Verified</p>`;
-          
-          loadRecentLogs();
-        }
-      } catch (err) {
-        resultBox.className = "p-3 rounded-xl text-center bg-red-950 border border-red-600 text-red-300";
-        resultBox.innerHTML = "<p class='text-xs text-red-200'>Code check failed or database offline</p>";
-      }
-    }
-
-    async function loadRecentLogs() {
-      const container = document.getElementById("recent-logs-list");
-      try {
-        if (!supabaseClient) return;
-        const { data } = await supabaseClient
-          .from('visitor_passes')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(6);
-
-        if (!data || data.length === 0) {
-          container.innerHTML = "<p class='text-[11px] text-slate-500 italic'>No recent passes created.</p>";
-          return;
-        }
-
-        container.innerHTML = data.map(log => `
-          <div class="p-2 bg-slate-950 border border-slate-800 rounded-lg flex justify-between items-center">
-            <div>
-              <p class="font-bold text-white text-[11px]">${log.visitor_name}</p>
-              <p class="text-[10px] text-slate-400">${log.resident_name || 'Resident'} • ${log.house_number || 'Plot'} (${log.pass_type})</p>
-            </div>
-            <span class="px-2 py-0.5 text-[9px] font-mono font-bold rounded ${log.status === 'USED' ? 'bg-emerald-950 text-emerald-400 border border-emerald-600' : 'bg-blue-950 text-blue-400'}">${log.status}</span>
-          </div>
-        `).join('');
-      } catch (e) {
-        container.innerHTML = "<p class='text-[11px] text-slate-500 italic'>Failed to load logs.</p>";
-      }
-    }
-
-    async function leaveEstateSelf() {
-      if (!confirm("Confirm you have completed your visit and left NITEL Estate?")) return;
-      if (countdownTimer) clearInterval(countdownTimer);
-
-      if (currentGuestCode && supabaseClient) {
-        await supabaseClient.from('visitor_passes').update({ status: 'EXITED' }).eq('access_code', currentGuestCode);
-      }
-
-      document.getElementById('exit-estate-btn').classList.add('hidden');
-      document.getElementById('exit-confirmed-msg').classList.remove('hidden');
-      document.getElementById('guest-countdown').innerText = "EXITED";
-      document.getElementById('guest-countdown').className = "text-2xl font-black font-mono text-slate-500 py-1";
-    }
-
-    function startPersistentCountdown(targetExpiryMs) {
-      const display = document.getElementById('guest-countdown');
-      const warning = document.getElementById('guest-expiry-warning');
-      if (countdownTimer) clearInterval(countdownTimer);
-
-      function update() {
-        const diffMs = targetExpiryMs - Date.now();
-
-        if (diffMs <= 0) {
-          clearInterval(countdownTimer);
-          display.innerText = "EXPIRED";
-          display.className = "text-3xl font-black font-mono text-rose-500 animate-pulse py-1";
-          warning.innerText = "⚠️ Authorized visit time has ended. Please proceed to the exit gate.";
-          warning.className = "text-[11px] font-bold text-rose-400";
-          return;
-        }
-
-        const totalSeconds = Math.floor(diffMs / 1000);
-        const hrs = Math.floor(totalSeconds / 3600);
-        const mins = Math.floor((totalSeconds % 3600) / 60);
-        const secs = totalSeconds % 60;
-
-        display.innerText = 
-          String(hrs).padStart(2, '0') + ":" + 
-          String(mins).padStart(2, '0') + ":" + 
-          String(secs).padStart(2, '0');
-
-        if (totalSeconds < 900) {
-          display.className = "text-5xl font-black font-mono text-amber-400 py-1";
-        }
-      }
-
-      update();
-      countdownTimer = setInterval(update, 1000);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const name = urlParams.get('name');
-      const host = urlParams.get('host');
-      const expParam = urlParams.get('exp');
-
-      if (code) {
-        const navBar = document.getElementById('main-nav-bar');
-        if (navBar) navBar.classList.add('hidden');
-
-        currentGuestCode = code;
-        switchTab('pass');
-        document.getElementById('guest-code-hero').innerText = code;
-        if (name) document.getElementById('guest-name-box').innerText = `Visitor: ${name}`;
-        if (host) document.getElementById('guest-dest-box').innerText = `Visiting Host: ${host}`;
-
-        const targetExpiry = expParam ? parseInt(expParam) : (Date.now() + 4 * 3600 * 1000);
-        startPersistentCountdown(targetExpiry);
-      }
-    });
-  </script>
-</body>
-</html>
+        document.getElementById("guard
