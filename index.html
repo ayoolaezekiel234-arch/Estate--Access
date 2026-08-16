@@ -51,7 +51,7 @@
       <button id="tab-pass" onclick="switchTab('pass')" class="flex-1 py-2 rounded-lg font-bold text-xs text-slate-400">My Pass</button>
     </div>
 
-    <!-- 1. RESIDENT PASS GENERATOR (SECURED) -->
+    <!-- 1. RESIDENT PASS GENERATOR -->
     <div id="view-resident" class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 shadow-xl">
       <div>
         <h2 class="text-base font-bold text-blue-400">Generate Visitor Pass</h2>
@@ -63,7 +63,7 @@
         <label class="text-[11px] font-bold text-blue-300 flex items-center gap-1">
           <span>🔑 Official Resident Passcode</span>
         </label>
-        <input id="res-passcode-auth" type="text" placeholder="Enter NITEL2026" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white outline-none focus:border-blue-400 tracking-wider font-mono" />
+        <input id="res-passcode-auth" type="text" value="NITEL2026" placeholder="Enter NITEL2026" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white outline-none focus:border-blue-400 tracking-wider font-mono uppercase" />
         <p class="text-[10px] text-slate-400 italic">Passcode: <b class="text-blue-300">NITEL2026</b></p>
       </div>
 
@@ -167,18 +167,19 @@
         </select>
       </div>
 
-      <button id="gen-btn" onclick="generatePass()" class="w-full py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-bold text-sm shadow-lg shadow-blue-600/30 transition">
+      <button id="gen-btn" type="button" onclick="generatePass()" class="w-full py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-bold text-sm shadow-lg shadow-blue-600/30 transition">
         Authorize & Generate Pass
       </button>
 
-      <div id="pass-result" class="hidden mt-3 p-4 bg-blue-950/60 border border-blue-600 rounded-xl text-center space-y-2">
+      <!-- RESULT BOX -->
+      <div id="pass-result" class="hidden mt-3 p-4 bg-blue-950/80 border border-blue-500 rounded-xl text-center space-y-2">
         <span class="text-[10px] font-bold uppercase tracking-wider text-blue-300">Access Pass Authorized</span>
-        <div id="pass-code-display" class="text-4xl font-black tracking-widest text-emerald-400 font-mono">000000</div>
+        <div id="pass-code-display" class="text-4xl font-black tracking-widest text-emerald-400 font-mono py-1">000000</div>
         <p id="pass-visitor-display" class="text-xs font-semibold text-slate-200"></p>
         <p id="pass-host-display" class="text-[11px] text-slate-400"></p>
         <p id="pass-validity-display" class="text-[11px] font-mono text-amber-300"></p>
 
-        <button id="whatsapp-btn" onclick="shareToWhatsApp()" class="w-full mt-2 py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-xs text-white flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/30 transition">
+        <button id="whatsapp-btn" type="button" onclick="shareToWhatsApp()" class="w-full mt-2 py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-xs text-white flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/30 transition">
           <span>📲 Share Pass via WhatsApp</span>
         </button>
       </div>
@@ -193,7 +194,7 @@
         <h2 class="text-base font-bold text-white">Security Gate Terminal</h2>
         <p class="text-xs text-slate-400">Enter Security Master PIN (NCDA / 6232) to unlock gate keypad.</p>
         <input id="guard-master-pin" type="password" maxlength="4" placeholder="••••" class="w-32 mx-auto p-2 text-center tracking-widest font-mono text-xl bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500" />
-        <button onclick="unlockGuardTerminal()" class="w-full py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-xs">Unlock Terminal</button>
+        <button type="button" onclick="unlockGuardTerminal()" class="w-full py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-xs">Unlock Terminal</button>
       </div>
 
       <!-- Unlocked Keypad Terminal -->
@@ -206,7 +207,7 @@
               <h2 class="text-base font-bold text-emerald-400">Gate Verification Keypad</h2>
               <p class="text-[10px] text-slate-400 font-mono">Main Security Terminal Active</p>
             </div>
-            <button onclick="lockGuardTerminal()" class="text-[10px] text-slate-400 underline">Lock Terminal</button>
+            <button type="button" onclick="lockGuardTerminal()" class="text-[10px] text-slate-400 underline">Lock Terminal</button>
           </div>
 
           <div class="bg-black p-3.5 rounded-xl text-center border border-slate-800">
@@ -214,18 +215,18 @@
           </div>
 
           <div class="grid grid-cols-3 gap-2">
-            <button onclick="pressKey('1')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">1</button>
-            <button onclick="pressKey('2')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">2</button>
-            <button onclick="pressKey('3')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">3</button>
-            <button onclick="pressKey('4')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">4</button>
-            <button onclick="pressKey('5')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">5</button>
-            <button onclick="pressKey('6')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">6</button>
-            <button onclick="pressKey('7')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">7</button>
-            <button onclick="pressKey('8')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">8</button>
-            <button onclick="pressKey('9')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">9</button>
-            <button onclick="clearPin()" class="py-3.5 bg-rose-900/80 active:bg-rose-900 text-xs font-bold rounded-xl">CLR</button>
-            <button onclick="pressKey('0')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">0</button>
-            <button id="verify-btn" onclick="verifyPass()" class="py-3.5 bg-emerald-600 active:bg-emerald-500 text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30">ENTER</button>
+            <button type="button" onclick="pressKey('1')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">1</button>
+            <button type="button" onclick="pressKey('2')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">2</button>
+            <button type="button" onclick="pressKey('3')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">3</button>
+            <button type="button" onclick="pressKey('4')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">4</button>
+            <button type="button" onclick="pressKey('5')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">5</button>
+            <button type="button" onclick="pressKey('6')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">6</button>
+            <button type="button" onclick="pressKey('7')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">7</button>
+            <button type="button" onclick="pressKey('8')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">8</button>
+            <button type="button" onclick="pressKey('9')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">9</button>
+            <button type="button" onclick="clearPin()" class="py-3.5 bg-rose-900/80 active:bg-rose-900 text-xs font-bold rounded-xl">CLR</button>
+            <button type="button" onclick="pressKey('0')" class="py-3.5 bg-slate-800 active:bg-slate-700 text-xl font-bold rounded-xl">0</button>
+            <button id="verify-btn" type="button" onclick="verifyPass()" class="py-3.5 bg-emerald-600 active:bg-emerald-500 text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30">ENTER</button>
           </div>
 
           <div id="gate-result" class="hidden p-3 rounded-xl text-center space-y-1"></div>
@@ -248,7 +249,7 @@
             <input id="guard-manual-plot" type="text" placeholder="Avenue / Road / Plot / Purpose" class="p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white outline-none focus:border-amber-400" />
           </div>
 
-          <button onclick="generateGuardEmergencyPass()" class="w-full py-2 bg-amber-600 active:bg-amber-700 text-slate-950 font-black text-xs rounded-lg transition shadow">
+          <button type="button" onclick="generateGuardEmergencyPass()" class="w-full py-2 bg-amber-600 active:bg-amber-700 text-slate-950 font-black text-xs rounded-lg transition shadow">
             Issue & Grant Gate Entry
           </button>
 
@@ -262,7 +263,7 @@
         <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-xl space-y-2">
           <div class="flex justify-between items-center">
             <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Recent Gate Entries</span>
-            <button onclick="loadRecentLogs()" class="text-[10px] text-blue-400 font-semibold">🔄 Refresh Log</button>
+            <button type="button" onclick="loadRecentLogs()" class="text-[10px] text-blue-400 font-semibold">🔄 Refresh Log</button>
           </div>
           <div id="recent-logs-list" class="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-left text-xs">
             <p class="text-[11px] text-slate-500 italic">No entry logs loaded.</p>
@@ -290,7 +291,7 @@
           <p id="guest-expiry-warning" class="text-[11px] text-slate-400">Present this PIN to security at the gate post.</p>
         </div>
 
-        <button id="exit-estate-btn" onclick="leaveEstateSelf()" class="w-full py-3 bg-rose-700 active:bg-rose-800 rounded-xl font-bold text-xs text-white shadow-lg shadow-rose-700/30 flex items-center justify-center gap-1.5 transition">
+        <button id="exit-estate-btn" type="button" onclick="leaveEstateSelf()" class="w-full py-3 bg-rose-700 active:bg-rose-800 rounded-xl font-bold text-xs text-white shadow-lg shadow-rose-700/30 flex items-center justify-center gap-1.5 transition">
           <span>🚪 I Have Left NITEL Estate</span>
         </button>
 
@@ -333,12 +334,4 @@
     let countdownTimer = null;
 
     function toggleHotelStayOptions() {
-      const type = document.getElementById("res-pass-type").value;
-      const hotelBox = document.getElementById("hotel-duration-box");
-      if (type === "HOTEL_LODGE") hotelBox.classList.remove("hidden");
-      else hotelBox.classList.add("hidden");
-    }
-
-    function switchTab(tab) {
-      const resView = document.getElementById("view-resident");
-   
+      const type = document.getElementById
