@@ -240,7 +240,6 @@
         document.getElementById("pass-validity-display").innerText = `⏱️ Valid for ${lastDurationText}`;
         document.getElementById("pass-result").classList.remove("hidden");
       } catch (err) {
-        alert("Generated locally: " + randomCode);
         document.getElementById("pass-code-display").innerText = randomCode;
         document.getElementById("pass-result").classList.remove("hidden");
       } finally {
@@ -251,10 +250,18 @@
 
     function shareToWhatsApp() {
       if (!lastGeneratedCode) return;
-      const currentUrl = window.location.origin + window.location.pathname;
-      const guestLink = `${currentUrl}?code=${lastGeneratedCode}&name=${encodeURIComponent(lastVisitorName)}&mins=${lastMinutesAllowed}`;
-      const message = `*Estate Access Pass*%0A%0A*Visitor:* ${lastVisitorName}%0A*Access PIN:* ${lastGeneratedCode}%0A*Validity:* ${lastDurationText}%0A%0A*Tap to Open Live Pass & Countdown:*%0A${guestLink}`;
-      window.open(`https://wa.me/?text=${message}`, '_blank');
+      const baseUrl = window.location.origin + window.location.pathname;
+      const cleanName = encodeURIComponent(lastVisitorName);
+      const guestLink = `${baseUrl}?code=${lastGeneratedCode}&name=${cleanName}&mins=${lastMinutesAllowed}`;
+      
+      const fullText = `*Estate Access Pass*\n\n` +
+        `*Visitor:* ${lastVisitorName}\n` +
+        `*Access PIN:* ${lastGeneratedCode}\n` +
+        `*Validity:* ${lastDurationText}\n\n` +
+        `*Live Pass & Countdown:*\n` +
+        guestLink;
+
+      window.open(`https://wa.me/?text=${encodeURIComponent(fullText)}`, '_blank');
     }
 
     function pressKey(num) {
@@ -303,7 +310,6 @@
       }
     }
 
-    // DIRECT SELF-STARTING COUNTDOWN ENGINE
     function startCountdownEngine(totalSeconds) {
       let remaining = totalSeconds;
       const display = document.getElementById('guest-countdown');
@@ -341,7 +347,6 @@
       tick();
     }
 
-    // DETECT VISITOR LINK OPEN
     window.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
@@ -376,5 +381,4 @@
     });
   </script>
 </body>
-            </html>
-          
+</html>
