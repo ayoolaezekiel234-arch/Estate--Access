@@ -79,19 +79,45 @@
         </div>
       </div>
 
-      <!-- Estate Address -->
+      <!-- Estate Address (Avenues A - T) -->
       <div class="grid grid-cols-2 gap-2.5">
         <div>
-          <label class="text-[11px] font-semibold text-slate-300">Estate Zone / Road</label>
+          <label class="text-[11px] font-semibold text-slate-300">Estate Zone / Avenue</label>
           <select id="res-zone-select" class="w-full mt-1 p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-blue-500">
-            <option value="Main Avenue">Main Avenue</option>
-            <option value="Road 1">Road 1</option>
-            <option value="Road 2">Road 2</option>
-            <option value="Road 3">Road 3</option>
-            <option value="Road 4">Road 4</option>
-            <option value="Road 5">Road 5</option>
-            <option value="Commercial Wing">Commercial Wing</option>
-            <option value="Mosque / Church Axis">Worship Center Axis</option>
+            <optgroup label="Estate Avenues (A – T)">
+              <option value="Avenue A">Avenue A</option>
+              <option value="Avenue B">Avenue B</option>
+              <option value="Avenue C">Avenue C</option>
+              <option value="Avenue D">Avenue D</option>
+              <option value="Avenue E">Avenue E</option>
+              <option value="Avenue F">Avenue F</option>
+              <option value="Avenue G">Avenue G</option>
+              <option value="Avenue H">Avenue H</option>
+              <option value="Avenue I">Avenue I</option>
+              <option value="Avenue J">Avenue J</option>
+              <option value="Avenue K">Avenue K</option>
+              <option value="Avenue L">Avenue L</option>
+              <option value="Avenue M">Avenue M</option>
+              <option value="Avenue N">Avenue N</option>
+              <option value="Avenue O">Avenue O</option>
+              <option value="Avenue P">Avenue P</option>
+              <option value="Avenue Q">Avenue Q</option>
+              <option value="Avenue R">Avenue R</option>
+              <option value="Avenue S">Avenue S</option>
+              <option value="Avenue T">Avenue T</option>
+            </optgroup>
+            <optgroup label="Main Roads & Axis">
+              <option value="Main Avenue">Main Avenue</option>
+              <option value="Road 1">Road 1</option>
+              <option value="Road 2">Road 2</option>
+              <option value="Road 3">Road 3</option>
+              <option value="Road 4">Road 4</option>
+              <option value="Road 5">Road 5</option>
+            </optgroup>
+            <optgroup label="Commercial & Worship Wings">
+              <option value="Commercial Wing">Commercial Wing</option>
+              <option value="Mosque / Church Axis">Worship Center Axis</option>
+            </optgroup>
           </select>
         </div>
         <div>
@@ -218,7 +244,7 @@
 
           <div class="grid grid-cols-2 gap-2 pt-1">
             <input id="guard-manual-name" type="text" placeholder="Resident / Guest Name" class="p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white outline-none focus:border-amber-400" />
-            <input id="guard-manual-plot" type="text" placeholder="Plot / Flat / Purpose" class="p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white outline-none focus:border-amber-400" />
+            <input id="guard-manual-plot" type="text" placeholder="Avenue / Plot / Purpose" class="p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white outline-none focus:border-amber-400" />
           </div>
 
           <button onclick="generateGuardEmergencyPass()" class="w-full py-2 bg-amber-600 active:bg-amber-700 text-slate-950 font-black text-xs rounded-lg transition shadow">
@@ -313,33 +339,4 @@
     }
 
     function switchTab(tab) {
-      const resView = document.getElementById("view-resident");
-      const guardView = document.getElementById("view-guard");
-      const passView = document.getElementById("view-pass");
-
-      const resTab = document.getElementById("tab-resident");
-      const guardTab = document.getElementById("tab-guard");
-      const passTab = document.getElementById("tab-pass");
-
-      [resTab, guardTab, passTab].forEach(t => {
-        if (t) t.className = "flex-1 py-2 rounded-lg font-bold text-xs text-slate-400";
-      });
-      [resView, guardView, passView].forEach(v => v.classList.add("hidden"));
-
-      if (tab === "resident") {
-        resView.classList.remove("hidden");
-        if (resTab) resTab.className = "flex-1 py-2 rounded-lg font-bold text-xs bg-blue-600 text-white shadow";
-      } else if (tab === "guard") {
-        guardView.classList.remove("hidden");
-        if (guardTab) guardTab.className = "flex-1 py-2 rounded-lg font-bold text-xs bg-emerald-600 text-white shadow";
-      } else if (tab === "pass") {
-        passView.classList.remove("hidden");
-        if (passTab) passTab.className = "flex-1 py-2 rounded-lg font-bold text-xs bg-cyan-600 text-white shadow";
-      }
-    }
-
-    function unlockGuardTerminal() {
-      const pin = document.getElementById("guard-master-pin").value;
-      if (pin === GUARD_MASTER_PIN) {
-        document.getElementById("guard-auth-box").classList.add("hidden");
-        document.getElementById("guard
+      const resView = document.getElementById("
