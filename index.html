@@ -16,7 +16,7 @@
       background: #ef4444;
       border: 2px solid #ffffff;
       border-radius: 50%;
-      box-shadow: 0 0 10px #ef4444;
+      box-shadow: 0 0 8px #ef4444;
     }
   </style>
 </head>
@@ -163,6 +163,8 @@
     let watchGeoId = null;
     let map = null;
     let markers = {};
+    let countdownTimer = null;
+    let lastGpsSendTime = 0;
 
     function toggleHotelStayOptions() {
       const type = document.getElementById("res-pass-type").value;
@@ -198,10 +200,14 @@
 
     function initMap() {
       if (!map) {
-        map = L.map('map').setView([6.6194, 3.5105], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        try {
+          map = L.map('map').setView([6.6194, 3.5105], 15);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        } catch (e) {
+          console.error("Map init error:", e);
+        }
       }
-      setTimeout(() => { map.invalidateSize(); }, 200);
+      setTimeout(() => { if (map) map.invalidateSize(); }, 250);
       refreshMapMarkers();
     }
 
@@ -212,26 +218,30 @@
     });
 
     async function refreshMapMarkers() {
-      const { data } = await supabaseClient.from('live_locations').select('*');
-      if (!data) return;
+      if (!map) return;
+      try {
+        const { data } = await supabaseClient.from('live_locations').select('*');
+        if (!data) return;
 
-      // Remove cleared markers
-      Object.keys(markers).forEach(k => {
-        if (!data.some(d => d.pass_code === k)) {
-          map.removeLayer(markers[k]);
-          delete markers[k];
-        }
-      });
+        Object.keys(markers).forEach(k => {
+          if (!data.some(d => d.pass_code === k)) {
+            map.removeLayer(markers[k]);
+            delete markers[k];
+          }
+        });
 
-      data.forEach(loc => {
-        if (markers[loc.pass_code]) {
-          markers[loc.pass_code].setLatLng([loc.latitude, loc.longitude]);
-        } else {
-          markers[loc.pass_code] = L.marker([loc.latitude, loc.longitude], { icon: customRadarIcon })
-            .addTo(map)
-            .bindPopup(`<b>${loc.visitor_name}</b><br>PIN: ${loc.pass_code}`);
-        }
-      });
+        data.forEach(loc => {
+          if (markers[loc.pass_code]) {
+            markers[loc.pass_code].setLatLng([loc.latitude, loc.longitude]);
+          } else {
+            markers[loc.pass_code] = L.marker([loc.latitude, loc.longitude], { icon: customRadarIcon })
+              .addTo(map)
+              .bindPopup(`<b>${loc.visitor_name}</b><br>PIN: ${loc.pass_code}`);
+          }
+        });
+      } catch (err) {
+        console.error("Refresh error:", err);
+      }
     }
 
     async function generatePass() {
@@ -343,13 +353,14 @@
       }
     }
 
-    // SELF-EXIT ACTION: Stops GPS and clears dot from radar
     async function leaveEstateSelf() {
       if (!confirm("Are you sure you have exited NITEL Estate?")) return;
 
       if (watchGeoId && navigator.geolocation) {
         navigator.geolocation.clearWatch(watchGeoId);
+        watchGeoId = null;
       }
+      if (countdownTimer) clearInterval(countdownTimer);
 
       if (currentGuestCode) {
         await supabaseClient.from('live_locations').delete().eq('pass_code', currentGuestCode);
@@ -368,13 +379,13 @@
       const card = document.getElementById('guest-tracker-card');
       const warning = document.getElementById('guest-expiry-warning');
 
-      function tick() {
-        if (display.innerText === "EXITED") return;
+      if (countdownTimer) clearInterval(countdownTimer);
 
-        const now = Date.now();
-        const diffMs = targetExpiryMs - now;
+      function update() {
+        const diffMs = targetExpiryMs - Date.now();
 
         if (diffMs <= 0) {
+          clearInterval(countdownTimer);
           display.innerText = "TIME EXPIRED";
           display.className = "text-3xl font-black font-mono text-rose-500 animate-pulse py-1";
           card.className = "p-5 bg-rose-950 border-2 border-rose-600 rounded-2xl space-y-3 text-center shadow-2xl";
@@ -397,20 +408,10 @@
           display.className = "text-5xl font-black font-mono text-amber-400 py-1";
           card.className = "p-5 bg-amber-950/80 border-2 border-amber-500 rounded-2xl space-y-3 text-center shadow-2xl";
         }
-
-        setTimeout(tick, 1000);
       }
 
-      tick();
+      update();
+      countdownTimer = setInterval(update, 1000);
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const name = urlParams.get('name');
-      const expParam = urlParams.get('exp');
-
-      if (code) {
-        currentGuestCode = code;
-        switchTab('map');
-        const trackerCard = do
+    window.addEven
