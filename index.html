@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NITEL Estate Access Pass</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen p-4 flex flex-col items-center">
+
+  <div class="w-full max-w-md space-y-6">
+
+    <!-- Top Tab Bar -->
+    <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+      <button id="tab-resident" onclick="switchTab('resident')" class="flex-1 py-2.5 rounded-lg font-bold text-xs bg-blue-600 text-white">Pass Generator</button>
+      <button id="tab-guard" onclick="switchTab('guard')" class="flex-1 py-2.5 rounded-lg font-bold text-xs text-slate-400">Gate Keypad</button>
+      <button id="tab-pass" onclick="switchTab('pass')" class="flex-1 py-2.5 rounded-lg font-bold text-xs text-slate-400">My Live Pass</button>
+    </div>
+
+    <!-- 1. RESIDENT SCREEN -->
+    <div id="view-resident" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
+      <h2 class="text-xl font-bold text-blue-400">Generate Access Pass</h2>
+      <p class="text-xs text-slate-400">NITEL Estate visitor access portal.</p>
+
+      <div>
+        <label class="text-xs font-semibold text-slate-300">Visitor / Guest Name</label>
+        <input id="res-visitor-name" type="text" placeholder="e.g. John Okoro" class="w-full mt-1 p-3 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500" />
+      </div>
+
+      <div>
+        <label class="text-xs font-semibold text-slate-300">Destination Category</label>
+        <select id="res-pass-type" onchange="toggleHotelStayOptions()" class="w-full mt-1 p-3 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none">
+          <optgroup label="Worship Services">
+            <option value="MOSQUE">Mosque Service (4 hrs)</option>
+            <option value="CHURCH">Church Service (4 hrs)</option>
+          </optgroup>
+          <optgroup label="Commercial & Retail">
+            <option value="SUPERMARKET">Supermarket / Groceries (1 hr)</option>
+            <option value="FOOD_STALL">Food Vendor / Eatery (1 hr)</option>
+            <option value="RETAIL_SHOP">Retail Store / Shopping (1 hr)</option>
+            <option value="SPA_SALON">Spa & Salon (2 hrs)</option>
+            <option value="BAR_LOUNGE">Bar & Lounge (3 hrs)</option>
+          </optgroup>
+          <optgroup label="Lodging & Residential">
+            <option value="HOTEL_LODGE">Hotel / Short-Let Resident (Multi-Day)</option>
+            <option value="HOTEL_EVENT">Hotel Event Guest (12 hrs)</option>
+            <option value="RESIDENTIAL">Residential Guest (24 hrs)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div id="hotel-duration-box" class="hidden space-y-1">
+        <label class="text-xs font-semibold text-amber-300">Hotel Stay Duration</label>
+        <select id="res-hotel-days" class="w-full p-3 bg-slate-900 border border-amber-500/50 rounded-xl text-white outline-none">
+          <option value="1">1 Night (24 Hours)</option>
+          <option value="2">2 Nights (48 Hours)</option>
+          <option value="3">3 Nights (72 Hours)</option>
+          <option value="7" selected>1 Week (7 Days Stay)</option>
+          <option value="14">2 Weeks (14 Days Stay)</option>
+        </select>
+      </div>
+
+      <button id="gen-btn" onclick="generatePass()" class="w-full py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-bold text-lg shadow-lg">Generate Pass</button>
+
+      <div id="pass-result" class="hidden mt-4 p-4 bg-blue-950 border border-blue-600 rounded-xl text-center space-y-3">
+        <span class="text-xs font-semibold uppercase tracking-wider text-blue-300">Pass Generated</span>
+        <div id="pass-code-display" class="text-4xl font-extrabold tracking-widest text-emerald-400">000000</div>
+        <p id="pass-visitor-display" class="text-sm font-medium text-slate-300"></p>
+        <p id="pass-validity-display" class="text-xs font-mono text-amber-400"></p>
+
+        <button id="whatsapp-btn" onclick="shareToWhatsApp()" class="w-full py-2.5 bg-emerald-600 active:bg-emerald-700 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2">
+          <span>📲 Share Pass & Live Countdown</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. GUARD TERMINAL SCREEN -->
+    <div id="view-guard" class="hidden bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
+      <h2 class="text-xl font-bold text-emerald-400">Security Gate Keypad</h2>
+      <p class="text-xs text-slate-400">Punch in 6-digit code to verify validity.</p>
+
+      <div class="bg-black p-4 rounded-xl text-center border border-slate-700">
+        <span id="pin-display" class="text-3xl font-mono tracking-widest text-white">------</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="pressKey('1')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">1</button>
+        <button onclick="pressKey('2')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">2</button>
+        <button onclick="pressKey('3')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">3</button>
+        <button onclick="pressKey('4')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">4</button>
+        <button onclick="pressKey('5')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">5</button>
+        <button onclick="pressKey('6')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">6</button>
+        <button onclick="pressKey('7')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">7</button>
+        <button onclick="pressKey('8')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">8</button>
+        <button onclick="pressKey('9')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">9</button>
+        <button onclick="clearPin()" class="py-4 bg-rose-800 text-lg font-bold rounded-xl">CLR</button>
+        <button onclick="pressKey('0')" class="py-4 bg-slate-700 active:bg-slate-600 text-2xl font-bold rounded-xl">0</button>
+        <button id="verify-btn" onclick="verifyPass()" class="py-4 bg-emerald-600 active:bg-emerald-500 text-lg font-bold rounded-xl">ENTER</button>
+      </div>
+
+      <div id="gate-result" class="hidden p-4 rounded-xl text-center space-y-1"></div>
+    </div>
+
+    <!-- 3. GUEST LIVE PASS & COUNTDOWN SCREEN -->
+    <div id="view-pass" class="hidden space-y-4">
+      <div class="p-6 bg-slate-800 border border-slate-700 rounded-3xl space-y-4 text-center shadow-2xl">
+        <span class="text-[11px] font-bold tracking-widest text-emerald-400 uppercase">NITEL Estate Access Pass</span>
+        
+        <div id="guest-code-hero" class="text-4xl font-extrabold tracking-widest text-white py-1">------</div>
+        <p id="guest-name-box" class="text-sm font-semibold text-slate-300">Guest Pass Active</p>
+        
+        <!-- Live Countdown Timer Box -->
+        <div class="p-4 bg-slate-900 rounded-2xl border border-slate-700 space-y-1">
+          <span class="text-[10px] font-mono uppercase text-slate-400">Authorized Time Remaining</span>
+          <div id="guest-countdown" class="text-5xl font-black font-mono text-emerald-400 py-1">00:00:00</div>
+          <p id="guest-expiry-warning" class="text-xs text-slate-400">Present your PIN at the gate upon entry/exit.</p>
+        </div>
+
+        <!-- Self Exit Button -->
+        <button id="exit-estate-btn" onclick="leaveEstateSelf()" class="w-full py-3 bg-rose-700 active:bg-rose-800 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2">
+          <span>🚪 I Have Left NITEL Estate</span>
+        </button>
+
+        <div id="exit-confirmed-msg" class="hidden p-4 bg-emerald-950 border border-emerald-500 rounded-2xl text-xs text-emerald-300 font-semibold space-y-1">
+          <p class="text-sm font-bold">✅ Pass Checked Out</p>
+          <p>Thank you for visiting NITEL Estate!</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_FYbGL09hgU7Fc25ChlXbDw_YpXMjDmS";
+    let supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let enteredPin = "";
+    let lastGeneratedCode = "";
+    let lastVisitorName = "";
+    let lastTargetExpiryTime = 0;
+    let lastDurationText = "";
+    let currentGuestCode = "";
+    let countdownTimer = null;
+
+    function toggleHotelStayOptions() {
+      const type = document.getElementById("res-pass-type").value;
+      const hotelBox = document.getElementById("hotel-duration-box");
+      if (type === "HOTEL_LODGE") hotelBox.classList.remove("hidden");
+      else hotelBox.classList.add("hidden");
+    }
+
+    function switchTab(tab) {
+      const resView = document.getElementById("view-resident");
+      const guardView = document.getElementById("view-guard");
+      const passView = document.getElementById("view-pass");
+
+      const resTab = document.getElementById("tab-resident");
+      const guardTab = document.getElementById("tab-guard");
+      const passTab = document.getElementById("tab-pass");
+
+      [resTab, guardTab, passTab].forEach(t => t.className = "flex-1 py-2.5 rounded-lg font-bold text-xs text-slate-400");
+      [resView, guardView, passView].forEach(v => v.classList.add("hidden"));
+
+      if (tab === "resident") {
+        resView.classList.remove("hidden");
+        resTab.className = "flex-1 py-2.5 rounded-lg font-bold text-xs bg-blue-600 text-white";
+      } else if (tab === "guard") {
+        guardView.classList.remove("hidden");
+        guardTab.className = "flex-1 py-2.5 rounded-lg font-bold text-xs bg-emerald-600 text-white";
+      } else if (tab === "pass") {
+        passView.classList.remove("hidden");
+        passTab.className = "flex-1 py-2.5 rounded-lg font-bold text-xs bg-emerald-600 text-white";
+      }
+    }
+
+    async function generatePass() {
+      const nameInput = document.getElementById("res-visitor-name");
+      const name = nameInput.value.trim();
+      const type = document.getElementById("res-pass-type").value;
+      const btn = document.getElementById("gen-btn");
+
+      if (!name) return alert("Please enter visitor name first");
+
+      btn.disabled = true;
+      btn.innerText = "Creating Pass...";
+
+      let mins = 60;
+      if (type === "MOSQUE" || type === "CHURCH") mins = 240;
+      else if (type === "BAR_LOUNGE") mins = 180;
+      else if (type === "SPA_SALON") mins = 120;
+      else if (type === "RESIDENTIAL") mins = 1440;
+      else if (type === "HOTEL_EVENT") mins = 720;
+      else if (type === "HOTEL_LODGE") {
+        const days = parseInt(document.getElementById("res-hotel-days").value);
+        mins = days * 1440;
+      }
+
+      lastTargetExpiryTime = Date.now() + (mins * 60 * 1000);
+      lastVisitorName = name;
+      lastDurationText = mins >= 1440 ? `${mins/1440} Day(s)` : `${mins/60} Hour(s)`;
+
+      const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+      lastGeneratedCode = randomCode;
+
+      try {
+        await supabaseClient.from('visitor_passes').insert([
+          { visitor_name: name, access_code: randomCode, pass_type: type, status: 'ACTIVE' }
+        ]);
+
+        document.getElementById("pass-code-display").innerText = randomCode;
+        document.getElementById("pass-visitor-display").innerText = "Guest: " + name + " (" + type.replace('_', ' ') + ")";
+        document.getElementById("pass-validity-display").innerText = `⏱️ Valid for ${lastDurationText}`;
+        document.getElementById("pass-result").classList.remove("hidden");
+      } catch (err) {
+        document.getElementById("pass-code-display").innerText = randomCode;
+        document.getElementById("pass-result").classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Generate Pass";
+      }
+    }
+
+    function shareToWhatsApp() {
+      if (!lastGeneratedCode) return;
+      const baseUrl = window.location.origin + window.location.pathname;
+      const cleanName = encodeURIComponent(lastVisitorName);
+      const guestLink = `${baseUrl}?code=${lastGeneratedCode}&name=${cleanName}&exp=${lastTargetExpiryTime}`;
+      
+      const fullText = `*NITEL Estate Access Pass*\n\n` +
+        `*Visitor:* ${lastVisitorName}\n` +
+        `*Access PIN:* ${lastGeneratedCode}\n` +
+        `*Validity:* ${lastDurationText}\n\n` +
+        `*Live Pass & Countdown:*\n` +
+        guestLink;
+
+      window.open(`https://wa.me/?text=${encodeURIComponent(fullText)}`, '_blank');
+    }
+
+    function pressKey(num) {
+      if (enteredPin.length < 6) {
+        enteredPin += num;
+        document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-");
+      }
+    }
+
+    function clearPin() {
+      enteredPin = "";
+      document.getElementById("pin-display").innerText = "------";
+      document.getElementById("gate-result").classList.add("hidden");
+    }
+
+    async function verifyPass() {
+      if (enteredPin.length !== 6) return alert("Enter full 6-digit code");
+      const resultBox = document.getElementById("gate-result");
+      resultBox.classList.remove("hidden");
+      resultBox.className = "p-4 rounded-xl text-center bg-slate-700 text-white";
+      resultBox.innerHTML = "<p class='text-sm font-bold'>Checking gate database...</p>";
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('visitor_passes')
+          .select('*')
+          .eq('access_code', enteredPin)
+          .single();
+
+        if (error || !data) {
+          resultBox.className = "p-4 rounded-xl text-center bg-red-950 border border-red-600 text-red-300";
+          resultBox.innerHTML = "<h3 class='text-lg font-black'>ACCESS DENIED</h3><p class='text-xs'>Invalid Code</p>";
+        } else if (data.status === 'USED') {
+          resultBox.className = "p-4 rounded-xl text-center bg-amber-950 border border-amber-600 text-amber-300";
+          resultBox.innerHTML = `<h3 class='text-lg font-black'>ACCESS DENIED</h3><p class='text-xs font-bold'>Pass Already Used!</p>`;
+        } else {
+          await supabaseClient.from('visitor_passes').update({ status: 'USED' }).eq('id', data.id);
+          resultBox.className = "p-4 rounded-xl text-center bg-emerald-950 border border-emerald-500 text-emerald-300";
+          resultBox.innerHTML = `<h3 class='text-lg font-black text-emerald-400'>ACCESS GRANTED</h3>
+            <p class='text-xs font-bold text-white'>Guest: ${data.visitor_name}</p>
+            <p class='text-[10px] text-emerald-400 mt-1 uppercase tracking-wider font-semibold'>Pass Verified & Burned</p>`;
+        }
+      } catch (err) {
+        resultBox.className = "p-4 rounded-xl text-center bg-red-950 border border-red-600 text-red-300";
+        resultBox.innerHTML = "<p class='text-xs text-red-200'>Error verifying code</p>";
+      }
+    }
+
+    async function leaveEstateSelf() {
+      if (!confirm("Are you sure you have exited NITEL Estate?")) return;
+
+      if (countdownTimer) clearInterval(countdownTimer);
+
+      if (currentGuestCode) {
+        await supabaseClient.from('visitor_passes').update({ status: 'EXITED' }).eq('access_code', currentGuestCode);
+      }
+
+      document.getElementById('exit-estate-btn').classList.add('hidden');
+      document.getElementById('exit-confirmed-msg').classList.remove('hidden');
+      document.getElementById('guest-countdown').innerText = "EXITED";
+      document.getElementById('guest-countdown').className = "text-3xl font-black font-mono text-slate-400 py-1";
+    }
+
+    function startPersistentCountdown(targetExpiryMs) {
+      const display = document.getElementById('guest-countdown');
+      const warning = document.getElementById('guest-expiry-warning');
+
+      if (countdownTimer) clearInterval(countdownTimer);
+
+      function update() {
+        const diffMs = targetExpiryMs - Date.now();
+
+        if (diffMs <= 0) {
+          clearInterval(countdownTimer);
+          display.innerText = "TIME EXPIRED";
+          display.className = "text-3xl font-black font-mono text-rose-500 animate-pulse py-1";
+          warning.innerText = "⚠️ Your allocated stay time has ended. Please proceed to the gate exit.";
+          warning.className = "text-xs font-bold text-rose-300";
+          return;
+        }
+
+        const totalSeconds = Math.floor(diffMs / 1000);
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+
+        display.innerText = 
+          String(hrs).padStart(2, '0') + ":" + 
+          String(mins).padStart(2, '0') + ":" + 
+          String(secs).padStart(2, '0');
+
+        if (totalSeconds < 900) {
+          display.className = "text-5xl font-black font-mono text-amber-400 py-1";
+        }
+      }
+
+      update();
+      countdownTimer = setInterval(update, 1000);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const name = urlParams.get('name');
+      const expParam = urlParams.get('exp');
+
+      if (code) {
+        currentGuestCode = code;
+        switchTab('pass');
+        document.getElementById('guest-code-hero').innerText = code;
+        if (name) document.getElementById('guest-name-box').innerText = `Guest: ${name}`;
+
+        const targetExpiry = expParam ? parseInt(expParam) : (Date.now() + 4 * 3600 * 1000);
+        startPersistentCountdown(targetExpiry);
+      }
+    });
+  </script>
+</body>
+</html>
