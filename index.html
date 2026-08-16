@@ -3,13 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Estate Access & GPS Control</title>
+  <title>NITEL Estate Access & GPS Control</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     #map { height: 320px; width: 100%; border-radius: 1rem; z-index: 10; }
+    .radar-dot {
+      width: 14px;
+      height: 14px;
+      background: #ef4444;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ef4444;
+    }
   </style>
 </head>
 <body class="bg-slate-900 text-white min-h-screen p-4 flex flex-col items-center">
@@ -26,7 +34,7 @@
     <!-- 1. RESIDENT SCREEN -->
     <div id="view-resident" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
       <h2 class="text-xl font-bold text-blue-400">Generate Access Pass</h2>
-      <p class="text-xs text-slate-400">Issue timed OTPs with instant live guest countdown.</p>
+      <p class="text-xs text-slate-400">NITEL Estate visitor access & tracking portal.</p>
 
       <div>
         <label class="text-xs font-semibold text-slate-300">Visitor / Guest Name</label>
@@ -68,7 +76,6 @@
 
       <button id="gen-btn" onclick="generatePass()" class="w-full py-3 bg-blue-600 active:bg-blue-700 rounded-xl font-bold text-lg shadow-lg">Generate Pass</button>
 
-      <!-- Pass Result Display -->
       <div id="pass-result" class="hidden mt-4 p-4 bg-blue-950 border border-blue-600 rounded-xl text-center space-y-3">
         <span class="text-xs font-semibold uppercase tracking-wider text-blue-300">Pass Generated</span>
         <div id="pass-code-display" class="text-4xl font-extrabold tracking-widest text-emerald-400">000000</div>
@@ -112,18 +119,27 @@
     <div id="view-map" class="hidden bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
       
       <!-- GUEST COUNTDOWN HERO -->
-      <div id="guest-tracker-card" class="hidden p-5 bg-slate-900 border-2 border-emerald-500 rounded-2xl space-y-2 text-center shadow-2xl">
-        <span class="text-[11px] font-bold tracking-widest text-emerald-400 uppercase">Authorized Stay Remaining</span>
+      <div id="guest-tracker-card" class="hidden p-5 bg-slate-900 border-2 border-emerald-500 rounded-2xl space-y-3 text-center shadow-2xl">
+        <span class="text-[11px] font-bold tracking-widest text-emerald-400 uppercase">NITEL Estate Stay Remaining</span>
         <div id="guest-countdown" class="text-5xl font-black font-mono text-white py-1">00:00:00</div>
         <p id="guest-name-box" class="text-sm font-semibold text-slate-300"></p>
-        <p id="guest-expiry-warning" class="text-xs text-slate-400">Please exit via the main gate when time expires.</p>
-        <div id="gps-status" class="text-[11px] font-mono text-cyan-400 pt-2">📡 Connecting GPS beacon...</div>
+        <p id="guest-expiry-warning" class="text-xs text-slate-400">Keep active while inside NITEL Estate.</p>
+        <div id="gps-status" class="text-[11px] font-mono text-cyan-400">📡 Broadcasting GPS Beacon...</div>
+
+        <!-- Self Exit Button -->
+        <button id="exit-estate-btn" onclick="leaveEstateSelf()" class="w-full mt-2 py-3 bg-rose-700 active:bg-rose-800 rounded-xl font-bold text-sm text-white shadow-lg flex items-center justify-center gap-2">
+          <span>🚪 I Have Left NITEL Estate</span>
+        </button>
+
+        <div id="exit-confirmed-msg" class="hidden p-3 bg-emerald-950 border border-emerald-500 rounded-xl text-xs text-emerald-300 font-semibold">
+          ✅ Thank you for visiting NITEL Estate! Your pass has been checked out.
+        </div>
       </div>
 
       <div class="flex justify-between items-center">
         <div>
           <h2 class="text-lg font-bold text-cyan-400">Security Control Radar</h2>
-          <p class="text-xs text-slate-400">Live estate positions</p>
+          <p class="text-xs text-slate-400">NITEL Estate live positions</p>
         </div>
         <button onclick="refreshMapMarkers()" class="px-3 py-1.5 bg-slate-700 active:bg-slate-600 rounded-lg text-xs font-semibold">🔄 Refresh</button>
       </div>
@@ -141,8 +157,10 @@
     let enteredPin = "";
     let lastGeneratedCode = "";
     let lastVisitorName = "";
-    let lastMinutesAllowed = 240;
+    let lastTargetExpiryTime = 0;
     let lastDurationText = "";
+    let currentGuestCode = "";
+    let watchGeoId = null;
     let map = null;
     let markers = {};
 
@@ -180,23 +198,38 @@
 
     function initMap() {
       if (!map) {
-        map = L.map('map').setView([6.6194, 3.5105], 14);
+        map = L.map('map').setView([6.6194, 3.5105], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
       }
       setTimeout(() => { map.invalidateSize(); }, 200);
       refreshMapMarkers();
     }
 
+    const customRadarIcon = L.divIcon({
+      className: 'radar-dot',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+
     async function refreshMapMarkers() {
       const { data } = await supabaseClient.from('live_locations').select('*');
       if (!data) return;
+
+      // Remove cleared markers
+      Object.keys(markers).forEach(k => {
+        if (!data.some(d => d.pass_code === k)) {
+          map.removeLayer(markers[k]);
+          delete markers[k];
+        }
+      });
+
       data.forEach(loc => {
         if (markers[loc.pass_code]) {
           markers[loc.pass_code].setLatLng([loc.latitude, loc.longitude]);
         } else {
-          markers[loc.pass_code] = L.marker([loc.latitude, loc.longitude])
+          markers[loc.pass_code] = L.marker([loc.latitude, loc.longitude], { icon: customRadarIcon })
             .addTo(map)
-            .bindPopup(`<b>${loc.visitor_name}</b><br>Code: ${loc.pass_code}`);
+            .bindPopup(`<b>${loc.visitor_name}</b><br>PIN: ${loc.pass_code}`);
         }
       });
     }
@@ -223,7 +256,7 @@
         mins = days * 1440;
       }
 
-      lastMinutesAllowed = mins;
+      lastTargetExpiryTime = Date.now() + (mins * 60 * 1000);
       lastVisitorName = name;
       lastDurationText = mins >= 1440 ? `${mins/1440} Day(s)` : `${mins/60} Hour(s)`;
 
@@ -252,9 +285,9 @@
       if (!lastGeneratedCode) return;
       const baseUrl = window.location.origin + window.location.pathname;
       const cleanName = encodeURIComponent(lastVisitorName);
-      const guestLink = `${baseUrl}?code=${lastGeneratedCode}&name=${cleanName}&mins=${lastMinutesAllowed}`;
+      const guestLink = `${baseUrl}?code=${lastGeneratedCode}&name=${cleanName}&exp=${lastTargetExpiryTime}`;
       
-      const fullText = `*Estate Access Pass*\n\n` +
+      const fullText = `*NITEL Estate Access Pass*\n\n` +
         `*Visitor:* ${lastVisitorName}\n` +
         `*Access PIN:* ${lastGeneratedCode}\n` +
         `*Validity:* ${lastDurationText}\n\n` +
@@ -310,37 +343,61 @@
       }
     }
 
-    function startCountdownEngine(totalSeconds) {
-      let remaining = totalSeconds;
+    // SELF-EXIT ACTION: Stops GPS and clears dot from radar
+    async function leaveEstateSelf() {
+      if (!confirm("Are you sure you have exited NITEL Estate?")) return;
+
+      if (watchGeoId && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchGeoId);
+      }
+
+      if (currentGuestCode) {
+        await supabaseClient.from('live_locations').delete().eq('pass_code', currentGuestCode);
+        await supabaseClient.from('visitor_passes').update({ status: 'EXITED' }).eq('access_code', currentGuestCode);
+      }
+
+      document.getElementById('exit-estate-btn').classList.add('hidden');
+      document.getElementById('exit-confirmed-msg').classList.remove('hidden');
+      document.getElementById('guest-countdown').innerText = "EXITED";
+      document.getElementById('guest-countdown').className = "text-3xl font-black font-mono text-slate-400 py-1";
+      document.getElementById('gps-status').innerText = "📍 GPS Beacon Terminated.";
+    }
+
+    function startPersistentCountdown(targetExpiryMs) {
       const display = document.getElementById('guest-countdown');
       const card = document.getElementById('guest-tracker-card');
       const warning = document.getElementById('guest-expiry-warning');
 
       function tick() {
-        if (remaining <= 0) {
+        if (display.innerText === "EXITED") return;
+
+        const now = Date.now();
+        const diffMs = targetExpiryMs - now;
+
+        if (diffMs <= 0) {
           display.innerText = "TIME EXPIRED";
           display.className = "text-3xl font-black font-mono text-rose-500 animate-pulse py-1";
-          card.className = "p-5 bg-rose-950 border-2 border-rose-600 rounded-2xl space-y-2 text-center shadow-2xl";
-          warning.innerText = "⚠️ Your allocated stay time has ended. Please proceed to the gate exit.";
+          card.className = "p-5 bg-rose-950 border-2 border-rose-600 rounded-2xl space-y-3 text-center shadow-2xl";
+          warning.innerText = "⚠️ Your allocated stay time has ended. Please exit via the main gate.";
           warning.className = "text-xs font-bold text-rose-300";
           return;
         }
 
-        const hrs = Math.floor(remaining / 3600);
-        const mins = Math.floor((remaining % 3600) / 60);
-        const secs = remaining % 60;
+        const totalSeconds = Math.floor(diffMs / 1000);
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
 
         display.innerText = 
           String(hrs).padStart(2, '0') + ":" + 
           String(mins).padStart(2, '0') + ":" + 
           String(secs).padStart(2, '0');
 
-        if (remaining < 900) {
+        if (totalSeconds < 900) {
           display.className = "text-5xl font-black font-mono text-amber-400 py-1";
-          card.className = "p-5 bg-amber-950/80 border-2 border-amber-500 rounded-2xl space-y-2 text-center shadow-2xl";
+          card.className = "p-5 bg-amber-950/80 border-2 border-amber-500 rounded-2xl space-y-3 text-center shadow-2xl";
         }
 
-        remaining--;
         setTimeout(tick, 1000);
       }
 
@@ -351,34 +408,9 @@
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
       const name = urlParams.get('name');
-      const minsParam = urlParams.get('mins');
+      const expParam = urlParams.get('exp');
 
       if (code) {
+        currentGuestCode = code;
         switchTab('map');
-        const trackerCard = document.getElementById('guest-tracker-card');
-        trackerCard.classList.remove('hidden');
-        if (name) document.getElementById('guest-name-box').innerText = `Guest: ${name} (PIN: ${code})`;
-
-        const totalMinutes = minsParam ? parseInt(minsParam) : 240;
-        startCountdownEngine(totalMinutes * 60);
-
-        if (navigator.geolocation) {
-          navigator.geolocation.watchPosition((pos) => {
-            const { latitude, longitude } = pos.coords;
-            document.getElementById('gps-status').innerText = `📡 GPS Active (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
-            supabaseClient.from('live_locations').upsert({
-              pass_code: code,
-              visitor_name: name || 'Guest',
-              latitude: latitude,
-              longitude: longitude,
-              updated_at: new Date()
-            }, { onConflict: 'pass_code' });
-          }, () => {
-            document.getElementById('gps-status').innerText = "📍 GPS Active (Default)";
-          }, { enableHighAccuracy: true });
-        }
-      }
-    });
-  </script>
-</body>
-</html>
+        const trackerCard = do
