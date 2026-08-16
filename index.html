@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NITEL Estate — Access Portal</title>
   
-  <!-- PWA Metadata -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0f172a" />
   <link rel="apple-touch-icon" href="/nitel-logo.png" />
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: #020617; color: #f8fafc; padding: 12px; display: flex; justify-content: center; min-height: 100vh; overflow-y: auto; }
-    .container { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
+    body { background-color: #020617; color: #f8fafc; padding: 12px; display: flex; justify-content: center; min-height: 100vh; }
+    .container { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; padding-bottom: 30px; }
     .card { background-color: #0f172a; border: 1px solid #1e293b; border-radius: 16px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     .header-row { display: flex; align-items: center; gap: 12px; }
     .logo-badge { width: 48px; height: 48px; border-radius: 12px; object-fit: contain; }
@@ -41,6 +40,8 @@
     .btn-blue:active { background: #1d4ed8; }
     .btn-green { background: #059669; color: #fff; }
     .btn-rose { background: #be123c; color: #fff; }
+
+    .error-banner { display: none; padding: 8px 10px; background: #450a0a; border: 1px solid #f87171; border-radius: 8px; color: #fca5a5; font-size: 11px; font-weight: bold; margin-top: 8px; }
 
     .result-card { background: #022c22; border: 2px solid #10b981; border-radius: 14px; padding: 14px; text-align: center; margin-top: 14px; display: none; }
     .pin-hero { font-size: 38px; font-weight: 900; font-family: monospace; letter-spacing: 4px; color: #34d399; margin: 4px 0; }
@@ -84,7 +85,7 @@
 
       <div class="passcode-box">
         <label style="color: #93c5fd;">🔑 Resident Verification Passcode</label>
-        <input id="res-passcode-auth" type="password" placeholder="Enter Resident Passcode" autocomplete="off" />
+        <input id="res-passcode-auth" type="password" value="NITEL2026" placeholder="Enter Resident Passcode" />
       </div>
 
       <div class="form-row form-group">
@@ -162,7 +163,9 @@
         </select>
       </div>
 
-      <button type="button" class="btn-action btn-blue" onclick="generatePassSafely()">
+      <div id="gen-error-banner" class="error-banner"></div>
+
+      <button type="button" class="btn-action btn-blue" onclick="generatePassDirect()">
         Authorize & Generate Pass
       </button>
 
@@ -184,6 +187,7 @@
         <div style="font-size: 14px; font-weight: bold; margin-top: 4px;">Gate Security Terminal</div>
         <div style="font-size: 11px; color: #94a3b8;">Enter Security Master PIN to unlock</div>
         <input id="guard-master-pin" type="password" maxlength="4" style="width: 120px; margin: 10px auto; text-align: center; font-size: 20px; font-family: monospace; letter-spacing: 4px;" placeholder="••••" autocomplete="off" />
+        <div id="guard-error-banner" class="error-banner" style="margin-bottom:8px;"></div>
         <button type="button" class="btn-action btn-green" onclick="unlockTerminal()">Unlock Keypad</button>
       </div>
 
@@ -268,60 +272,71 @@
       document.getElementById("tab-pass").className = "nav-btn" + (tab === 'pass' ? ' active-cyan' : '');
     }
 
-    function generatePassSafely() {
-      try {
-        var passInput = document.getElementById("res-passcode-auth");
-        var hostInput = document.getElementById("res-host-name");
-        var phoneInput = document.getElementById("res-host-phone");
-        var zoneInput = document.getElementById("res-zone-select");
-        var houseInput = document.getElementById("res-house-no");
-        var visitorInput = document.getElementById("res-visitor-name");
-        var typeInput = document.getElementById("res-pass-type");
-
-        var passKey = passInput ? passInput.value.trim().toUpperCase() : "";
-        var host = hostInput ? hostInput.value.trim() : "";
-        var phone = phoneInput ? phoneInput.value.trim() : "";
-        var zone = zoneInput ? zoneInput.value : "Avenue 1";
-        var house = houseInput ? houseInput.value.trim() : "";
-        var visitor = visitorInput ? visitorInput.value.trim() : "";
-        var type = typeInput ? typeInput.value : "RESIDENTIAL";
-
-        if (!passKey) {
-          alert("Please enter the Resident Verification Passcode.");
-          return;
-        }
-        if (passKey !== RESIDENT_PASSCODE) {
-          alert("Incorrect Passcode. Use the official NITEL Estate passcode.");
-          return;
-        }
-        if (!visitor) {
-          alert("Please enter visitor name.");
-          return;
-        }
-
-        var code = String(Math.floor(100000 + Math.random() * 900000));
-        var hostFull = (host || "Host Resident") + " (" + zone + (house ? " - " + house : "") + ")";
-        var durationHours = (type === 'HOTEL') ? 168 : (type === 'RESIDENTIAL' ? 24 : 4);
-
-        currentPassCode = code;
-        currentVisitorName = visitor;
-        currentHostInfo = hostFull;
-        currentExpiry = Date.now() + (durationHours * 3600 * 1000);
-
-        var records = getStorage();
-        records.unshift({ code: code, visitor: visitor, host: hostFull, status: "ACTIVE" });
-        saveStorage(records);
-
-        document.getElementById("pass-code-display").innerText = code;
-        document.getElementById("pass-visitor-display").innerText = "Visitor: " + visitor;
-        document.getElementById("pass-host-display").innerText = "Host: " + hostFull + (phone ? " [Tel: " + phone + "]" : "");
-        document.getElementById("pass-validity-display").innerText = "⏱️ Authorized for " + durationHours + " Hours";
-
-        var resBox = document.getElementById("pass-result");
-        resBox.style.display = "block";
-      } catch (err) {
-        alert("Error: " + err.message);
+    function showGenError(msg) {
+      var err = document.getElementById("gen-error-banner");
+      if (err) {
+        err.innerText = msg;
+        err.style.display = "block";
       }
+    }
+
+    function hideGenError() {
+      var err = document.getElementById("gen-error-banner");
+      if (err) err.style.display = "none";
+    }
+
+    function generatePassDirect() {
+      hideGenError();
+
+      var passInput = document.getElementById("res-passcode-auth");
+      var hostInput = document.getElementById("res-host-name");
+      var phoneInput = document.getElementById("res-host-phone");
+      var zoneInput = document.getElementById("res-zone-select");
+      var houseInput = document.getElementById("res-house-no");
+      var visitorInput = document.getElementById("res-visitor-name");
+      var typeInput = document.getElementById("res-pass-type");
+
+      var passKey = passInput ? passInput.value.trim().toUpperCase() : "";
+      var host = hostInput ? hostInput.value.trim() : "";
+      var phone = phoneInput ? phoneInput.value.trim() : "";
+      var zone = zoneInput ? zoneInput.value : "Avenue 1";
+      var house = houseInput ? houseInput.value.trim() : "";
+      var visitor = visitorInput ? visitorInput.value.trim() : "";
+      var type = typeInput ? typeInput.value : "RESIDENTIAL";
+
+      if (!passKey || passKey !== RESIDENT_PASSCODE) {
+        showGenError("⚠️ Enter valid passcode: NITEL2026");
+        if (passInput) passInput.focus();
+        return;
+      }
+
+      if (!visitor) {
+        showGenError("⚠️ Please type Visitor Full Name.");
+        if (visitorInput) visitorInput.focus();
+        return;
+      }
+
+      var code = String(Math.floor(100000 + Math.random() * 900000));
+      var hostFull = (host || "Host Resident") + " (" + zone + (house ? " - " + house : "") + ")";
+      var durationHours = (type === 'HOTEL') ? 168 : (type === 'RESIDENTIAL' ? 24 : 4);
+
+      currentPassCode = code;
+      currentVisitorName = visitor;
+      currentHostInfo = hostFull;
+      currentExpiry = Date.now() + (durationHours * 3600 * 1000);
+
+      var records = getStorage();
+      records.unshift({ code: code, visitor: visitor, host: hostFull, status: "ACTIVE" });
+      saveStorage(records);
+
+      document.getElementById("pass-code-display").innerText = code;
+      document.getElementById("pass-visitor-display").innerText = "Visitor: " + visitor;
+      document.getElementById("pass-host-display").innerText = "Host: " + hostFull + (phone ? " [Tel: " + phone + "]" : "");
+      document.getElementById("pass-validity-display").innerText = "⏱️ Authorized for " + durationHours + " Hours";
+
+      var resBox = document.getElementById("pass-result");
+      resBox.style.display = "block";
+      resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
     function sharePassWhatsApp() {
@@ -332,12 +347,18 @@
     }
 
     function unlockTerminal() {
+      var err = document.getElementById("guard-error-banner");
       var pin = (document.getElementById("guard-master-pin").value || "").trim();
+      if (err) err.style.display = "none";
+
       if (pin === GUARD_MASTER_PIN) {
         document.getElementById("guard-auth-box").style.display = "none";
         document.getElementById("guard-terminal-box").style.display = "block";
       } else {
-        alert("Incorrect PIN");
+        if (err) {
+          err.innerText = "❌ Incorrect Master PIN (6232)";
+          err.style.display = "block";
+        }
       }
     }
 
@@ -360,22 +381,4 @@
       document.getElementById("gate-result").style.display = "none";
     }
 
-    function verifyGatePass() {
-      if (enteredPin.length !== 6) return alert("Enter 6-digit PIN");
-      var res = document.getElementById("gate-result");
-      res.style.display = "block";
-
-      var records = getStorage();
-      var found = records.find(function(r) { return r.code === enteredPin; });
-
-      if (!found) {
-        res.style.background = "#450a0a";
-        res.style.color = "#fca5a5";
-        res.innerHTML = "<b>ACCESS DENIED</b><br><small>Invalid Code</small>";
-      } else if (found.status === 'USED') {
-        res.style.background = "#451a03";
-        res.style.color = "#fcd34d";
-        res.innerHTML = "<b>ACCESS DENIED</b><br><small>Pass Already Used</small>";
-      } else {
-        found.status = 'USED';
-        saveStorage(re
+    fun
