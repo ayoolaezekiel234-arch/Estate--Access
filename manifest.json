@@ -1,0 +1,24 @@
+{
+  "name": "NITEL Estate Access Control",
+  "short_name": "NITEL Access",
+  "description": "Digital Gate Pass & Resident Access Control for NITEL Estate.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/nitel-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/nitel-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
