@@ -71,7 +71,6 @@
 
   <div class="container">
 
-    <!-- Header & Hotline -->
     <div class="card">
       <div class="header-row">
         <img src="/nitel-logo.png" alt="NITEL" class="logo-badge" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';" />
@@ -86,7 +85,6 @@
       </a>
     </div>
 
-    <!-- Navigation Tabs -->
     <div id="main-nav-bar" class="nav-bar">
       <button id="tab-visitor" class="nav-btn active-blue" onclick="switchTab('visitor')">Visitor Pass</button>
       <button id="tab-resident" class="nav-btn" onclick="switchTab('resident')">Resident ID</button>
@@ -94,7 +92,7 @@
       <button id="tab-pass" class="nav-btn" onclick="switchTab('pass')">My Pass</button>
     </div>
 
-    <!-- 1. VISITOR PASS GENERATOR (For Guests) -->
+    <!-- 1. VISITOR PASS GENERATOR -->
     <div id="view-visitor" class="card">
       <div style="font-size: 14px; font-weight: bold; color: #60a5fa;">Generate Visitor Pass</div>
       <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">For Resident's Guests, Artisans & Deliveries</div>
@@ -186,7 +184,6 @@
         Authorize Visitor Pass
       </button>
 
-      <!-- Visitor Output Result Card -->
       <div id="visitor-result" class="result-card">
         <div style="font-size: 10px; font-weight: 800; color: #6ee7b7; text-transform: uppercase;">Visitor Pass Authorized</div>
         <div id="visitor-code-display" class="pin-hero">000000</div>
@@ -204,7 +201,7 @@
       </div>
     </div>
 
-    <!-- 2. RESIDENT DIGITAL ID (For Homeowners & Tenants) -->
+    <!-- 2. RESIDENT DIGITAL ID -->
     <div id="view-resident" class="card" style="display: none;">
       <div style="font-size: 14px; font-weight: bold; color: #34d399;">Resident Access ID</div>
       <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">For Verified NITEL Estate Residents & Landlords</div>
@@ -274,7 +271,6 @@
         Generate Resident Digital ID
       </button>
 
-      <!-- Resident Output Card -->
       <div id="resident-id-result" class="result-card" style="background:#0f172a; border-color:#3b82f6;">
         <div style="font-size: 10px; font-weight: 800; color: #60a5fa; text-transform: uppercase;">NITEL Estate Resident Badge</div>
         <div id="resident-badge-code" class="pin-hero" style="color:#60a5fa;">000000</div>
@@ -291,7 +287,7 @@
       </div>
     </div>
 
-    <!-- 3. GUARD TERMINAL & DEAD PHONE EMERGENCY OVERRIDE -->
+    <!-- 3. GUARD TERMINAL & EMERGENCY OVERRIDE -->
     <div id="view-guard" class="card" style="display: none;">
       
       <div id="guard-auth-box" style="text-align: center;">
@@ -335,7 +331,6 @@
 
         <div id="gate-result" style="display:none; padding:10px; border-radius:10px; text-align:center; margin-top:10px;"></div>
 
-        <!-- 🚨 GATE-SIDE RESIDENT DEAD PHONE / EMERGENCY CREATOR -->
         <div class="emergency-box">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-size: 11px; font-weight: 800; color: #fda4af; text-transform: uppercase;">⚡ Gate-Side Resident / Emergency Creator</span>
@@ -379,7 +374,6 @@
           </div>
         </div>
 
-        <!-- Audit Logs Feed & CSV Export -->
         <div style="margin-top: 18px; border-top: 1px solid #334155; padding-top: 12px; display:flex; flex-direction:column; gap:8px;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-size:11px; font-weight:800; color:#cbd5e1; text-transform:uppercase;">Entry Audit & Pass Logs</span>
@@ -406,9 +400,7 @@
             </div>
           </div>
 
-          <div id="audit-log-feed" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
-            <!-- Logs rendered here -->
-          </div>
+          <div id="audit-log-feed" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-top: 4px;"></div>
         </div>
 
       </div>
@@ -480,7 +472,6 @@
       }
     }
 
-    // 1. GENERATE VISITOR PASS (Pure 6-Digit Number)
     function generateVisitorPass() {
       var passInput = document.getElementById("res-passcode-auth");
       var hostInput = document.getElementById("res-host-name");
@@ -562,7 +553,6 @@
       resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    // 2. GENERATE RESIDENT DIGITAL ID (Pure 6-Digit Number Starting with 77)
     function generateResidentID() {
       var passKey = (document.getElementById("res-id-passcode").value || "").trim().toUpperCase();
       var name = (document.getElementById("resident-own-name").value || "").trim();
@@ -624,7 +614,6 @@
       resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    // 3. GUARD GATE-SIDE OVERRIDE (Pure 6-Digit Number Starting with 88 or 911)
     function generateGuardGateSidePass() {
       var type = document.getElementById("guard-emg-type").value;
       var name = (document.getElementById("guard-emg-name").value || "").trim();
@@ -846,7 +835,6 @@
       document.getElementById("gate-result").style.display = "none";
     }
 
-    // 4. VERIFY GATE PASS (Supports 6-Digit Resident, Visitor & Emergency Codes)
     function verifyGatePass() {
       var res = document.getElementById("gate-result");
       if (enteredPin.length !== 6) {
@@ -933,7 +921,7 @@
           "<div style='font-size:10px; color:#cbd5e1;'>📍 <b>Location:</b> " + item.host + "</div>" +
           "<div style='font-size:10px; color:#93c5fd;'>🔑 <b>Authorized By:</b> " + (item.generatorName || 'Resident') + "</div>" +
           "<div style='font-size:9px; color:#64748b; margin-top:2px; font-family:monospace;'>" +
-            "<span>PIN: " + item.code + " | 📅 " + (item.dateString || 'Today') + " " + (item.timeString || '') + "</span>" +
+            "<span>Code: " + item.code + " | 📅 " + (item.dateString || 'Today') + " " + (item.timeString || '') + "</span>" +
           "</div>" +
           callButton +
         "</div>";
