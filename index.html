@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NITEL Estate — Digital Access Control</title>
+  
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="apple-touch-icon" href="/nitel-logo.png" />
+
+  <!-- Standalone QR & Scanner Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #f1f5f9; color: #0f172a; display: flex; justify-content: center; min-height: 100vh; }
+    .container { width: 100%; max-width: 430px; background: #ffffff; min-height: 100vh; display: flex; flex-direction: column; padding: 18px 16px 40px; box-shadow: 0 0 25px rgba(0,0,0,0.06); }
+    
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; }
+    .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
+    .header-icons { display: flex; gap: 8px; align-items: center; }
+    .notif-badge { position: relative; }
+    .notif-dot { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; }
+
+    .brand-section { margin-bottom: 18px; }
+    .brand-title { font-size: 26px; font-weight: 900; color: #0f2b5c; letter-spacing: -0.5px; display: flex; align-items: center; gap: 4px; }
+    .brand-accent { color: #0ea5e9; font-weight: 900; }
+    .brand-sub { font-size: 13px; font-weight: 600; color: #64748b; margin-top: 1px; }
+
+    .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .grid-card { border-radius: 16px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent; min-height: 105px; }
+    .grid-card:active { transform: scale(0.97); }
+    
+    .card-dark { background: #3b506e; color: #ffffff; }
+    .card-light { background: #e2e8f0; color: #1e293b; }
+    
+    .grid-card .card-icon { font-size: 22px; margin-bottom: 6px; }
+    .grid-card .card-title { font-size: 12px; font-weight: 700; line-height: 1.25; }
+
+    .btn-hero { width: 100%; padding: 15px; background: #1e2e4a; color: #ffffff; border-radius: 14px; font-size: 14px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(30, 46, 74, 0.25); text-transform: uppercase; letter-spacing: 0.5px; }
+    .btn-hero:active { background: #0f1c30; transform: scale(0.98); }
+
+    .panel-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px; margin-top: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .panel-title { font-size: 15px; font-weight: 800; color: #0f2b5c; margin-bottom: 2px; }
+    .panel-sub { font-size: 11px; color: #64748b; margin-bottom: 12px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
+    .form-row { display: flex; gap: 8px; }
+    .form-row > div { flex: 1; }
+    label { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; }
+    input, select, textarea { width: 100%; padding: 11px 12px; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; color: #0f172a; font-size: 13px; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: #0284c7; background: #ffffff; }
+
+    .passcode-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 10px 12px; margin-top: 6px; }
+    .emergency-box { background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 14px; padding: 14px; margin-top: 16px; }
+
+    .btn-action { width: 100%; padding: 13px; border-radius: 12px; font-size: 13px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; margin-top: 12px; }
+    .btn-blue { background: #0284c7; color: #ffffff; }
+    .btn-emerald { background: #059669; color: #ffffff; }
+    .btn-amber { background: #d97706; color: #ffffff; }
+    .btn-rose { background: #e11d48; color: #ffffff; }
+    .btn-outline { background: #ffffff; border: 1.5px solid #cbd5e1; color: #475569; padding: 7px 12px; font-size: 11px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+    .error-banner { display: none; padding: 10px; background: #fee2e2; border: 1px solid #ef4444; border-radius: 10px; color: #b91c1c; font-size: 12px; font-weight: 700; margin-top: 10px; }
+
+    .result-card { background: #f0fdf4; border: 2px solid #22c55e; border-radius: 16px; padding: 18px; text-align: center; margin-top: 14px; display: none; }
+    .pin-hero { font-size: 40px; font-weight: 900; font-family: monospace; letter-spacing: 5px; color: #15803d; margin: 4px 0; }
+    .timer-hero { font-size: 42px; font-weight: 900; font-family: monospace; color: #15803d; margin: 8px 0; }
+    .qr-container { display: flex; justify-content: center; margin: 12px 0; padding: 8px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; width: 146px; height: 146px; margin-left: auto; margin-right: auto; }
+
+    .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .keypad-btn { padding: 13px; font-size: 18px; font-weight: 800; background: #f8fafc; color: #0f172a; border: 1.5px solid #cbd5e1; border-radius: 10px; cursor: pointer; }
+    .keypad-btn:active { background: #e2e8f0; }
+
+    .log-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .log-item.overstay-alert { border: 2px solid #ef4444; background: #fff1f2; }
+    .log-badge { font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 6px; text-transform: uppercase; font-family: monospace; }
+    .badge-used { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge-active { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+    .badge-resident { background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; }
+    .badge-contractor { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .badge-emergency { background: #ffe4e6; color: #be123c; border: 1px solid #fecdd3; }
+    .badge-overstay { background: #e11d48; color: #ffffff; animation: pulse 1.5s infinite; }
+    .badge-exit { background: #f1f5f9; color: #64748b; }
+
+    .hotline-banner { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 9px; margin-top: 14px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; color: #be123c; font-size: 11px; font-weight: 800; text-decoration: none; }
+
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="top-bar">
+      <div class="icon-btn" onclick="openMenu()">☰</div>
+      <div class="header-icons">
+        <div class="icon-btn notif-badge" onclick="switchTab('guard')">
+          🔔<span class="notif-dot"></span>
+        </div>
+        <div class="icon-btn" onclick="switchTab('resident')">👤</div>
+      </div>
+    </div>
+
+    <div class="brand-section">
+      <div class="brand-title">
+        <span>NiT<span class="brand-accent">E</span>L</span> Estate
+      </div>
+      <div class="brand-sub">Digital Access Control</div>
+    </div>
+
+    <div class="quick-grid">
+      <div class="grid-card card-dark" onclick="switchTab('visitor')">
+        <div class="card-icon">🚗</div>
+        <div class="card-title">Generate<br>Pass</div>
+      </div>
+      <div class="grid-card card-dark" onclick="switchTab('resident')">
+        <div class="card-icon">📍</div>
+        <div class="card-title">Resident<br>Badge</div>
+      </div>
+      <div class="grid-card card-light" onclick="switchTab('guard')">
+        <div class="card-icon">🛡️</div>
+        <div class="card-title">Gate Post<br>Terminal</div>
+      </div>
+      <div class="grid-card card-light" onclick="switchTab('pass')">
+        <div class="card-icon">⏱️</div>
+        <div class="card-title">Active<br>Pass Status</div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-hero" onclick="switchTab('visitor')">
+      + Create Visitor Pass
+    </button>
+
+    <a href="tel:08108429710" class="hotline-banner">
+      🚨 Gate Security Hotline: 0810 842 9710
+    </a>
+
+    <!-- 1. VISITOR / LABORER PANEL -->
+    <div id="view-visitor" class="panel-card" style="display: block;">
+      <div class="panel-title">Create Visitor / Laborer Pass</div>
+      <div class="panel-sub">Authorize guests, site workers, artisans and deliveries</div>
+
+      <div class="form-group" style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; padding: 10px; margin-top: 10px;">
+        <label style="color: #166534;">📝 Visit Details / Specific Instructions (Optional)</label>
+        <input id="res-custom-notes" type="text" placeholder="e.g. Pure water supply, plumber, groceries delivery" style="background: #ffffff;" />
+      </div>
+
+      <div class="passcode-box">
+        <label style="color: #1e40af;">🔑 Resident Passcode</label>
+        <input id="res-passcode-auth" type="password" value="NITEL2026" placeholder="Enter Resident Passcode" />
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Host Name</label>
+          <input id="res-host-name" type="text" placeholder="e.g. Mr. Adeleke" />
+        </div>
+        <div>
+          <label>Host Phone</label>
+          <input id="res-host-phone" type="tel" placeholder="e.g. 08031234567" />
+        </div>
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Avenue / Road</label>
+          <select id="res-zone-select">
+            <optgroup label="Avenues (1 – 5)">
+              <option value="Avenue 1">Avenue 1</option>
+              <option value="Avenue 2">Avenue 2</option>
+              <option value="Avenue 3">Avenue 3</option>
+              <option value="Avenue 4">Avenue 4</option>
+              <option value="Avenue 5">Avenue 5</option>
+            </optgroup>
+            <optgroup label="Roads (A – U)">
+              <option value="Road A">Road A</option>
+              <option value="Road B">Road B</option>
+              <option value="Road C">Road C</option>
+              <option value="Road D">Road D</option>
+              <option value="Road E">Road E</option>
+              <option value="Road F">Road F</option>
+              <option value="Road G">Road G</option>
+              <option value="Road H">Road H</option>
+              <option value="Road I">Road I</option>
+              <option value="Road J">Road J</option>
+              <option value="Road K">Road K</option>
+              <option value="Road L">Road L</option>
+              <option value="Road M">Road M</option>
+              <option value="Road N">Road N</option>
+              <option value="Road O">Road O</option>
+              <option value="Road P">Road P</option>
+              <option value="Road Q">Road Q</option>
+              <option value="Road R">Road R</option>
+              <option value="Road S">Road S</option>
+              <option value="Road T">Road T</option>
+              <option value="Road U">Road U</option>
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <label>Plot / House</label>
+          <input id="res-house-no" type="text" placeholder="e.g. Plot 12" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Visitor / Lead Worker Name</label>
+        <input id="res-visitor-name" type="text" placeholder="e.g. Emmanuel Chukwu" />
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Headcount</label>
+          <select id="res-headcount">
+            <option value="1 Person (Solo)">1 Person (Solo)</option>
+            <option value="2 Persons (1 Extra)">2 Persons (1 Extra)</option>
+            <option value="Family (Adults + Kids)">Family (Adults + Kids)</option>
+            <option value="Small Crew (3-5 Workers)">Small Crew (3-5 Workers)</option>
+            <option value="Large Gang (6+ Workers)">Large Gang (6+ Workers)</option>
+          </select>
+        </div>
+        <div>
+          <label>Vehicle Plate</label>
+          <input id="res-vehicle-no" type="text" placeholder="e.g. KSF-123AA / None" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Purpose & Stay Duration</label>
+        <select id="res-pass-type">
+          <option value="RESIDENTIAL">Residential Guest (24 Hours)</option>
+          <option value="LABORER">Site Laborer / Worker (8 Hours)</option>
+          <option value="CONTRACTOR">Contractor / Heavy Site Work (12 Hours)</option>
+          <option value="ARTISAN">Artisan / Short Delivery (2 Hours)</option>
+          <option value="MOSQUE">Mosque Service (4 Hours)</option>
+          <option value="CHURCH">Church Service (4 Hours)</option>
+          <option value="SUPERMARKET">Supermarket / Retail (1 Hour)</option>
+          <option value="HOTEL">Hotel / Short-let (7 Days)</option>
+        </select>
+      </div>
+
+      <div id="gen-error-banner" class="error-banner"></div>
+
+      <button type="button" class="btn-action btn-blue" onclick="generateVisitorPass()">
+        Authorize Access Pass
+      </button>
+
+      <div id="visitor-result" class="result-card">
+        <div style="font-size: 11px; font-weight: 800; color: #166534; text-transform: uppercase;">Pass Authorized</div>
+        <div id="visitor-code-display" class="pin-hero">000000</div>
+        
+        <div id="qrcode-box" class="qr-container"></div>
+        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Show QR or PIN at Security Gate</div>
+
+        <div id="visitor-name-display" style="font-size: 13px; font-weight: 800; color: #0f172a;"></div>
+        <div id="visitor-host-display" style="font-size: 11px; color: #475569;"></div>
+        <div id="visitor-headcount-display" style="font-size: 11px; color: #b45309; font-weight: 700; margin-top: 2px;"></div>
+        <div id="visitor-vehicle-display" style="font-size: 11px; color: #0369a1; margin-top: 2px;"></div>
+        <div id="visitor-notes-display" style="font-size: 11px; color: #15803d; font-weight: 700; margin-top: 2px;"></div>
+        <div id="visitor-validity-display" style="font-size: 11px; color: #15803d; font-weight: 800; margin-top: 4px;"></div>
+
+        <button type="button" class="btn-action btn-emerald" onclick="sharePassWhatsApp()">📲 Share via WhatsApp</button>
+        <button type="button" class="btn-action btn-amber" onclick="downloadPassSlipImage()">🖼️ Download Image Slip</button>
+      </div>
+    </div>
+
+    <!-- 2. RESIDENT DIGITAL ID PANEL -->
+    <div id="view-resident" class="panel-card" style="display: none;">
+      <div class="panel-title">Resident Access ID</div>
+      <div class="panel-sub">Verified identity card for landlords and residents</div>
+
+      <div class="passcode-box">
+        <label style="color: #1e40af;">🔑 Resident Passcode</label>
+        <input id="res-id-passcode" type="password" value="NITEL2026" placeholder="Enter Resident Passcode" />
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Full Name</label>
+          <input id="resident-own-name" type="text" placeholder="e.g. Chief O. Mitchelle" />
+        </div>
+        <div>
+          <label>Phone Number</label>
+          <input id="resident-own-phone" type="tel" placeholder="e.g. 08108429710" />
+        </div>
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Avenue / Road</label>
+          <select id="resident-own-zone">
+            <option value="Avenue 1">Avenue 1</option>
+            <option value="Avenue 2">Avenue 2</option>
+            <option value="Avenue 3">Avenue 3</option>
+            <option value="Avenue 4">Avenue 4</option>
+            <option value="Avenue 5">Avenue 5</option>
+            <option value="Road A">Road A</option>
+            <option value="Road B">Road B</option>
+            <option value="Road C">Road C</option>
+            <option value="Road D">Road D</option>
+            <option value="Road E">Road E</option>
+            <option value="Road F">Road F</option>
+            <option value="Road G">Road G</option>
+            <option value="Road H">Road H</option>
+            <option value="Road I">Road I</option>
+            <option value="Road J">Road J</option>
+            <option value="Road K">Road K</option>
+            <option value="Road L">Road L</option>
+            <option value="Road M">Road M</option>
+            <option value="Road N">Road N</option>
+            <option value="Road O">Road O</option>
+            <option value="Road P">Road P</option>
+            <option value="Road Q">Road Q</option>
+            <option value="Road R">Road R</option>
+            <option value="Road S">Road S</option>
+            <option value="Road T">Road T</option>
+            <option value="Road U">Road U</option>
+          </select>
+        </div>
+        <div>
+          <label>Plot / House</label>
+          <input id="resident-own-house" type="text" placeholder="e.g. Plot 14" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Vehicle Plate No.</label>
+        <input id="resident-own-vehicle" type="text" placeholder="e.g. BDG-456XY (Optional)" />
+      </div>
+
+      <div id="res-error-banner" class="error-banner"></div>
+
+      <button type="button" class="btn-action btn-emerald" onclick="generateResidentID()">
+        Generate Resident Digital Badge
+      </button>
+
+      <div id="resident-id-result" class="result-card" style="background:#eff6ff; border-color:#3b82f6;">
+        <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">NITEL Verified Resident Badge</div>
+        <div id="resident-badge-code" class="pin-hero" style="color:#1d4ed8;">000000</div>
+        
+        <div id="resident-qrcode-box" class="qr-container"></div>
+        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Show this QR or Code at gate for express clearance</div>
+
+        <div id="resident-badge-name" style="font-size: 14px; font-weight: 800; color: #0f172a;"></div>
+        <div id="resident-badge-address" style="font-size: 12px; color: #475569;"></div>
+        <div id="resident-badge-vehicle" style="font-size: 11px; color: #0284c7; margin-top: 2px;"></div>
+        <div style="font-size: 12px; color: #16a34a; margin-top: 4px; font-weight:800;">✅ Active Verified Resident</div>
+
+        <button type="button" class="btn-action btn-amber" onclick="downloadResidentBadgeSlip()">🖼️ Save Badge to Gallery</button>
+      </div>
+    </div>
+
+    <!-- 3. GUARD GATE POST & AUDIT TERMINAL -->
+    <div id="view-guard" class="panel-card" style="display: none;">
+      
+      <div id="guard-auth-box" style="text-align: center; padding: 10px 0;">
+        <div style="font-size: 34px;">🛡️</div>
+        <div class="panel-title" style="margin-top: 6px;">Security Gate Terminal</div>
+        <div class="panel-sub">Enter Security PIN to unlock gate controls</div>
+        <input id="guard-master-pin" type="password" maxlength="4" style="width: 130px; margin: 10px auto; text-align: center; font-size: 22px; font-family: monospace; letter-spacing: 5px;" placeholder="••••" autocomplete="off" />
+        <div id="guard-error-banner" class="error-banner" style="margin-bottom:8px;"></div>
+        <button type="button" class="btn-action btn-emerald" onclick="unlockTerminal()">Unlock Gate Terminal</button>
+      </div>
+
+      <div id="guard-terminal-box" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 13px; font-weight: 800; color: #0f2b5c;">Gate Verification</span>
+          <span style="font-size: 10px; font-weight: 800; color: #16a34a;">🟢 Instant Local Engine</span>
+          <button type="button" onclick="lockTerminal()" style="background:none; border:none; color:#64748b; font-size:11px; font-weight:700; text-decoration:underline; cursor:pointer;">Lock</button>
+        </div>
+
+        <button id="toggle-camera-btn" type="button" class="btn-action btn-blue" style="margin-top: 10px; padding: 11px;" onclick="toggleQrScanner()">📷 Open Camera QR Scanner</button>
+        <div id="qr-reader-container" style="display:none; width: 100%; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1.5px solid #cbd5e1;">
+          <div id="qr-reader" style="width:100%;"></div>
+        </div>
+
+        <div style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 12px; border-radius: 12px; text-align:center; margin: 12px 0;">
+          <span id="pin-display" style="font-size: 34px; font-family: monospace; letter-spacing: 5px; color: #0f2b5c; font-weight: 900;">------</span>
+        </div>
+
+        <div class="keypad-grid">
+          <button type="button" class="keypad-btn" onclick="pressKey('1')">1</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('2')">2</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('3')">3</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('4')">4</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('5')">5</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('6')">6</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('7')">7</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('8')">8</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('9')">9</button>
+          <button type="button" class="keypad-btn" style="background:#fee2e2; color:#b91c1c;" onclick="clearPin()">CLR</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('0')">0</button>
+          <button type="button" class="keypad-btn" style="background:#dcfce7; color:#15803d;" onclick="verifyGatePass()">ENTER</button>
+        </div>
+
+        <div id="gate-result" style="display:none; padding:12px; border-radius:12px; text-align:center; margin-top:12px;"></div>
+
+        <div class="emergency-box">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size: 11px; font-weight: 800; color: #be123c; text-transform: uppercase;">⚡ Gate-Side Override & Luggage Check</span>
+          </div>
+          <div style="font-size: 11px; color: #64748b; margin-top: 2px;">For Flat Phone residents, site laborers, and emergencies.</div>
+
+          <div class="form-row form-group">
+            <div>
+              <label style="color:#9f1239;">Entry Type</label>
+              <select id="guard-emg-type">
+                <option value="DEAD_PHONE">📱 Resident Dead Battery / Flat Phone</option>
+                <option value="OMO_ONILE">🏗️ Community Relations / Site Levy</option>
+                <option value="SITE_LABOR">🔨 Walk-in Site Laborers (8 Hours)</option>
+                <option value="AMBULANCE">🚑 Ambulance / Medical Emergency</option>
+                <option value="POLICE">🚓 Police / Security Patrol</option>
+                <option value="UTILITY">⚡ EKEDC / Utility Maintenance</option>
+              </select>
+            </div>
+            <div>
+              <label style="color:#9f1239;">Visitor Name</label>
+              <input id="guard-emg-name" type="text" placeholder="e.g. Mr. Okon" />
+            </div>
+          </div>
+
+          <div class="form-row form-group">
+            <div>
+              <label style="color:#9f1239;">Destination</label>
+              <input id="guard-emg-dest" type="text" placeholder="e.g. Avenue 3 Plot 10" />
+            </div>
+            <div>
+              <label style="color:#9f1239;">Vehicle / Info</label>
+              <input id="guard-emg-veh" type="text" placeholder="e.g. Toyota Camry" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label style="color:#9f1239;">🔍 Luggage / Materials Inspected (Guard Notes)</label>
+            <input id="guard-emg-notes" type="text" placeholder="e.g. 15 bags of pure water, 1 tool box inspected" />
+          </div>
+
+          <button type="button" class="btn-action btn-rose" onclick="generateGuardGateSidePass()">⚡ Clear Gate Entry</button>
+          
+          <div id="guard-emg-success" style="display:none; background:#ffe4e6; border:1.5px solid #f43f5e; padding:12px; border-radius:12px; text-align:center; margin-top:10px;">
+            <div style="font-size:11px; font-weight:800; color:#9f1239;">ENTRY CLEARED & LOGGED BY GUARD</div>
+            <div id="guard-emg-code" style="font-size:26px; font-weight:900; font-family:monospace; color:#881337; letter-spacing:4px;">000000</div>
+            <div id="guard-emg-details" style="font-size:11px; color:#4c0519; font-weight:600;"></div>
+          </div>
+        </div>
+
+        <!-- Audit Logs Feed & CSV Export -->
+        <div style="margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 14px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:12px; font-weight:800; color:#0f2b5c; text-transform:uppercase;">Entry Audit & Logs</span>
+            <button type="button" class="btn-outline" onclick="exportLogsToCSV()">📊 Export CSV</button>
+          </div>
+
+          <div class="form-row">
+            <div>
+              <label>Timeline</label>
+              <select id="log-timeline-filter" onchange="renderLogs()" style="padding:8px; font-size:11px;">
+                <option value="ALL">All Entries</option>
+                <option value="MONTH">This Month</option>
+                <option value="YEAR">This Year (2026)</option>
+              </select>
+            </div>
+            <div>
+              <label>Category</label>
+              <select id="log-status-filter" onchange="renderLogs()" style="padding:8px; font-size:11px;">
+                <option value="ALL">All Categories</option>
+                <option value="OVERSTAY">⚠️ Overstayed</option>
+                <option value="RESIDENT">Resident Entries</option>
+                <option value="VISITOR">Visitor Passes</option>
+                <option value="LABORER">Laborers (8h)</option>
+                <option value="CONTRACTOR">Contractors (12h)</option>
+                <option value="EMERGENCY">Overrides / Community</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="audit-log-feed" style="max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 6px;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. VISITOR LIVE PASS STATUS PANEL -->
+    <div id="view-pass" class="panel-card" style="display: none; text-align: center;">
+      <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase;">NITEL Digital Pass Status</div>
+      <div id="guest-code-hero" class="pin-hero" style="font-size: 34px; color: #0f2b5c;">------</div>
+      
+      <div id="guest-qr-box" class="qr-container"></div>
+
+      <div id="guest-name-box" style="font-size: 14px; font-weight: 800; color:#0f172a;"></div>
+      <div id="guest-dest-box" style="font-size: 12px; color: #64748b; margin-top: 2px;"></div>
+      <div id="guest-headcount-box" style="font-size: 12px; color: #b45309; font-weight: 700; margin-top: 2px;"></div>
+      <div id="guest-vehicle-box" style="font-size: 12px; color: #0369a1; margin-top: 2px;"></div>
+      <div id="guest-notes-box" style="font-size: 12px; color: #15803d; font-weight: 700; margin-top: 2px;"></div>
+
+      <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; padding: 14px; border-radius: 14px; margin: 14px 0;">
+        <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase;">Authorized Stay Remaining</div>
+        <div id="guest-countdown" class="timer-hero">00:00:00</div>
+        <div style="font-size: 11px; color: #94a3b8;">Present QR or PIN at Security Gate</div>
+      </div>
+
+      <button id="exit-estate-btn" type="button" class="btn-action btn-rose" onclick="checkoutVisitor()">🚪 I Have Left Estate</button>
+      <div id="exit-confirmed-msg" style="display:none; padding:12px; background:#f0fdf4; border:1.5px solid #22c55e; border-radius:12px; font-size:13px; color:#15803d; font-weight:800;">
+        ✅ Checked Out Successfully
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    var GUARD_MASTER_PIN = "6232";
+    var RESIDENT_PASSCODE = "NITEL2026";
+
+    var enteredPin = "";
+    var currentPassCode = "";
+    var currentVisitorName = "";
+    var currentHostInfo = "";
+    var currentHeadcount = "";
+    var currentVehicleInfo = "";
+    var currentNotesInfo = "";
+    var currentExpiry = 0;
+    var timerInterval = null;
+    var html5QrScanner = null;
+
+    var audioCtx = null;
+    function playBeep(type) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'success') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.25);
+        } else {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.35);
+        }
+      } catch (e) {}
+    }
+
+    function getStorage() {
+      try { return JSON.parse(localStorage.getItem("nitel_master_records") || "[]"); } 
+      catch (e) { return []; }
+    }
+
+    function saveStorage(arr) {
+      try { localStorage.setItem("nitel_master_records", JSON.stringify(arr.slice(0, 500))); } 
+      catch (e) {}
+    }
+
+    function switchTab(tab) {
+      document.getElementById("view-visitor").style.display = (tab === 'visitor') ? 'block' : 'none';
+      document.getElementById("view-resident").style.display = (tab === 'resident') ? 'block' : 'none';
+      document.getElementById("view-guard").style.display = (tab === 'guard') ? 'block' : 'none';
+      document.getElementById("view-pass").style.display = (tab === 'pass') ? 'block' : 'none';
+
+      if (tab === 'guard') renderLogs();
+      if (tab !== 'guard' && html5QrScanner) {
+        try { html5QrScanner.stop().catch(function(){}); } catch(e) {}
+        document.getElementById("qr-reader-container").style.display = "none";
+      }
+      window.scrollTo({ top: 380, behavior: 'smooth' });
+    }
+
+    function openMenu() {
+      switchTab('visitor');
+    }
+
+    function generateVisitorPass() {
+      var passInput = document.getElementById("res-passcode-auth");
+      var hostInput = document.getElementById("res-host-name");
+      var phoneInput = document.getElementById("res-host-phone");
+      var zoneInput = document.getElementById("res-zone-select");
+      var houseInput = document.getElementById("res-house-no");
+      var visitorInput = document.getElementById("res-visitor-name");
+      var headInput = document.getElementById("res-headcount");
+      var typeInput = document.getElementById("res-pass-type");
+      var vehicleInput = document.getElementById("res-vehicle-no");
+      var notesInput = document.getElementById("res-custom-notes");
+
+      var passKey = passInput ? passInput.value.trim().toUpperCase() : "";
+      var host = hostInput ? hostInput.value.trim() : "";
+      var phone = phoneInput ? phoneInput.value.trim() : "";
+      var zone = zoneInput ? zoneInput.value : "Avenue 1";
+      var house = houseInput ? houseInput.value.trim() : "";
+      var visitor = visitorInput ? visitorInput.value.trim() : "";
+      var headcount = headInput ? headInput.value : "1 Person (Solo)";
+      var type = typeInput ? typeInput.value : "RESIDENTIAL";
+      var vehicle = vehicleInput ? vehicleInput.value.trim() : "";
+      var notes = notesInput ? notesInput.value.trim() : "";
+
+      var err = document.getElementById("gen-error-banner");
+      if (err) err.style.display = "none";
+
+      if (!passKey || passKey !== RESIDENT_PASSCODE) {
+        if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; }
+        playBeep('error');
+        return;
+      }
+
+      if (!visitor) {
+        if (err) { err.innerText = "⚠️ Please type Visitor / Worker Name."; err.style.display = "block"; }
+        playBeep('error');
+        return;
+      }
+
+      var code = String(Math.floor(100000 + Math.random() * 900000));
+      var hostFull = (host || "Host Resident") + " (" + zone + (house ? " - " + house : "") + ")";
+      
+      var durationHours = 24;
+      if (type === 'HOTEL') durationHours = 168;
+      else if (type === 'CONTRACTOR') durationHours = 12;
+      else if (type === 'LABORER') durationHours = 8;
+      else if (type === 'MOSQUE' || type === 'CHURCH') durationHours = 4;
+      else if (type === 'ARTISAN') durationHours = 2;
+      else if (type === 'SUPERMARKET') durationHours = 1;
+
+      var now = new Date();
+      var expiryTime = Date.now() + (durationHours * 3600 * 1000);
+
+      currentPassCode = code;
+      currentVisitorName = visitor;
+      currentHostInfo = hostFull;
+      currentHeadcount = headcount;
+      currentVehicleInfo = vehicle || "Pedestrian / None";
+      currentNotesInfo = notes;
+      currentExpiry = expiryTime;
+
+      var categoryType = (type === 'LABORER') ? 'LABORER' : ((type === 'CONTRACTOR') ? 'CONTRACTOR' : 'VISITOR');
+
+      var recordData = {
+        code: code,
+        visitor: visitor,
+        host: hostFull,
+        headcount: headcount,
+        generatorName: host || "Resident",
+        generatorPhone: phone || "",
+        vehicle: vehicle || "Pedestrian",
+        notes: notes || "Standard Entry",
+        type: categoryType,
+        status: "ACTIVE",
+        timestamp: now.getTime(),
+        expiry: expiryTime,
+        dateString: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
+        timeString: now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+      };
+
+      var localArr = getStorage();
+      localArr.unshift(recordData);
+      saveStorage(localArr);
+
+      document.getElementById("visitor-code-display").innerText = code;
+      document.getElementById("visitor-name-display").innerText = "Visitor: " + visitor;
+      document.getElementById("visitor-host-display").innerText = "Host: " + hostFull + (phone ? " [Tel: " + phone + "]" : "");
+      document.getElementById("visitor-headcount-display").innerText = "👥 Headcount: " + headcount;
+      document.getElementById("visitor-vehicle-display").innerText = "🚗 Vehicle: " + (vehicle || "None (Pedestrian)");
+      document.getElementById("visitor-notes-display").innerText = notes ? "📝 Details: " + notes : "";
+      document.getElementById("visitor-validity-display").innerText = "⏱️ Authorized for " + durationHours + " Hours";
+
+      var qrBox = document.getElementById("qrcode-box");
+      qrBox.innerHTML = "";
+      new QRCode(qrBox, {
+        text: "NITEL-PASS:" + code,
+        width: 130,
+        height: 130,
+        colorDark : "#0f172a",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.M
+      });
+
+      var resBox = document.getElementById("visitor-result");
+      resBox.style.display = "block";
+      resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      playBeep('success');
+    }
+
+    function generateResidentID() {
+      var passKey = (document.getElementById("res-id-passcode").value || "").trim().toUpperCase();
+      var name = (document.getElementById("resident-own-name").value || "").trim();
+      var phone = (document.getElementById("resident-own-phone").value || "").trim();
+      var zone = document.getElementById("resident-own-zone").value;
+      var house = (document.getElementById("resident-own-house").value || "").trim();
+      var vehicle = (document.getElementById("resident-own-vehicle").value || "").trim();
+
+      var err = document.getElementById("res-error-banner");
+      if (err) err.style.display = "none";
+
+      if (passKey !== RESIDENT_PASSCODE) {
+        if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; }
+        playBeep('error');
+        return;
+      }
+      if (!name) {
+        if (err) { err.innerText = "⚠️ Please type your Resident Full Name."; err.style.display = "block"; }
+        playBeep('error');
+        return;
+      }
+
+      var code = "77" + String(Math.floor(1000 + Math.random() * 9000));
+      var now = new Date();
+      var address = zone + (house ? " - " + house : "");
+
+      var recordData = {
+        code: code,
+        visitor: "Resident: " + name,
+        host: address,
+        headcount: "1 Resident",
+        generatorName: name,
+        generatorPhone: phone,
+        vehicle: vehicle || "Resident Vehicle",
+        notes: "Verified Resident",
+        type: "RESIDENT",
+        status: "ACTIVE",
+        timestamp: now.getTime(),
+        expiry: Date.now() + (365 * 24 * 3600 * 1000),
+        dateString: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
+        timeString: now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+      };
+
+      var localArr = getStorage();
+      localArr.unshift(recordData);
+      saveStorage(localArr);
+
+      document.getElementById("resident-badge-code").innerText = code;
+      document.getElementById("resident-badge-name").innerText = "Name: " + name;
+      document.getElementById("resident-badge-address").innerText = "Residence: " + address + (phone ? " [Tel: " + phone + "]" : "");
+      document.getElementById("resident-badge-vehicle").innerText = "🚗 Vehicle: " + (vehicle || "None Registered");
+
+      var rqrBox = document.getElementById("resident-qrcode-box");
+      rqrBox.innerHTML = "";
+      new QRCode(rqrBox, {
+        text: "NITEL-PASS:" + code,
+        width: 130,
+        height: 130,
+        colorDark : "#0f172a",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.M
+      });
+
+      var resBox = document.getElementById("resident-id-result");
+      resBox.style.display = "block";
+      resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      playBeep('success');
+    }
+
+    function generateGuardGateSidePass() {
+      var type = document.getElementById("guard-emg-type").value;
+      var name = (document.getElementById("guard-emg-name").value || "").trim();
+      var dest = (document.getElementById("guard-emg-dest").value || "").trim();
+      var veh = (document.getElementById("guard-emg-veh").value || "").trim();
+      var notes = (document.getElementById("guard-emg-notes").value || "").trim();
+
+      var code = "88" + String(Math.floor(1000 + Math.random() * 9000));
+      var now = new Date();
+      var person = name || "Community / Site Personnel";
+      var plot = dest || "NITEL Estate Axis";
+
+      var typeTag = (type === 'OMO_ONILE') ? "🏗️ [COMMUNITY/LEVY] " : (type === 'SITE_LABOR' ? "🔨 [SITE LABOR (8H)] " : (type === 'DEAD_PHONE' ? "📱 [DEAD PHONE] " : "⚡ [OVERRIDE] "));
+
+      var recordData = {
+        code: code,
+        visitor: typeTag + person,
+        host: plot,
+        headcount: veh || "Gate Cleared",
+        generatorName: "SECURITY GATE POST (Manual Verification)",
+        generatorPhone: "08108429710",
+        vehicle: veh || "Walk-in",
+        notes: notes || "Gate Verified Cargo",
+        type: (type === 'SITE_LABOR') ? 'LABORER' : 'EMERGENCY',
+        status: "USED",
+        timestamp: now.getTime(),
+        expiry: Date.now() + (8 * 3600 * 1000),
+        dateString: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
+        timeString: now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+      };
+
+      var localArr = getStorage();
+      localArr.unshift(recordData);
+      saveStorage(localArr);
+
+      document.getElementById("guard-emg-code").innerText = code;
+      document.getElementById("guard-emg-details").innerText = person + " $\rightarrow$ " + plot + " (" + (veh || 'Cleared') + ")" + (notes ? " | Note: " + notes : "");
+      document.getElementById("guard-emg-success").style.display = "block";
+
+      document.getElementById("guard-emg-name").value = "";
+      document.getElementById("guard-emg-dest").value = "";
+      document.getElementById("guard-emg-veh").value = "";
+      document.getElementById("guard-emg-notes").value = "";
+      playBeep('success');
+      renderLogs();
+    }
+
+    function sharePassWhatsApp() {
+      if (!currentPassCode) return;
+      var link = window.location.origin + window.location.pathname + "?code=" + currentPassCode + "&name=" + encodeURIComponent(currentVisitorName) + "&host=" + encodeURIComponent(currentHostInfo) + "&head=" + encodeURIComponent(currentHeadcount) + "&veh=" + encodeURIComponent(currentVehicleInfo) + "&notes=" + encodeURIComponent(currentNotesInfo) + "&exp=" + currentExpiry;
+      var text = "*NITEL ESTATE DIGITAL PASS*\n\n*Visitor:* " + currentVisitorName + "\n*Destination:* " + currentHostInfo + "\n*Headcount:* " + currentHeadcount + "\n*Vehicle:* " + currentVehicleInfo + (currentNotesInfo ? "\n*Details:* " + currentNotesInfo : "") + "\n*Access PIN:* " + currentPassCode + "\n\n*Live Gate Link:*\n" + link;
+      window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+    }
+
+    function downloadPassSlipImage() {
+      var canvas = document.createElement("canvas");
+      canvas.width = 600;
+      canvas.height = 700;
+      var ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 600, 700);
+      ctx.fillStyle = "#0f2b5c";
+      ctx.fillRect(0, 0, 600, 100);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 26px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("NITEL ESTATE — ACCESS PASS", 300, 50);
+      ctx.font = "14px sans-serif";
+      ctx.fillStyle = "#38bdf8";
+      ctx.fillText("DIGITAL ACCESS CONTROL", 300, 78);
+
+      ctx.fillStyle = "#f8fafc";
+      ctx.fillRect(40, 130, 520, 110);
+      ctx.strokeStyle = "#0ea5e9";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(40, 130, 520, 110);
+
+      ctx.fillStyle = "#0f2b5c";
+      ctx.font = "bold 48px monospace";
+      ctx.fillText(currentPassCode || "000000", 300, 205);
+
+      ctx.fillStyle = "#1e293b";
+      ctx.font = "bold 18px sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("Name: " + currentVisitorName, 60, 280);
+      ctx.fillText("Host / Plot: " + currentHostInfo, 60, 330);
+      ctx.fillText("Headcount: " + currentHeadcount, 60, 380);
+      ctx.fillText("Vehicle / Plate: " + currentVehicleInfo, 60, 430);
+      if (currentNotesInfo) {
+        ctx.fillText("Details: " + currentNotesInfo, 60, 480);
+        ctx.fillText("Issued: " + new Date().toLocaleDateString('en-GB') + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 60, 530);
+      } else {
+        ctx.fillText("Issued: " + new Date().toLocaleDateString('en-GB') + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 60, 480);
+      }
+
+      ctx.fillStyle = "#64748b";
+      ctx.font = "italic 14px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Security Hotline: 0810 842 9710 • Present to Gate Post", 300, 650);
+
+      var link = document.createElement('a');
+      link.download = 'NITEL_Pass_' + currentPassCode + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function downloadResidentBadgeSlip() {
+      var name = document.getElementById("resident-own-name").value || "Resident";
+      var code = document.getElementById("resident-badge-code").innerText;
+      var zone = document.getElementById("resident-own-zone").value;
+      var house = document.getElementById("resident-own-house").value || "";
+      var veh = document.getElementById("resident-own-vehicle").value || "None";
+
+      var canvas = document.createElement("canvas");
+      canvas.width = 600;
+      canvas.height = 600;
+      var ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 600, 600);
+      ctx.fillStyle = "#0f2b5c";
+      ctx.fillRect(0, 0, 600, 100);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 26px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("NITEL ESTATE — RESIDENT ID", 300, 50);
+      ctx.font = "14px sans-serif";
+      ctx.fillStyle = "#38bdf8";
+      ctx.fillText("VERIFIED RESIDENT ACCESS CARD", 300, 78);
+
+      ctx.fillStyle = "#eff6ff";
+      ctx.fillRect(40, 130, 520, 100);
+      ctx.strokeStyle = "#3b82f6";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(40, 130, 520, 100);
+
+      ctx.fillStyle = "#1d4ed8";
+      ctx.font = "bold 44px monospace";
+      ctx.fillText(code, 300, 195);
+
+      ctx.fillStyle = "#1e293b";
+      ctx.font = "bold 18px sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("Resident: " + name, 60, 280);
+      ctx.fillText("Address: " + zone + (house ? " - " + house : ""), 60, 330);
+      ctx.fillText("Vehicle: " + veh, 60, 380);
+
+      ctx.fillStyle = "#15803d";
+      ctx.font = "bold 16px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("✅ Verified NITEL Estate Community Member", 300, 480);
+
+      var link = document.createElement('a');
+      link.download = 'NITEL_Resident_Badge_' + code + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function unlockTerminal() {
+      var err = document.getElementById("guard-error-banner");
+      var pin = (document.getElementById("guard-master-pin").value || "").trim();
+      if (err) err.style.display = "none";
+
+      if (pin === GUARD_MASTER_PIN) {
+        document.getElementById("guard-auth-box").style.display = "none";
+        document.getElementById("guard-terminal-box").style.display = "block";
+        playBeep('success');
+        renderLogs();
+      } else {
+        if (err) {
+          err.innerText = "❌ Incorrect Master PIN (6232)";
+          err.style.display = "block";
+        }
+        playBeep('error');
+      }
+    }
+
+    function lockTerminal() {
+      document.getElementById("guard-master-pin").value = "";
+      document.getElementById("guard-auth-box").style.display = "block";
+      document.getElementById("guard-terminal-box").style.display = "none";
+      if (html5QrScanner) {
+        try { html5QrScanner.stop().catch(function(){}); } catch(e){}
+      }
+    }
+
+    function toggleQrScanner() {
+      var qrContainer = document.getElementById("qr-reader-container");
+      var btn = document.getElementById("toggle-camera-btn");
+
+      if (qrContainer.style.display === "none") {
+        qrContainer.style.display = "block";
+        btn.innerText = "⏹️ Stop QR Scanner";
+
+        try {
+          html5QrScanner = new Html5Qrcode("qr-reader");
+          html5QrScanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 220, height: 220 } },
+            function(decodedText) {
+              var code = decodedText.replace("NITEL-PASS:", "").trim();
+              if (code.length === 6) {
+                enteredPin = code;
+                document.getElementById("pin-display").innerText = code;
+                try {
+                  html5QrScanner.stop().then(function() {
+                    qrContainer.style.display = "none";
+                    btn.innerText = "📷 Open Camera QR Scanner";
+                    verifyGatePass();
+                  }).catch(function(){ verifyGatePass(); });
+                } catch(e) { verifyGatePass(); }
+              }
+            },
+            function(errorMessage) {}
+          ).catch(function(err) {
+            qrContainer.style.display = "none";
+            btn.innerText = "📷 Open Camera QR Scanner";
+            alert("Camera access error. Ensure permissions are allowed.");
+          });
+        } catch(e) {
+          qrContainer.style.display = "none";
+          btn.innerText = "📷 Open Camera QR Scanner";
+        }
+      } else {
+        if (html5QrScanner) {
+          try {
+            html5QrScanner.stop().then(function() {
+              qrContainer.style.display = "none";
+              btn.innerText = "📷 Open Camera QR Scanner";
+            }).catch(function(){
+              qrContainer.style.display = "none";
+              btn.innerText = "📷 Open Camera QR Scanner";
+            });
+          } catch(e) {
+            qrContainer.style.display = "none";
+            btn.innerText = "📷 Open Camera QR Scanner";
+          }
+        }
+      }
+    }
+
+    function pressKey(n) {
+      if (enteredPin.length < 6) {
+        enteredPin += n;
+        document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-");
+      }
+    }
+
+    function clearPin() {
+      enteredPin = "";
+      document.getElementById("pin-display").innerText = "------";
+      document.getElementById("gate-result").style.display = "none";
+    }
+
+    function verifyGatePass() {
+      var res = document.getElementById("gate-result");
+      if (enteredPin.length !== 6) {
+        res.style.display = "block";
+        res.style.background = "#fee2e2";
+        res.style.color = "#991b1b";
+        res.innerHTML = "<b>ENTER FULL 6-DIGIT PIN</b>";
+        playBeep('error');
+        return;
+      }
+
+      res.style.display = "block";
+      var records = getStorage();
+      var found = records.find(function(r) { return r.code === enteredPin; });
+
+      if (!found) {
+        res.style.background = "#fee2e2";
+        res.style.color = "#991b1b";
+        res.innerHTML = "<b>ACCESS DENIED</b><br><small>Invalid Code</small>";
+        playBeep('error');
+      } else if (found.type === 'RESIDENT') {
+        res.style.background = "#dcfce7";
+        res.style.color = "#166534";
+        res.innerHTML = "<b>RESIDENT ENTRY GRANTED</b><br><small>" + found.visitor + " | " + found.host + "</small>";
+        playBeep('success');
+      } else if (found.status === 'USED') {
+        res.style.background = "#fef3c7";
+        res.style.color = "#92400e";
+        res.innerHTML = "<b>ACCESS DENIED</b><br><small>Pass Already Verified Earlier</small>";
+        playBeep('error');
+      } else {
+        found.status = 'USED';
+        found.verifiedTime = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+        saveStorage(records);
+
+        res.style.background = "#dcfce7";
+        res.style.color = "#166534";
+        res.innerHTML = "<b>ACCESS GRANTED</b><br><small>" + found.visitor + " (" + (found.headcount || '1 Person') + ") | " + found.host + (found.notes ? "<br><i>Note: " + found.notes + "</i>" : "") + "</small>";
+        playBeep('success');
+        renderLogs();
+      }
+    }
+
+    function renderLogs() {
+      var container = document.getElementById("audit-log-feed");
+      if (!container) return;
+
+      var timeline = document.getElementById("log-timeline-filter").value;
+      var catFilter = document.getElementById("log-status-filter").value;
+      var records = getStorage();
+
+      var now = new Date();
+      var curMonth = now.getMonth();
+      var curYear = now.getFullYear();
+
+      var filtered = records.filter(function(item) {
+        var d = new Date(item.timestamp || Date.now());
+        var matchTime = true;
+        if (timeline === 'MONTH') matchTime = (d.getMonth() === curMonth && d.getFullYear() === curYear);
+        if (timeline === 'YEAR') matchTime = (d.getFullYear() === curYear);
+
+        var isOverstay = (item.status === 'USED' && item.expiry && Date.now() > item.expiry && item.type !== 'RESIDENT');
+
+        var matchCat = true;
+        if (catFilter === 'OVERSTAY') matchCat = isOverstay;
+        else if (catFilter === 'RESIDENT') matchCat = (item.type === 'RESIDENT');
+        else if (catFilter === 'VISITOR') matchCat = (item.type === 'VISITOR');
+        else if (catFilter === 'LABORER') matchCat = (item.type === 'LABORER');
+        else if (catFilter === 'CONTRACTOR') matchCat = (item.type === 'CONTRACTOR');
+        else if (catFilter === 'EMERGENCY') matchCat = (item.type === 'EMERGENCY');
+
+        return matchTime && matchCat;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px; font-style:italic;'>No logs matching filters.</p>";
+        return;
+      }
+
+      container.innerHTML = filtered.map(function(item) {
+        var isResident = item.type === 'RESIDENT';
+        var isLaborer = item.type === 'LABORER';
+        var isContractor = item.type === 'CONTRACTOR';
+        var isEmergency = item.type === 'EMERGENCY';
+        var isOverstay = (item.status === 'USED' && item.expiry && Date.now() > item.expiry && !isResident);
+
+        var badgeClass = isOverstay ? 'badge-overstay' : (item.status === 'EXITED' ? 'badge-exit' : (isEmergency ? 'badge-emergency' : (isLaborer || isContractor ? 'badge-contractor' : (isResident ? 'badge-resident' : (item.status === 'USED' ? 'badge-used' : 'badge-active')))));
+        var badgeText = isOverstay ? '⚠️ OVERSTAYED' : (item.status === 'EXITED' ? 'EXITED' : (isEmergency ? 'OVERRIDE' : (isLaborer ? 'LABORER (8H)' : (isContractor ? 'CONTRACTOR (12H)' : (isResident ? 'RESIDENT' : item.status)))));
+
+        var cardClass = isOverstay ? "log-item overstay-alert" : "log-item";
+
+        var callButton = (item.generatorPhone && !isResident) ? 
+          "<div style='display:flex; gap:6px; margin-top:6px;'>" +
+            "<a href='tel:" + item.generatorPhone + "' style='flex:1; text-align:center; background:#e0f2fe; color:#0369a1; padding:6px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>📞 Call Host</a>" +
+            "<a href='https://wa.me/234" + item.generatorPhone.replace(/^0/, '') + "' target='_blank' style='flex:1; text-align:center; background:#dcfce7; color:#15803d; padding:6px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>💬 WhatsApp</a>" +
+          "</div>" : "";
+
+        var notesDisplay = item.notes ? "<div style='font-size:11px; color:#15803d; margin-top:2px; font-weight:700;'>📝 <b>Details:</b> " + item.notes + "</div>" : "";
+
+        return "<div class='" + cardClass + "'>" +
+          "<div style='display:flex; justify-content:space-between; align-items:center;'>" +
+            "<span style='font-size:13px; font-weight:800; color:#0f172a;'>" + (isEmergency ? "⚡ " : (isLaborer ? "🔨 " : (isContractor ? "🏗️ " : (isResident ? "🏠 " : "👤 ")))) + item.visitor + "</span>" +
+            "<span class='log-badge " + badgeClass + "'>" + badgeText + "</span>" +
+          "</div>" +
+          "<div style='font-size:11px; color:#475569;'>📍 <b>Location:</b> " + item.host + "</div>" +
+          "<div style='font-size:11px; color:#b45309; font-weight:700;'>👥 <b>Headcount:</b> " + (item.headcount || '1 Person') + "</div>" +
+          "<div style='font-size:11px; color:#0284c7; font-weight:600;'>🔑 <b>Authorized By:</b> " + (item.generatorName || 'Resident') + "</div>" +
+          notesDisplay +
+          "<div style='font-size:10px; color:#64748b; margin-top:2px; font-family:monospace;'>" +
+            "<span>Code: " + item.code + " | 📅 " + (item.dateString || 'Today') + " " + (item.timeString || '') + "</span>" +
+          "</div>" +
+          callButton +
+        "</div>";
+      }).join('');
+    }
+
+    function exportLogsToCSV() {
+      var records = getStorage();
+      if (records.length === 0) return alert("No logs available to export.");
+
+      var csvContent = "data:text/csv;charset=utf-8,Pass Code,Name,Destination / Residence,Headcount,Authorized By,Contact Phone,Vehicle Plate,Visit Details / Notes,Type,Status,Date,Time\n";
+
+      records.forEach(function(r) {
+        var row = [
+          r.code,
+          '"' + (r.visitor || '') + '"',
+          '"' + (r.host || '') + '"',
+          '"' + (r.headcount || '1 Person') + '"',
+          '"' + (r.generatorName || '') + '"',
+          '"' + (r.generatorPhone || '') + '"',
+          '"' + (r.vehicle || '') + '"',
+          '"' + (r.notes || '') + '"',
+          r.type || 'VISITOR',
+          r.status,
+          r.dateString || '',
+          r.timeString || ''
+        ].join(",");
+        csvContent += row + "\n";
+      });
+
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "NITEL_Estate_Access_Audit_2026.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function checkoutVisitor() {
+      if (timerInterval) clearInterval(timerInterval);
+      document.getElementById("exit-estate-btn").style.display = "none";
+      document.getElementById("exit-confirmed-msg").style.display = "block";
+      document.getElementById("guest-countdown").innerText = "EXITED";
+      playBeep('success');
+
+      if (currentPassCode) {
+        var records = getStorage();
+        var found = records.find(function(r) { return r.code === currentPassCode; });
+        if (found) {
+          found.status = 'EXITED';
+          saveStorage(records);
+        }
+      }
+    }
+
+    function runTimer(exp) {
+      var disp = document.getElementById("guest-countdown");
+      if (timerInterval) clearInterval(timerInterval);
+      function update() {
+        var diff = exp - Date.now();
+        if (diff <= 0) {
+          clearInterval(timerInterval);
+          disp.innerText = "EXPIRED";
+          disp.style.color = "#dc2626";
+          return;
+        }
+        var s = Math.floor(diff / 1000);
+        var hrs = Math.floor(s / 3600);
+        var mins = Math.floor((s % 3600) / 60);
+        var secs = s % 60;
+        disp.innerText = (hrs < 10 ? '0' : '') + hrs + ":" + (mins < 10 ? '0' : '') + mins + ":" + (secs < 10 ? '0' : '') + secs;
+      }
+      update();
+      timerInterval = setInterval(update, 1000);
+    }
+
+    window.onload = function() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(function(){});
+      }
+
+      var urlParams = new URLSearchParams(window.location.search);
+      var code = urlParams.get("code");
+      var name = urlParams.get("name");
+      var host = urlParams.get("host");
+      var head = urlParams.get("head");
+      var veh = urlParams.get("veh");
+      var notes = urlParams.get("notes");
+      var exp = urlParams.get("exp");
+
+      if (code) {
+        switchTab("pass");
+        document.getElementById("guest-code-hero").innerText = code;
+        if (name) document.getElementById("guest-name-box").innerText = "Visitor: " + name;
+        if (host) document.getElementById("guest-dest-box").innerText = "Host: " + host;
+        if (head) document.getElementById("guest-headcount-box").innerText = "👥 Headcount: " + head;
+        if (veh) document.getElementById("guest-vehicle-box").innerText = "🚗 Vehicle: " + veh;
+        if (notes) document.getElementById("guest-notes-box").innerText = "📝 Note: " + notes;
+
+        var gQrBox = document.getElementById("guest-qr-box");
+        gQrBox.innerHTML = "";
+        new QRCode(gQrBox, {
+          text: "NITEL-PASS:" + code,
+          width: 130,
+          height: 130,
+          colorDark : "#0f172a",
+          colorLight : "#ffffff",
+          correctLevel : QRCode.CorrectLevel.M
+        });
+
+        runTimer(exp ? parseInt(exp) : (Date.now() + 4 * 3600 * 1000));
+      }
+    };
+  </script>
+</body>
+</html>
