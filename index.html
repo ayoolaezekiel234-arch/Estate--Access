@@ -64,6 +64,7 @@
     .badge-used { background: #064e3b; color: #34d399; border: 1px solid #059669; }
     .badge-active { background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; }
     .badge-resident { background: #1e1b4b; color: #a5b4fc; border: 1px solid #6366f1; }
+    .badge-contractor { background: #78350f; color: #fde68a; border: 1px solid #d97706; }
     .badge-emergency { background: #881337; color: #fecdd3; border: 1px solid #f43f5e; }
   </style>
 </head>
@@ -71,6 +72,7 @@
 
   <div class="container">
 
+    <!-- Header & Hotline -->
     <div class="card">
       <div class="header-row">
         <img src="/nitel-logo.png" alt="NITEL" class="logo-badge" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';" />
@@ -85,6 +87,7 @@
       </a>
     </div>
 
+    <!-- Navigation Tabs -->
     <div id="main-nav-bar" class="nav-bar">
       <button id="tab-visitor" class="nav-btn active-blue" onclick="switchTab('visitor')">Visitor Pass</button>
       <button id="tab-resident" class="nav-btn" onclick="switchTab('resident')">Resident ID</button>
@@ -92,10 +95,10 @@
       <button id="tab-pass" class="nav-btn" onclick="switchTab('pass')">My Pass</button>
     </div>
 
-    <!-- 1. VISITOR PASS GENERATOR -->
+    <!-- 1. VISITOR & LABORER PASS GENERATOR -->
     <div id="view-visitor" class="card">
-      <div style="font-size: 14px; font-weight: bold; color: #60a5fa;">Generate Visitor Pass</div>
-      <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">For Resident's Guests, Artisans & Deliveries</div>
+      <div style="font-size: 14px; font-weight: bold; color: #60a5fa;">Generate Visitor / Laborer Pass</div>
+      <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">For Resident Guests, Site Laborers, Artisans & Deliveries</div>
 
       <div class="passcode-box">
         <label style="color: #93c5fd;">🔑 Resident Verification Passcode</label>
@@ -156,26 +159,39 @@
       </div>
 
       <div class="form-group">
-        <label>Visitor Full Name</label>
-        <input id="res-visitor-name" type="text" placeholder="e.g. Emmanuel Chukwu" />
+        <label>Primary Visitor / Lead Laborer Name</label>
+        <input id="res-visitor-name" type="text" placeholder="e.g. Emmanuel Chukwu / Site Worker" />
       </div>
 
       <div class="form-row form-group">
         <div>
-          <label>Visit Purpose</label>
-          <select id="res-pass-type">
-            <option value="RESIDENTIAL">Residential Guest (24h)</option>
-            <option value="ARTISAN">Artisan / Delivery (2h)</option>
-            <option value="MOSQUE">Mosque Service (4h)</option>
-            <option value="CHURCH">Church Service (4h)</option>
-            <option value="SUPERMARKET">Supermarket / Retail (1h)</option>
-            <option value="HOTEL">Hotel / Short-let (7 Days)</option>
+          <label>No. of Persons (Headcount)</label>
+          <select id="res-headcount">
+            <option value="1 Person (Solo)">1 Person (Solo)</option>
+            <option value="2 Persons (1 Extra)">2 Persons (1 Extra)</option>
+            <option value="Family (Adults + Kids)">Family (Adults + Kids)</option>
+            <option value="Small Crew (3-5 Workers)">Small Crew (3-5 Workers)</option>
+            <option value="Large Gang (6+ Workers)">Large Gang (6+ Workers)</option>
           </select>
         </div>
         <div>
           <label>Vehicle Plate No.</label>
-          <input id="res-vehicle-no" type="text" placeholder="e.g. KSF-123AA / Uber" />
+          <input id="res-vehicle-no" type="text" placeholder="e.g. KSF-123AA / Pedestrian" />
         </div>
+      </div>
+
+      <div class="form-group">
+        <label>Visit Purpose & Duration</label>
+        <select id="res-pass-type">
+          <option value="RESIDENTIAL">Residential Guest (24 Hours)</option>
+          <option value="LABORER">Site Laborer / Worker (8 Hours)</option>
+          <option value="CONTRACTOR">Contractor / Heavy Site Work (12 Hours)</option>
+          <option value="ARTISAN">Artisan / Short Delivery (2 Hours)</option>
+          <option value="MOSQUE">Mosque Service (4 Hours)</option>
+          <option value="CHURCH">Church Service (4 Hours)</option>
+          <option value="SUPERMARKET">Supermarket / Retail (1 Hour)</option>
+          <option value="HOTEL">Hotel / Short-let (7 Days)</option>
+        </select>
       </div>
 
       <div id="gen-error-banner" class="error-banner"></div>
@@ -184,8 +200,9 @@
         Authorize Visitor Pass
       </button>
 
+      <!-- Visitor Output Result Card -->
       <div id="visitor-result" class="result-card">
-        <div style="font-size: 10px; font-weight: 800; color: #6ee7b7; text-transform: uppercase;">Visitor Pass Authorized</div>
+        <div style="font-size: 10px; font-weight: 800; color: #6ee7b7; text-transform: uppercase;">Access Pass Authorized</div>
         <div id="visitor-code-display" class="pin-hero">000000</div>
         
         <div id="qrcode-box" class="qr-container"></div>
@@ -193,8 +210,9 @@
 
         <div id="visitor-name-display" style="font-size: 12px; font-weight: bold; color: #fff;"></div>
         <div id="visitor-host-display" style="font-size: 11px; color: #cbd5e1;"></div>
+        <div id="visitor-headcount-display" style="font-size: 11px; color: #fde047; margin-top: 2px;"></div>
         <div id="visitor-vehicle-display" style="font-size: 11px; color: #93c5fd; margin-top: 2px;"></div>
-        <div id="visitor-validity-display" style="font-size: 11px; color: #fde047; margin-top: 4px;"></div>
+        <div id="visitor-validity-display" style="font-size: 11px; color: #6ee7b7; margin-top: 4px;"></div>
 
         <button type="button" class="btn-action btn-emerald" onclick="sharePassWhatsApp()">📲 Share via WhatsApp</button>
         <button type="button" class="btn-action btn-amber" onclick="downloadPassSlipImage()">🖼️ Download Image Slip</button>
@@ -271,6 +289,7 @@
         Generate Resident Digital ID
       </button>
 
+      <!-- Resident Output Card -->
       <div id="resident-id-result" class="result-card" style="background:#0f172a; border-color:#3b82f6;">
         <div style="font-size: 10px; font-weight: 800; color: #60a5fa; text-transform: uppercase;">NITEL Estate Resident Badge</div>
         <div id="resident-badge-code" class="pin-hero" style="color:#60a5fa;">000000</div>
@@ -287,7 +306,7 @@
       </div>
     </div>
 
-    <!-- 3. GUARD TERMINAL & EMERGENCY OVERRIDE -->
+    <!-- 3. GUARD TERMINAL & DEAD PHONE / OMO ONILE OVERRIDE -->
     <div id="view-guard" class="card" style="display: none;">
       
       <div id="guard-auth-box" style="text-align: center;">
@@ -331,49 +350,52 @@
 
         <div id="gate-result" style="display:none; padding:10px; border-radius:10px; text-align:center; margin-top:10px;"></div>
 
+        <!-- 🚨 GATE-SIDE SPECIAL/EMERGENCY/COMMUNITY CREATOR -->
         <div class="emergency-box">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size: 11px; font-weight: 800; color: #fda4af; text-transform: uppercase;">⚡ Gate-Side Resident / Emergency Creator</span>
+            <span style="font-size: 11px; font-weight: 800; color: #fda4af; text-transform: uppercase;">⚡ Gate-Side Clearance & Override</span>
           </div>
-          <div style="font-size: 10px; color: #cbd5e1; margin-top: 2px;">Use this when a resident's phone is dead, flat battery, or emergency entry.</div>
+          <div style="font-size: 10px; color: #cbd5e1; margin-top: 2px;">For Dead Phone residents, Laborers, Community (Omo Onile), or Emergencies.</div>
 
           <div class="form-row form-group">
             <div>
               <label style="color:#fecdd3;">Entry Type</label>
               <select id="guard-emg-type">
                 <option value="DEAD_PHONE">📱 Resident Dead Battery / Flat Phone</option>
-                <option value="AMBULANCE">🚑 Ambulance / Medical</option>
+                <option value="OMO_ONILE">🏗️ Community Relations / Site Levy / Omo Onile</option>
+                <option value="SITE_LABOR">🔨 Walk-in Site Laborers (8 Hours)</option>
+                <option value="AMBULANCE">🚑 Ambulance / Medical Emergency</option>
                 <option value="POLICE">🚓 Police / Security Patrol</option>
-                <option value="FIRE">🚒 Fire Service</option>
-                <option value="UTILITY">⚡ Utility / PHCN Repair</option>
+                <option value="UTILITY">⚡ EKEDC / Utility Maintenance</option>
               </select>
             </div>
             <div>
-              <label style="color:#fecdd3;">Resident / Person Name</label>
-              <input id="guard-emg-name" type="text" placeholder="e.g. Mr. Okon / Patrol Officer" />
+              <label style="color:#fecdd3;">Visitor / Person Name</label>
+              <input id="guard-emg-name" type="text" placeholder="e.g. Mr. Okon / Chief Rasheed" />
             </div>
           </div>
 
           <div class="form-row form-group">
             <div>
-              <label style="color:#fecdd3;">Avenue / Plot</label>
-              <input id="guard-emg-dest" type="text" placeholder="e.g. Avenue 3 Plot 10" />
+              <label style="color:#fecdd3;">Avenue / Plot Destination</label>
+              <input id="guard-emg-dest" type="text" placeholder="e.g. Avenue 3 Plot 10 / Site 14" />
             </div>
             <div>
-              <label style="color:#fecdd3;">Vehicle / Plate No.</label>
-              <input id="guard-emg-veh" type="text" placeholder="e.g. Toyota RAV4 / KSF-123" />
+              <label style="color:#fecdd3;">Vehicle / Group Info</label>
+              <input id="guard-emg-veh" type="text" placeholder="e.g. 4 Persons / Toyota Camry" />
             </div>
           </div>
 
           <button type="button" class="btn-action btn-rose" onclick="generateGuardGateSidePass()">⚡ Authorize Immediate Entry</button>
           
           <div id="guard-emg-success" style="display:none; background:#4c0519; border:1px solid #f43f5e; padding:10px; border-radius:10px; text-align:center; margin-top:8px;">
-            <div style="font-size:10px; font-weight:bold; color:#fda4af;">ENTRY CLEARED BY GUARD</div>
+            <div style="font-size:10px; font-weight:bold; color:#fda4af;">ENTRY CLEARED & AUDITED BY GUARD</div>
             <div id="guard-emg-code" style="font-size:24px; font-weight:900; font-family:monospace; color:#fff; letter-spacing:3px;">000000</div>
             <div id="guard-emg-details" style="font-size:11px; color:#fecdd3;"></div>
           </div>
         </div>
 
+        <!-- Audit Logs Feed & CSV Export -->
         <div style="margin-top: 18px; border-top: 1px solid #334155; padding-top: 12px; display:flex; flex-direction:column; gap:8px;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-size:11px; font-weight:800; color:#cbd5e1; text-transform:uppercase;">Entry Audit & Pass Logs</span>
@@ -395,7 +417,9 @@
                 <option value="ALL">All Entries</option>
                 <option value="RESIDENT">Resident Entries</option>
                 <option value="VISITOR">Visitor Passes</option>
-                <option value="EMERGENCY">Dead Phone / Emergency</option>
+                <option value="LABORER">Site Laborers (8h)</option>
+                <option value="CONTRACTOR">Contractors (12h)</option>
+                <option value="EMERGENCY">Overrides / Community</option>
               </select>
             </div>
           </div>
@@ -415,6 +439,7 @@
 
       <div id="guest-name-box" style="font-size: 12px; font-weight: bold;"></div>
       <div id="guest-dest-box" style="font-size: 11px; color: #94a3b8; margin-top: 2px;"></div>
+      <div id="guest-headcount-box" style="font-size: 11px; color: #fde047; margin-top: 2px;"></div>
       <div id="guest-vehicle-box" style="font-size: 11px; color: #93c5fd; margin-top: 2px;"></div>
 
       <div style="background: #020617; border: 1px solid #1e293b; padding: 12px; border-radius: 14px; margin: 12px 0;">
@@ -439,6 +464,7 @@
     var currentPassCode = "";
     var currentVisitorName = "";
     var currentHostInfo = "";
+    var currentHeadcount = "";
     var currentVehicleInfo = "";
     var currentExpiry = 0;
     var timerInterval = null;
@@ -472,6 +498,7 @@
       }
     }
 
+    // 1. GENERATE VISITOR / LABORER PASS
     function generateVisitorPass() {
       var passInput = document.getElementById("res-passcode-auth");
       var hostInput = document.getElementById("res-host-name");
@@ -479,6 +506,7 @@
       var zoneInput = document.getElementById("res-zone-select");
       var houseInput = document.getElementById("res-house-no");
       var visitorInput = document.getElementById("res-visitor-name");
+      var headInput = document.getElementById("res-headcount");
       var typeInput = document.getElementById("res-pass-type");
       var vehicleInput = document.getElementById("res-vehicle-no");
 
@@ -488,6 +516,7 @@
       var zone = zoneInput ? zoneInput.value : "Avenue 1";
       var house = houseInput ? houseInput.value.trim() : "";
       var visitor = visitorInput ? visitorInput.value.trim() : "";
+      var headcount = headInput ? headInput.value : "1 Person (Solo)";
       var type = typeInput ? typeInput.value : "RESIDENTIAL";
       var vehicle = vehicleInput ? vehicleInput.value.trim() : "";
 
@@ -500,30 +529,45 @@
       }
 
       if (!visitor) {
-        if (err) { err.innerText = "⚠️ Please type Visitor Full Name."; err.style.display = "block"; }
+        if (err) { err.innerText = "⚠️ Please type Visitor / Lead Name."; err.style.display = "block"; }
         return;
       }
 
       var code = String(Math.floor(100000 + Math.random() * 900000));
       var hostFull = (host || "Host Resident") + " (" + zone + (house ? " - " + house : "") + ")";
-      var durationHours = (type === 'HOTEL') ? 168 : (type === 'RESIDENTIAL' ? 24 : 4);
+      
+      // Calculate exact duration
+      var durationHours = 24;
+      if (type === 'HOTEL') durationHours = 168;
+      else if (type === 'CONTRACTOR') durationHours = 12;
+      else if (type === 'LABORER') durationHours = 8;
+      else if (type === 'MOSQUE' || type === 'CHURCH') durationHours = 4;
+      else if (type === 'ARTISAN') durationHours = 2;
+      else if (type === 'SUPERMARKET') durationHours = 1;
+
       var now = new Date();
 
       currentPassCode = code;
       currentVisitorName = visitor;
       currentHostInfo = hostFull;
+      currentHeadcount = headcount;
       currentVehicleInfo = vehicle || "Pedestrian / None";
       currentExpiry = Date.now() + (durationHours * 3600 * 1000);
+
+      var categoryType = 'VISITOR';
+      if (type === 'LABORER') categoryType = 'LABORER';
+      else if (type === 'CONTRACTOR') categoryType = 'CONTRACTOR';
 
       var records = getStorage();
       records.unshift({ 
         code: code, 
         visitor: visitor, 
         host: hostFull, 
+        headcount: headcount,
         generatorName: host || "Resident",
         generatorPhone: phone || "",
         vehicle: vehicle || "Pedestrian",
-        type: "VISITOR",
+        type: categoryType,
         status: "ACTIVE",
         timestamp: now.getTime(),
         dateString: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
@@ -534,6 +578,7 @@
       document.getElementById("visitor-code-display").innerText = code;
       document.getElementById("visitor-name-display").innerText = "Visitor: " + visitor;
       document.getElementById("visitor-host-display").innerText = "Host: " + hostFull + (phone ? " [Tel: " + phone + "]" : "");
+      document.getElementById("visitor-headcount-display").innerText = "👥 Headcount: " + headcount;
       document.getElementById("visitor-vehicle-display").innerText = "🚗 Vehicle: " + (vehicle || "None (Pedestrian)");
       document.getElementById("visitor-validity-display").innerText = "⏱️ Authorized for " + durationHours + " Hours";
 
@@ -553,6 +598,7 @@
       resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
+    // 2. GENERATE RESIDENT DIGITAL ID
     function generateResidentID() {
       var passKey = (document.getElementById("res-id-passcode").value || "").trim().toUpperCase();
       var name = (document.getElementById("resident-own-name").value || "").trim();
@@ -582,6 +628,7 @@
         code: code,
         visitor: "Resident: " + name,
         host: address,
+        headcount: "1 Resident",
         generatorName: name,
         generatorPhone: phone,
         vehicle: vehicle || "Resident Vehicle",
@@ -614,27 +661,30 @@
       resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
+    // 3. GUARD GATE-SIDE OVERRIDE
     function generateGuardGateSidePass() {
       var type = document.getElementById("guard-emg-type").value;
       var name = (document.getElementById("guard-emg-name").value || "").trim();
       var dest = (document.getElementById("guard-emg-dest").value || "").trim();
       var veh = (document.getElementById("guard-emg-veh").value || "").trim();
 
-      var isDeadPhone = (type === 'DEAD_PHONE');
-      var code = isDeadPhone ? ("88" + String(Math.floor(1000 + Math.random() * 9000))) : ("911" + String(Math.floor(100 + Math.random() * 900)));
+      var code = "88" + String(Math.floor(1000 + Math.random() * 9000));
       var now = new Date();
-      var person = name || (isDeadPhone ? "Resident (Flat Battery)" : "Emergency Personnel");
-      var plot = dest || "NITEL Estate";
+      var person = name || "Community / Site Personnel";
+      var plot = dest || "NITEL Estate Axis";
+
+      var typeTag = (type === 'OMO_ONILE') ? "🏗️ [COMMUNITY/LEVY] " : (type === 'SITE_LABOR' ? "🔨 [SITE LABOR (8H)] " : (type === 'DEAD_PHONE' ? "📱 [DEAD PHONE] " : "⚡ [OVERRIDE] "));
 
       var records = getStorage();
       records.unshift({
         code: code,
-        visitor: (isDeadPhone ? "📱 [DEAD PHONE] " : "🚨 [EMERGENCY] ") + person,
+        visitor: typeTag + person,
         host: plot,
+        headcount: veh || "Gate Cleared",
         generatorName: "SECURITY GATE POST (Manual Verification)",
         generatorPhone: "08108429710",
-        vehicle: veh || (isDeadPhone ? "Resident Car" : "Emergency Unit"),
-        type: "EMERGENCY",
+        vehicle: veh || "Walk-in",
+        type: (type === 'SITE_LABOR') ? 'LABORER' : 'EMERGENCY',
         status: "USED",
         timestamp: now.getTime(),
         dateString: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
@@ -643,7 +693,7 @@
       saveStorage(records);
 
       document.getElementById("guard-emg-code").innerText = code;
-      document.getElementById("guard-emg-details").innerText = person + " $\rightarrow$ " + plot + (veh ? " (" + veh + ")" : "");
+      document.getElementById("guard-emg-details").innerText = person + " $\rightarrow$ " + plot + " (" + (veh || 'Cleared') + ")";
       document.getElementById("guard-emg-success").style.display = "block";
 
       document.getElementById("guard-emg-name").value = "";
@@ -654,26 +704,26 @@
 
     function sharePassWhatsApp() {
       if (!currentPassCode) return;
-      var link = window.location.origin + window.location.pathname + "?code=" + currentPassCode + "&name=" + encodeURIComponent(currentVisitorName) + "&host=" + encodeURIComponent(currentHostInfo) + "&veh=" + encodeURIComponent(currentVehicleInfo) + "&exp=" + currentExpiry;
-      var text = "*NITEL ESTATE DIGITAL PASS*\n\n*Visitor:* " + currentVisitorName + "\n*Destination:* " + currentHostInfo + "\n*Vehicle:* " + currentVehicleInfo + "\n*Access PIN:* " + currentPassCode + "\n\n*Live Gate Link:*\n" + link;
+      var link = window.location.origin + window.location.pathname + "?code=" + currentPassCode + "&name=" + encodeURIComponent(currentVisitorName) + "&host=" + encodeURIComponent(currentHostInfo) + "&head=" + encodeURIComponent(currentHeadcount) + "&veh=" + encodeURIComponent(currentVehicleInfo) + "&exp=" + currentExpiry;
+      var text = "*NITEL ESTATE DIGITAL PASS*\n\n*Visitor:* " + currentVisitorName + "\n*Destination:* " + currentHostInfo + "\n*Headcount:* " + currentHeadcount + "\n*Vehicle:* " + currentVehicleInfo + "\n*Access PIN:* " + currentPassCode + "\n\n*Live Gate Link:*\n" + link;
       window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
     }
 
     function downloadPassSlipImage() {
       var canvas = document.createElement("canvas");
       canvas.width = 600;
-      canvas.height = 680;
+      canvas.height = 700;
       var ctx = canvas.getContext("2d");
 
       ctx.fillStyle = "#0f172a";
-      ctx.fillRect(0, 0, 600, 680);
+      ctx.fillRect(0, 0, 600, 700);
       ctx.fillStyle = "#2563eb";
       ctx.fillRect(0, 0, 600, 100);
 
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 26px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("NITEL ESTATE — VISITOR PASS", 300, 50);
+      ctx.fillText("NITEL ESTATE — ACCESS PASS", 300, 50);
       ctx.font = "14px sans-serif";
       ctx.fillStyle = "#fbbf24";
       ctx.fillText("OUR HOME • OUR COMMUNITY • OUR PRIDE", 300, 78);
@@ -691,18 +741,19 @@
       ctx.fillStyle = "#cbd5e1";
       ctx.font = "bold 18px sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText("Visitor Name: " + currentVisitorName, 60, 290);
-      ctx.fillText("Host / Plot: " + currentHostInfo, 60, 340);
-      ctx.fillText("Vehicle / Plate: " + currentVehicleInfo, 60, 390);
-      ctx.fillText("Issued: " + new Date().toLocaleDateString('en-GB') + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 60, 440);
+      ctx.fillText("Name: " + currentVisitorName, 60, 280);
+      ctx.fillText("Host / Plot: " + currentHostInfo, 60, 330);
+      ctx.fillText("Headcount: " + currentHeadcount, 60, 380);
+      ctx.fillText("Vehicle / Plate: " + currentVehicleInfo, 60, 430);
+      ctx.fillText("Issued: " + new Date().toLocaleDateString('en-GB') + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 60, 480);
 
       ctx.fillStyle = "#64748b";
       ctx.font = "italic 14px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("Security Hotline: 0810 842 9710 • Present to Gate Post", 300, 620);
+      ctx.fillText("Security Hotline: 0810 842 9710 • Present to Gate Post", 300, 650);
 
       var link = document.createElement('a');
-      link.download = 'NITEL_Visitor_Pass_' + currentPassCode + '.png';
+      link.download = 'NITEL_Pass_' + currentPassCode + '.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
     }
@@ -867,7 +918,7 @@
         saveStorage(records);
         res.style.background = "#022c22";
         res.style.color = "#6ee7b7";
-        res.innerHTML = "<b>ACCESS GRANTED</b><br><small>" + found.visitor + " | " + found.host + "</small>";
+        res.innerHTML = "<b>ACCESS GRANTED</b><br><small>" + found.visitor + " (" + (found.headcount || '1 Person') + ") | " + found.host + "</small>";
         renderLogs();
       }
     }
@@ -891,6 +942,8 @@
         var matchCat = true;
         if (catFilter === 'RESIDENT') matchCat = (item.type === 'RESIDENT');
         else if (catFilter === 'VISITOR') matchCat = (item.type === 'VISITOR');
+        else if (catFilter === 'LABORER') matchCat = (item.type === 'LABORER');
+        else if (catFilter === 'CONTRACTOR') matchCat = (item.type === 'CONTRACTOR');
         else if (catFilter === 'EMERGENCY') matchCat = (item.type === 'EMERGENCY');
 
         return matchTime && matchCat;
@@ -903,9 +956,12 @@
 
       container.innerHTML = filtered.map(function(item) {
         var isResident = item.type === 'RESIDENT';
+        var isLaborer = item.type === 'LABORER';
+        var isContractor = item.type === 'CONTRACTOR';
         var isEmergency = item.type === 'EMERGENCY';
-        var badgeClass = isEmergency ? 'badge-emergency' : (isResident ? 'badge-resident' : (item.status === 'USED' ? 'badge-used' : 'badge-active'));
-        var badgeText = isEmergency ? 'OVERRIDE' : (isResident ? 'RESIDENT' : item.status);
+
+        var badgeClass = isEmergency ? 'badge-emergency' : (isLaborer || isContractor ? 'badge-contractor' : (isResident ? 'badge-resident' : (item.status === 'USED' ? 'badge-used' : 'badge-active')));
+        var badgeText = isEmergency ? 'OVERRIDE' : (isLaborer ? 'LABORER (8H)' : (isContractor ? 'CONTRACTOR (12H)' : (isResident ? 'RESIDENT' : item.status)));
 
         var callButton = (item.generatorPhone && !isEmergency && !isResident) ? 
           "<div style='display:flex; gap:4px; margin-top:4px;'>" +
@@ -915,10 +971,11 @@
 
         return "<div class='log-item'>" +
           "<div style='display:flex; justify-content:space-between; align-items:center;'>" +
-            "<span style='font-size:12px; font-weight:bold; color:#fff;'>" + (isEmergency ? "⚡ " : (isResident ? "🏠 " : "👤 ")) + item.visitor + "</span>" +
+            "<span style='font-size:12px; font-weight:bold; color:#fff;'>" + (isEmergency ? "⚡ " : (isLaborer ? "🔨 " : (isContractor ? "🏗️ " : (isResident ? "🏠 " : "👤 ")))) + item.visitor + "</span>" +
             "<span class='log-badge " + badgeClass + "'>" + badgeText + "</span>" +
           "</div>" +
           "<div style='font-size:10px; color:#cbd5e1;'>📍 <b>Location:</b> " + item.host + "</div>" +
+          "<div style='font-size:10px; color:#fde047;'>👥 <b>Headcount:</b> " + (item.headcount || '1 Person') + "</div>" +
           "<div style='font-size:10px; color:#93c5fd;'>🔑 <b>Authorized By:</b> " + (item.generatorName || 'Resident') + "</div>" +
           "<div style='font-size:9px; color:#64748b; margin-top:2px; font-family:monospace;'>" +
             "<span>Code: " + item.code + " | 📅 " + (item.dateString || 'Today') + " " + (item.timeString || '') + "</span>" +
@@ -932,13 +989,14 @@
       var records = getStorage();
       if (records.length === 0) return alert("No logs available to export.");
 
-      var csvContent = "data:text/csv;charset=utf-8,Pass Code,Name,Destination / Residence,Authorized By,Contact Phone,Vehicle Plate,Type,Status,Date,Time\n";
+      var csvContent = "data:text/csv;charset=utf-8,Pass Code,Name,Destination / Residence,Headcount,Authorized By,Contact Phone,Vehicle Plate,Type,Status,Date,Time\n";
 
       records.forEach(function(r) {
         var row = [
           r.code,
           '"' + (r.visitor || '') + '"',
           '"' + (r.host || '') + '"',
+          '"' + (r.headcount || '1 Person') + '"',
           '"' + (r.generatorName || '') + '"',
           '"' + (r.generatorPhone || '') + '"',
           '"' + (r.vehicle || '') + '"',
@@ -1001,6 +1059,7 @@
       var code = urlParams.get("code");
       var name = urlParams.get("name");
       var host = urlParams.get("host");
+      var head = urlParams.get("head");
       var veh = urlParams.get("veh");
       var exp = urlParams.get("exp");
 
@@ -1010,6 +1069,7 @@
         document.getElementById("guest-code-hero").innerText = code;
         if (name) document.getElementById("guest-name-box").innerText = "Visitor: " + name;
         if (host) document.getElementById("guest-dest-box").innerText = "Host: " + host;
+        if (head) document.getElementById("guest-headcount-box").innerText = "👥 Headcount: " + head;
         if (veh) document.getElementById("guest-vehicle-box").innerText = "🚗 Vehicle: " + veh;
 
         var gQrBox = document.getElementById("guest-qr-box");
