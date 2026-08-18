@@ -1172,6 +1172,7 @@
       document.getElementById("visitor-validity-display").innerText = "⏱️ Authorized for " + durationHours + " Hours";
 
       var qrBox = document.getElementById("qrcode-box"); qrBox.innerHTML = "";
+      // STAGE 4 UPGRADE: Secure QR Token containing only the prefix and PIN
       new QRCode(qrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130, colorDark : "#0f172a", colorLight : "#ffffff" });
 
       var resBox = document.getElementById("visitor-result"); resBox.style.display = "block";
@@ -1212,6 +1213,7 @@
       document.getElementById("resident-badge-vehicle").innerText = "🚗 Vehicle: " + (vehicle || "None");
 
       var rqrBox = document.getElementById("resident-qrcode-box"); rqrBox.innerHTML = "";
+      // STAGE 4 UPGRADE: Secure Resident QR Token (Hiding plain text name/phone from public scans)
       new QRCode(rqrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130, colorDark : "#0f172a", colorLight : "#ffffff" });
 
       var resBox = document.getElementById("resident-id-result"); resBox.style.display = "block";
@@ -1358,7 +1360,6 @@
       renderLogs();
     }
 
-    // CHECKOUT FUNCTIONALITY
     function checkoutVisitor(code) {
       var records = getStorage();
       var found = records.find(function(r) { return r.code === code; });
@@ -1371,7 +1372,6 @@
       }
     }
 
-    // UPDATED RENDER LOGS WITH CHECKOUT BUTTON
     function renderLogs() {
       var container = document.getElementById("audit-log-feed"); 
       if (!container) return;
