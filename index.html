@@ -1124,7 +1124,11 @@
       if (passKey !== RESIDENT_PASSCODE) { if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; } playBeep('error'); return; }
       if (!visitor) { if (err) { err.innerText = "⚠️ Please type Visitor Name."; err.style.display = "block"; } playBeep('error'); return; }
 
-      var code = String(Math.floor(100000 + Math.random() * 900000));
+      // STAGE 2 UPGRADE: Cryptographically Secure PIN Generation
+      var array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      var code = String(100000 + (array[0] % 900000));
+
       var hostFull = (host || "Host Resident") + " (" + zone + (house ? " - " + house : "") + ")";
       var durationHours = (type === 'CONTRACTOR') ? 12 : ((type === 'LABORER') ? 8 : ((type === 'ARTISAN') ? 2 : 24));
       var now = new Date();
@@ -1171,7 +1175,11 @@
       if (passKey !== RESIDENT_PASSCODE) { if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; } playBeep('error'); return; }
       if (!name) { if (err) { err.innerText = "⚠️ Please type your Full Name."; err.style.display = "block"; } playBeep('error'); return; }
 
-      var code = "77" + String(Math.floor(1000 + Math.random() * 9000));
+      // STAGE 2 UPGRADE: Secure PIN for Resident ID
+      var array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      var code = "77" + String(1000 + (array[0] % 9000));
+
       var now = new Date(); var address = zone + (house ? " - " + house : "");
       var recordData = {
         code: code, visitor: "Resident: " + name, host: address, headcount: "1 Resident",
@@ -1201,7 +1209,10 @@
       var dest = (document.getElementById("guard-emg-dest").value || "").trim();
       var veh = (document.getElementById("guard-emg-veh").value || "").trim();
       var notes = (document.getElementById("guard-emg-notes").value || "").trim();
-      var code = "88" + String(Math.floor(1000 + Math.random() * 9000));
+      
+      var array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      var code = "88" + String(1000 + (array[0] % 9000));
       var now = new Date();
 
       var recordData = {
@@ -1268,16 +1279,43 @@
     function pressKey(n) { if (enteredPin.length < 6) { enteredPin += n; document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-"); } }
     function clearPin() { enteredPin = ""; document.getElementById("pin-display").innerText = "------"; document.getElementById("gate-result").style.display = "none"; }
 
+    // STAGE 2 UPGRADE: Strict Expiration & Single-Use Gate Verification
     function verifyGatePass() {
-      var res = document.getElementById("gate-result"); res.style.display = "block";
-      var records = getStorage(); var found = records.find(function(r) { return r.code === enteredPin; });
-      if (!found) { res.style.background = "#fee2e2"; res.style.color = "#991b1b"; res.innerHTML = "<b>ACCESS DENIED</b>"; playBeep('error'); }
-      else {
-        found.status = 'USED'; saveStorage(records);
-        res.style.background = "#dcfce7"; res.style.color = "#166534";
-        res.innerHTML = "<b>ACCESS GRANTED</b><br><small>" + found.visitor + " → " + found.host + "</small>";
-        playBeep('success'); renderLogs();
+      var res = document.getElementById("gate-result"); 
+      res.style.display = "block";
+      var records = getStorage(); 
+      var found = records.find(function(r) { return r.code === enteredPin; });
+      var now = Date.now();
+
+      if (!found) { 
+        res.style.background = "#fee2e2"; 
+        res.style.color = "#991b1b"; 
+        res.innerHTML = "<b>❌ ACCESS DENIED</b><br><small>PIN not recognized</small>"; 
+        playBeep('error'); 
       }
+      else if (found.status === 'USED') {
+        res.style.background = "#fff1f2"; 
+        res.style.color = "#be123c"; 
+        res.innerHTML = "<b>⚠️ ACCESS DENIED: Pass Already Used</b><br><small>" + found.visitor + " was already admitted.</small>"; 
+        playBeep('error');
+      }
+      else if (now > found.expiry) {
+        found.status = 'EXPIRED'; 
+        saveStorage(records); 
+        res.style.background = "#fef3c7"; 
+        res.style.color = "#b45309"; 
+        res.innerHTML = "<b>⏱️ ACCESS DENIED: Pass Expired</b><br><small>Expired at " + new Date(found.expiry).toLocaleTimeString() + "</small>"; 
+        playBeep('error');
+      }
+      else {
+        found.status = 'USED'; 
+        saveStorage(records);
+        res.style.background = "#dcfce7"; 
+        res.style.color = "#166534";
+        res.innerHTML = "<b>✅ ACCESS GRANTED</b><br><small>" + found.visitor + " → " + found.host + "</small>";
+        playBeep('success'); 
+      }
+      renderLogs();
     }
 
     function renderLogs() {
