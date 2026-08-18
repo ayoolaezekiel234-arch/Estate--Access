@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NITEL Estate — Verified Social & Access Hub</title>
+  
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="apple-touch-icon" href="/nitel-logo.png" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 430px;
+      background: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 18px 16px 40px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.06);
+    }
+    
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .brand-section {
+      margin-bottom: 18px;
+    }
+
+    .brand-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #0f2b5c;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .brand-accent {
+      color: #0ea5e9;
+      font-weight: 900;
+    }
+
+    .brand-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .grid-card {
+      border-radius: 12px;
+      padding: 10px 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      min-height: 75px;
+    }
+
+    .grid-card:active {
+      transform: scale(0.97);
+    }
+    
+    .card-dark { background: #3b506e; color: #ffffff; }
+    .card-light { background: #e2e8f0; color: #1e293b; }
+    .card-accent { background: #0284c7; color: #ffffff; }
+    .card-admin { background: #7c2d12; color: #ffffff; }
+    .card-guard { background: #065f46; color: #ffffff; }
+    .card-dues { background: #0f766e; color: #ffffff; }
+    
+    .grid-card .card-icon {
+      font-size: 18px;
+      margin-bottom: 3px;
+    }
+
+    .grid-card .card-title {
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .btn-hero {
+      width: 100%;
+      padding: 14px;
+      background: #1e2e4a;
+      color: #ffffff;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(30, 46, 74, 0.25);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .btn-hero:active {
+      background: #0f1c30;
+      transform: scale(0.98);
+    }
+
+    .panel-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f2b5c;
+      margin-bottom: 2px;
+    }
+
+    .panel-sub {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 10px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .form-row > div {
+      flex: 1;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      color: #0f172a;
+      font-size: 13px;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #0284c7;
+      background: #ffffff;
+    }
+
+    .passcode-box {
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: 6px;
+    }
+
+    .emergency-box {
+      background: #fff1f2;
+      border: 1.5px dashed #f43f5e;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 16px;
+    }
+
+    .btn-action {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
+    .btn-blue { background: #0284c7; color: #ffffff; }
+    .btn-emerald { background: #059669; color: #ffffff; }
+    .btn-amber { background: #d97706; color: #ffffff; }
+    .btn-rose { background: #e11d48; color: #ffffff; }
+    
+    .btn-outline {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #475569;
+      padding: 7px 12px;
+      font-size: 11px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .error-banner {
+      display: none;
+      padding: 10px;
+      background: #fee2e2;
+      border: 1px solid #ef4444;
+      border-radius: 10px;
+      color: #b91c1c;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    .result-card {
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      margin-top: 14px;
+      display: none;
+    }
+
+    .pin-hero {
+      font-size: 40px;
+      font-weight: 900;
+      font-family: monospace;
+      letter-spacing: 5px;
+      color: #15803d;
+      margin: 4px 0;
+    }
+
+    .qr-container {
+      display: flex;
+      justify-content: center;
+      margin: 12px 0;
+      padding: 8px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      width: 146px;
+      height: 146px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .keypad-btn {
+      padding: 13px;
+      font-size: 18px;
+      font-weight: 800;
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .log-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 12px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .log-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 6px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      font-family: monospace;
+    }
+
+    .badge-used { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge-active { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+
+    .hotline-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 9px;
+      margin-top: 10px;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      border-radius: 10px;
+      color: #be123c;
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .admin-subtab-btn {
+      flex: 1;
+      padding: 9px;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .admin-subtab-btn.active {
+      background: #7c2d12;
+      color: #ffffff;
+      border-color: #7c2d12;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="top-bar">
+      <div class="icon-btn" onclick="switchTab('visitor')">☰</div>
+      <div class="header-icons">
+        <div class="icon-btn" onclick="switchTab('news')">📰</div>
+        <div class="icon-btn" onclick="switchTab('residents-directory')">👥</div>
+        <div class="icon-btn" onclick="switchTab('guard')">🛡️</div>
+      </div>
+    </div>
+
+    <div class="brand-section">
+      <div class="brand-title">
+        <span>NiT<span class="brand-accent">E</span>L</span> Estate
+      </div>
+      <div class="brand-sub">Verified Social & Access Hub</div>
+    </div>
+
+    <!-- Main Navigation Grid -->
+    <div class="quick-grid">
+      <div class="grid-card card-dark" onclick="switchTab('visitor')">
+        <div class="card-icon">🚗</div>
+        <div class="card-title">Pass</div>
+      </div>
+      <div class="grid-card card-dark" onclick="switchTab('resident')">
+        <div class="card-icon">📍</div>
+        <div class="card-title">ID Badge</div>
+      </div>
+      <div class="grid-card card-dues" onclick="switchTab('dues')">
+        <div class="card-icon">💰</div>
+        <div class="card-title">Dues</div>
+      </div>
+      <div class="grid-card card-light" onclick="switchTab('residents-directory')">
+        <div class="card-icon">👥</div>
+        <div class="card-title">Residents</div>
+      </div>
+      <div class="grid-card card-light" onclick="switchTab('complaints')">
+        <div class="card-icon">📢</div>
+        <div class="card-title">Community</div>
+      </div>
+      <div class="grid-card card-accent" onclick="switchTab('news')">
+        <div class="card-icon">📰</div>
+        <div class="card-title">Magazine</div>
+      </div>
+      <div class="grid-card card-guard" onclick="switchTab('guard')">
+        <div class="card-icon">🛡️</div>
+        <div class="card-title">Guard</div>
+      </div>
+      <div class="grid-card card-admin" onclick="switchTab('admin-post')">
+        <div class="card-icon">👑</div>
+        <div class="card-title">Admin</div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-hero" onclick="switchTab('visitor')">
+      + Create Visitor Pass
+    </button>
+
+    <a href="tel:08108429710" class="hotline-banner">
+      🚨 Gate Security Hotline: 0810 842 9710
+    </a>
+
+    <!-- 1. VISITOR PANEL -->
+    <div id="view-visitor" class="panel-card" style="display: block;">
+      <div class="panel-title">Create Visitor / Laborer Pass</div>
+      <div class="panel-sub">Authorize guests, site workers, artisans and deliveries</div>
+
+      <div class="form-group" style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; padding: 10px; margin-top: 10px;">
+        <label style="color: #166534;">📝 Visit Instructions (Optional)</label>
+        <input id="res-custom-notes" type="text" placeholder="e.g. Pure water supply, plumber, groceries" style="background: #ffffff;" />
+      </div>
+
+      <div class="passcode-box">
+        <label style="color: #1e40af;">🔑 Resident Passcode</label>
+        <input id="res-passcode-auth" type="password" value="NITEL2026" placeholder="Enter Resident Passcode" />
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Host Name</label>
+          <input id="res-host-name" type="text" placeholder="e.g. Mr. Adeleke" />
+        </div>
+        <div>
+          <label>Host Phone</label>
+          <input id="res-host-phone" type="tel" placeholder="e.g. 08031234567" />
+        </div>
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Avenue / Road</label>
+          <select id="res-zone-select">
+            <optgroup label="Avenues (1 – 5)">
+              <option value="Avenue 1">Avenue 1</option>
+              <option value="Avenue 2">Avenue 2</option>
+              <option value="Avenue 3">Avenue 3</option>
+              <option value="Avenue 4">Avenue 4</option>
+              <option value="Avenue 5">Avenue 5</option>
+            </optgroup>
+            <optgroup label="Roads (A – U)">
+              <option value="Road A">Road A</option>
+              <option value="Road B">Road B</option>
+              <option value="Road C">Road C</option>
+              <option value="Road D">Road D</option>
+              <option value="Road E">Road E</option>
+              <option value="Road F">Road F</option>
+              <option value="Road G">Road G</option>
+              <option value="Road H">Road H</option>
+              <option value="Road I">Road I</option>
+              <option value="Road J">Road J</option>
+              <option value="Road K">Road K</option>
+              <option value="Road L">Road L</option>
+              <option value="Road M">Road M</option>
+              <option value="Road N">Road N</option>
+              <option value="Road O">Road O</option>
+              <option value="Road P">Road P</option>
+              <option value="Road Q">Road Q</option>
+              <option value="Road R">Road R</option>
+              <option value="Road S">Road S</option>
+              <option value="Road T">Road T</option>
+              <option value="Road U">Road U</option>
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <label>Plot / House</label>
+          <input id="res-house-no" type="text" placeholder="e.g. Plot 12" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Visitor / Worker Name</label>
+        <input id="res-visitor-name" type="text" placeholder="e.g. Emmanuel Chukwu" />
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Headcount</label>
+          <select id="res-headcount">
+            <option value="1 Person (Solo)">1 Person (Solo)</option>
+            <option value="2 Persons (1 Extra)">2 Persons (1 Extra)</option>
+            <option value="Family (Adults + Kids)">Family (Adults + Kids)</option>
+            <option value="Small Crew (3-5 Workers)">Small Crew (3-5 Workers)</option>
+            <option value="Large Gang (6+ Workers)">Large Gang (6+ Workers)</option>
+          </select>
+        </div>
+        <div>
+          <label>Vehicle Plate</label>
+          <input id="res-vehicle-no" type="text" placeholder="e.g. KSF-123AA / None" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Purpose & Duration</label>
+        <select id="res-pass-type">
+          <option value="RESIDENTIAL">Residential Guest (24 Hours)</option>
+          <option value="LABORER">Site Laborer / Worker (8 Hours)</option>
+          <option value="CONTRACTOR">Contractor / Heavy Work (12 Hours)</option>
+          <option value="ARTISAN">Artisan / Short Delivery (2 Hours)</option>
+        </select>
+      </div>
+
+      <div id="gen-error-banner" class="error-banner"></div>
+
+      <button type="button" class="btn-action btn-blue" onclick="generateVisitorPass()">
+        Authorize Access Pass
+      </button>
+
+      <div id="visitor-result" class="result-card">
+        <div style="font-size: 11px; font-weight: 800; color: #166534; text-transform: uppercase;">Pass Authorized</div>
+        <div id="visitor-code-display" class="pin-hero">000000</div>
+        
+        <div id="qrcode-box" class="qr-container"></div>
+        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Show QR or PIN at Security Gate</div>
+
+        <div id="visitor-name-display" style="font-size: 13px; font-weight: 800; color: #0f172a;"></div>
+        <div id="visitor-host-display" style="font-size: 11px; color: #475569;"></div>
+        <div id="visitor-headcount-display" style="font-size: 11px; color: #b45309; font-weight: 700; margin-top: 2px;"></div>
+        <div id="visitor-vehicle-display" style="font-size: 11px; color: #0369a1; margin-top: 2px;"></div>
+        <div id="visitor-notes-display" style="font-size: 11px; color: #15803d; font-weight: 700; margin-top: 2px;"></div>
+        <div id="visitor-validity-display" style="font-size: 11px; color: #15803d; font-weight: 800; margin-top: 4px;"></div>
+
+        <button type="button" class="btn-action btn-emerald" onclick="sharePassWhatsApp()">📲 Send to Visitor (WhatsApp)</button>
+        <button type="button" class="btn-action btn-rose" onclick="alertGateWhatsApp()">🚨 Alert Gate Security Desk</button>
+        <button type="button" class="btn-action btn-amber" onclick="downloadPassSlipImage()">🖼️ Download Image Slip</button>
+      </div>
+    </div>
+
+    <!-- 2. RESIDENT DIGITAL ID PANEL -->
+    <div id="view-resident" class="panel-card" style="display: none;">
+      <div class="panel-title">Resident Access ID</div>
+      <div class="panel-sub">Verified identity card for landlords and residents</div>
+
+      <div class="passcode-box">
+        <label style="color: #1e40af;">🔑 Resident Passcode</label>
+        <input id="res-id-passcode" type="password" value="NITEL2026" placeholder="Enter Resident Passcode" />
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Full Name</label>
+          <input id="resident-own-name" type="text" placeholder="e.g. Chief O. Mitchelle" />
+        </div>
+        <div>
+          <label>Phone Number</label>
+          <input id="resident-own-phone" type="tel" placeholder="e.g. 08108429710" />
+        </div>
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Avenue / Road</label>
+          <select id="resident-own-zone">
+            <option value="Avenue 1">Avenue 1</option>
+            <option value="Avenue 2">Avenue 2</option>
+            <option value="Avenue 3">Avenue 3</option>
+            <option value="Avenue 4">Avenue 4</option>
+            <option value="Avenue 5">Avenue 5</option>
+            <option value="Road A">Road A</option>
+            <option value="Road B">Road B</option>
+            <option value="Road C">Road C</option>
+            <option value="Road D">Road D</option>
+            <option value="Road E">Road E</option>
+            <option value="Road F">Road F</option>
+            <option value="Road G">Road G</option>
+            <option value="Road H">Road H</option>
+            <option value="Road I">Road I</option>
+            <option value="Road J">Road J</option>
+            <option value="Road K">Road K</option>
+            <option value="Road L">Road L</option>
+            <option value="Road M">Road M</option>
+            <option value="Road N">Road N</option>
+            <option value="Road O">Road O</option>
+            <option value="Road P">Road P</option>
+            <option value="Road Q">Road Q</option>
+            <option value="Road R">Road R</option>
+            <option value="Road S">Road S</option>
+            <option value="Road T">Road T</option>
+            <option value="Road U">Road U</option>
+          </select>
+        </div>
+        <div>
+          <label>Plot / House</label>
+          <input id="resident-own-house" type="text" placeholder="e.g. Plot 14" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Vehicle Plate No.</label>
+        <input id="resident-own-vehicle" type="text" placeholder="e.g. BDG-456XY (Optional)" />
+      </div>
+
+      <div id="res-error-banner" class="error-banner"></div>
+
+      <button type="button" class="btn-action btn-emerald" onclick="generateResidentID()">
+        Generate Resident Digital Badge
+      </button>
+
+      <div id="resident-id-result" class="result-card" style="background:#eff6ff; border-color:#3b82f6;">
+        <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">NITEL Verified Resident Badge</div>
+        <div id="resident-badge-code" class="pin-hero" style="color:#1d4ed8;">000000</div>
+        
+        <div id="resident-qrcode-box" class="qr-container"></div>
+        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Show this QR or Code at gate for express clearance</div>
+
+        <div id="resident-badge-name" style="font-size: 14px; font-weight: 800; color: #0f172a;"></div>
+        <div id="resident-badge-address" style="font-size: 12px; color: #475569;"></div>
+        <div id="resident-badge-vehicle" style="font-size: 11px; color: #0284c7; margin-top: 2px;"></div>
+        <div style="font-size: 12px; color: #16a34a; margin-top: 4px; font-weight:800;">✅ Active Verified Resident</div>
+
+        <button type="button" class="btn-action btn-amber" onclick="downloadResidentBadgeSlip()">🖼️ Save Badge to Gallery</button>
+      </div>
+    </div>
+
+    <!-- 3. ESTATE DUES PANEL -->
+    <div id="view-dues" class="panel-card" style="display: none;">
+      <div class="panel-title">💰 Estate Dues & Levy Clearance</div>
+      <div class="panel-sub">Verify payment clearance for security and development levies</div>
+
+      <div class="form-group" style="margin-top: 10px;">
+        <input id="dues-search-input" type="text" placeholder="🔍 Search by Resident Name, Avenue, or Plot No..." onkeyup="renderDuesFeed()" />
+      </div>
+
+      <div id="dues-feed" style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- 4. OFFICIAL RESIDENTS DIRECTORY -->
+    <div id="view-residents-directory" class="panel-card" style="display: none;">
+      <div class="panel-title">👥 Verified Estate Residents Directory</div>
+      <div class="panel-sub">Auto-updated official database of residents living in NITEL Estate</div>
+
+      <div class="form-group" style="margin-top: 10px;">
+        <input id="residents-search-input" type="text" placeholder="🔍 Search resident name, phone number, or house..." onkeyup="renderResidentsDirectory()" />
+      </div>
+
+      <div id="residents-directory-feed" style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- 5. SOCIAL COMMUNITY NOTICE BOARD -->
+    <div id="view-complaints" class="panel-card" style="display: none;">
+      <div class="panel-title">📢 NITEL Social Feed & Community Board</div>
+      <div class="panel-sub">Share notices, security alerts, and photos with neighbors</div>
+
+      <div class="form-group" style="margin-top: 10px;">
+        <label>Your Full Name *</label>
+        <input id="complaint-author" type="text" placeholder="e.g. Mr. Adeleke" />
+      </div>
+
+      <div class="form-row form-group">
+        <div>
+          <label>Phone Number *</label>
+          <input id="complaint-phone" type="tel" placeholder="e.g. 08031234567" />
+        </div>
+        <div>
+          <label>House / Plot Address *</label>
+          <input id="complaint-address" type="text" placeholder="e.g. Road B Plot 12" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Message / Notice *</label>
+        <textarea id="complaint-msg" rows="3" placeholder="e.g. Security observation, item found, or estate update..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>📸 Choose Photo from Phone Gallery</label>
+        <input id="complaint-file-input" type="file" accept="image/*" onchange="previewComplaintImage(event)" style="padding: 8px; background: #f8fafc;" />
+        <input id="complaint-image" type="hidden" />
+        <div id="complaint-img-preview" style="margin-top: 6px; display:none; max-height:120px; overflow:hidden; border-radius:8px;"></div>
+      </div>
+
+      <button type="button" class="btn-action btn-blue" onclick="submitComplaint()">🚀 Post to Community Social Feed</button>
+
+      <div style="margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+        <div style="font-size: 12px; font-weight: 800; color: #0f2b5c; margin-bottom: 8px; text-transform: uppercase;">Live Community Social Wall</div>
+        <div id="complaints-feed" style="max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;"></div>
+      </div>
+    </div>
+
+    <!-- 6. ESTATE MAGAZINE & DISCUSSIONS -->
+    <div id="view-news" class="panel-card" style="display: none;">
+      <div class="panel-title">📰 Estate Magazine & Discussions</div>
+      <div class="panel-sub">Official announcements, photo stories, and resident discussions</div>
+
+      <div id="news-feed" style="margin-top: 10px; display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- 7. ADMIN EXECUTIVE PORTAL -->
+    <div id="view-admin-post" class="panel-card" style="display: none;">
+      <div id="admin-auth-box" style="text-align: center; padding: 10px 0;">
+        <div style="font-size: 34px;">👑</div>
+        <div class="panel-title" style="margin-top: 6px;">Executive Admin Portal</div>
+        <div class="panel-sub">Enter Admin PIN to publish magazine articles and log dues</div>
+        <input id="admin-master-pin" type="password" maxlength="4" style="width: 130px; margin: 10px auto; text-align: center; font-size: 22px; font-family: monospace; letter-spacing: 5px;" placeholder="••••" autocomplete="off" />
+        <div id="admin-error-banner" class="error-banner" style="margin-bottom:8px;"></div>
+        <button type="button" class="btn-action btn-emerald" onclick="unlockAdminPortal()">Unlock Admin Portal</button>
+      </div>
+
+      <div id="admin-form-box" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span style="font-size: 13px; font-weight: 800; color: #7c2d12;">👑 NITEL Estate CDA Administration</span>
+          <button type="button" onclick="lockAdminPortal()" style="background:none; border:none; color:#64748b; font-size:11px; font-weight:700; text-decoration:underline; cursor:pointer;">Lock</button>
+        </div>
+
+        <div style="display: flex; gap: 6px; margin-bottom: 14px;">
+          <button id="admin-tab-btn-news" type="button" class="admin-subtab-btn active" onclick="switchAdminSubtab('news')">📰 Post Magazine</button>
+          <button id="admin-tab-btn-dues" type="button" class="admin-subtab-btn" onclick="switchAdminSubtab('dues')">💰 Log Payment</button>
+        </div>
+
+        <!-- Admin Sub-Panel: Post Magazine -->
+        <div id="admin-sub-news">
+          <div class="form-group">
+            <label>Magazine Headline / Title</label>
+            <input id="admin-news-title" type="text" placeholder="e.g. 🏗️ AGM Photo Report" />
+          </div>
+          <div class="form-group">
+            <label>Author / Committee</label>
+            <input id="admin-news-author" type="text" value="NITEL Estate CDA Executive" />
+          </div>
+          <div class="form-group">
+            <label>📸 Choose Cover Photo from Gallery</label>
+            <input id="admin-news-file-input" type="file" accept="image/*" onchange="previewAdminImage(event)" style="padding: 8px; background: #f8fafc;" />
+            <input id="admin-news-image" type="hidden" />
+            <div id="admin-img-preview" style="margin-top: 6px; display:none; max-height:120px; overflow:hidden; border-radius:8px;"></div>
+          </div>
+          <div class="form-group">
+            <label>Article Body Content</label>
+            <textarea id="admin-news-content" rows="4" placeholder="Type official announcement details here..."></textarea>
+          </div>
+          <button type="button" class="btn-action btn-emerald" onclick="publishEstateNews()">🚀 Publish Magazine Article</button>
+        </div>
+
+        <!-- Admin Sub-Panel: Log Resident Payment -->
+        <div id="admin-sub-dues" style="display: none;">
+          <div class="form-group">
+            <label>Resident Full Name</label>
+            <input id="admin-due-name" type="text" placeholder="e.g. Chief Adeleke O." />
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Property Address</label>
+              <input id="admin-due-address" type="text" placeholder="e.g. Road C Plot 12" />
+            </div>
+            <div>
+              <label>Amount (₦)</label>
+              <input id="admin-due-amount" type="text" placeholder="e.g. ₦15,000" />
+            </div>
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Levy Type</label>
+              <select id="admin-due-type">
+                <option value="Security Levy">🛡️ Security Levy</option>
+                <option value="Development Levy">🏗️ Estate Development Levy</option>
+                <option value="Sanitation & Gutter Dues">🧹 Sanitation & Gutter Dues</option>
+                <option value="Transformer / Power Levy">⚡ Transformer / Power Levy</option>
+                <option value="Annual Estate Dues">📋 Annual Estate Dues</option>
+              </select>
+            </div>
+            <div>
+              <label>Period / Month</label>
+              <input id="admin-due-period" type="text" placeholder="e.g. August 2026" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Receipt Reference</label>
+            <input id="admin-due-receipt" type="text" placeholder="e.g. REC-84920" />
+          </div>
+          <button type="button" class="btn-action btn-emerald" onclick="recordResidentPayment()">💾 Post Verified Payment</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 8. GUARD GATE TERMINAL -->
+    <div id="view-guard" class="panel-card" style="display: none;">
+      
+      <div id="guard-auth-box" style="text-align: center; padding: 10px 0;">
+        <div style="font-size: 34px;">🛡️</div>
+        <div class="panel-title" style="margin-top: 6px;">Security Gate Terminal</div>
+        <div class="panel-sub">Enter Security PIN to unlock gate controls</div>
+        <input id="guard-master-pin" type="password" maxlength="4" style="width: 130px; margin: 10px auto; text-align: center; font-size: 22px; font-family: monospace; letter-spacing: 5px;" placeholder="••••" autocomplete="off" />
+        <div id="guard-error-banner" class="error-banner" style="margin-bottom:8px;"></div>
+        <button type="button" class="btn-action btn-emerald" onclick="unlockTerminal()">Unlock Gate Terminal</button>
+      </div>
+
+      <div id="guard-terminal-box" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 13px; font-weight: 800; color: #0f2b5c;">Gate & Patrol Verification</span>
+          <span style="font-size: 10px; font-weight: 800; color: #16a34a;">🟢 Ready</span>
+          <button type="button" onclick="lockTerminal()" style="background:none; border:none; color:#64748b; font-size:11px; font-weight:700; text-decoration:underline; cursor:pointer;">Lock</button>
+        </div>
+
+        <button id="toggle-camera-btn" type="button" class="btn-action btn-blue" style="margin-top: 10px; padding: 11px;" onclick="toggleQrScanner()">📷 Open Camera QR Scanner</button>
+        <div id="qr-reader-container" style="display:none; width: 100%; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1.5px solid #cbd5e1; background:#000;">
+          <div id="qr-reader" style="width:100%;"></div>
+        </div>
+
+        <div style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 12px; border-radius: 12px; text-align:center; margin: 12px 0;">
+          <span id="pin-display" style="font-size: 34px; font-family: monospace; letter-spacing: 5px; color: #0f2b5c; font-weight: 900;">------</span>
+        </div>
+
+        <div class="keypad-grid">
+          <button type="button" class="keypad-btn" onclick="pressKey('1')">1</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('2')">2</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('3')">3</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('4')">4</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('5')">5</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('6')">6</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('7')">7</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('8')">8</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('9')">9</button>
+          <button type="button" class="keypad-btn" style="background:#fee2e2; color:#b91c1c;" onclick="clearPin()">CLR</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('0')">0</button>
+          <button type="button" class="keypad-btn" style="background:#dcfce7; color:#15803d;" onclick="verifyGatePass()">ENTER</button>
+        </div>
+
+        <div id="gate-result" style="display:none; padding:12px; border-radius:12px; text-align:center; margin-top:12px;"></div>
+
+        <div class="emergency-box">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size: 11px; font-weight: 800; color: #be123c; text-transform: uppercase;">⚡ Gate-Side Override & Verification</span>
+          </div>
+          <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Check resident database or log site workers.</div>
+
+          <div class="form-row form-group">
+            <div>
+              <label style="color:#9f1239;">Entry Type</label>
+              <select id="guard-emg-type">
+                <option value="DEAD_PHONE">📱 Resident Database Check / Flat Phone</option>
+                <option value="SITE_LABOR">🔨 Walk-in Site Laborers (8 Hours)</option>
+                <option value="AMBULANCE">🚑 Ambulance / Medical Emergency</option>
+                <option value="UTILITY">⚡ EKEDC / Utility Maintenance</option>
+              </select>
+            </div>
+            <div>
+              <label style="color:#9f1239;">Person Name</label>
+              <input id="guard-emg-name" type="text" placeholder="e.g. Mr. Okon" />
+            </div>
+          </div>
+
+          <div class="form-row form-group">
+            <div>
+              <label style="color:#9f1239;">Destination / House</label>
+              <input id="guard-emg-dest" type="text" placeholder="e.g. Avenue 3 Plot 10" />
+            </div>
+            <div>
+              <label style="color:#9f1239;">Vehicle / Info</label>
+              <input id="guard-emg-veh" type="text" placeholder="e.g. Toyota Camry" />
+            </div>
+          </div>
+
+          <button type="button" class="btn-action btn-rose" onclick="generateGuardGateSidePass()">⚡ Clear Gate Entry</button>
+          
+          <div id="guard-emg-success" style="display:none; background:#ffe4e6; border:1.5px solid #f43f5e; padding:12px; border-radius:12px; text-align:center; margin-top:10px;">
+            <div style="font-size:11px; font-weight:800; color:#9f1239;">ENTRY CLEARED & LOGGED</div>
+            <div id="guard-emg-code" style="font-size:26px; font-weight:900; font-family:monospace; color:#881337; letter-spacing:4px;">000000</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 14px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:12px; font-weight:800; color:#0f2b5c; text-transform:uppercase;">Entry Audit & Logs</span>
+            <button type="button" class="btn-outline" onclick="exportLogsToCSV()">📊 Export CSV</button>
+          </div>
+          <div id="audit-log-feed" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 6px;"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
+    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
+    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    var GUARD_MASTER_PIN = "6232";
+    var ADMIN_MASTER_PIN = "1532";
+    var RESIDENT_PASSCODE = "NITEL2026";
+    var GATE_PHONE_NUMBER = "2348108429710";
+
+    var enteredPin = "";
+    var currentPassCode = "";
+    var currentVisitorName = "";
+    var currentHostInfo = "";
+    var qrScannerInstance = null;
+    var replyingToCommentId = null;
+
+    var audioCtx = null;
+    function playBeep(type) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = type === 'success' ? 'sine' : 'sawtooth';
+        osc.frequency.setValueAtTime(type === 'success' ? 587.33 : 200, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+      } catch (e) {}
+    }
+
+    function getStorage() {
+      try { return JSON.parse(localStorage.getItem("nitel_master_records") || "[]"); } catch (e) { return []; }
+    }
+    function saveStorage(arr) {
+      try { localStorage.setItem("nitel_master_records", JSON.stringify(arr.slice(0, 500))); } catch (e) {}
+    }
+    function getMyTokens() {
+      try { return JSON.parse(localStorage.getItem("nitel_my_tokens") || "{}"); } catch (e) { return {}; }
+    }
+
+    function previewComplaintImage(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var base64Str = e.target.result;
+        document.getElementById("complaint-image").value = base64Str;
+        var prev = document.getElementById("complaint-img-preview");
+        prev.style.display = "block";
+        prev.innerHTML = "<img src='" + base64Str + "' style='height:100px; border-radius:8px; object-fit:cover;' />";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewAdminImage(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var base64Str = e.target.result;
+        document.getElementById("admin-news-image").value = base64Str;
+        var prev = document.getElementById("admin-img-preview");
+        prev.style.display = "block";
+        prev.innerHTML = "<img src='" + base64Str + "' style='height:100px; border-radius:8px; object-fit:cover;' />";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function registerResidentProfile(name, phone, address) {
+      if (!name || !phone || !address) return;
+      try {
+        await supabaseClient.from('estate_residents').insert([{
+          full_name: name.trim(), phone_number: phone.trim(), property_address: address.trim()
+        }]);
+      } catch (e) {}
+    }
+
+    async function renderResidentsDirectory() {
+      var container = document.getElementById("residents-directory-feed");
+      if (!container) return;
+      var query = (document.getElementById("residents-search-input").value || "").toLowerCase();
+
+      var { data, error } = await supabaseClient.from('estate_residents').select('*').order('id', { ascending: false });
+      if (error || !data || data.length === 0) {
+        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px; font-style:italic;'>No residents registered in database yet. They will appear here automatically when they post on the community board.</p>";
+        return;
+      }
+
+      var uniqueResidents = []; var seenPhones = {};
+      data.forEach(function(r) {
+        if (!seenPhones[r.phone_number]) { seenPhones[r.phone_number] = true; uniqueResidents.push(r); }
+      });
+
+      var filtered = uniqueResidents.filter(function(r) {
+        return r.full_name.toLowerCase().includes(query) || r.phone_number.toLowerCase().includes(query) || r.property_address.toLowerCase().includes(query);
+      });
+
+      container.innerHTML = filtered.map(function(r) {
+        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; display:flex; flex-direction:column; gap:4px;'>" +
+          "<div style='display:flex; justify-content:space-between; align-items:center;'><span style='font-size:13px; font-weight:800; color:#0f2b5c;'>👤 " + r.full_name + "</span><span style='font-size:10px; font-weight:800; background:#e0f2fe; color:#0369a1; padding:3px 6px; border-radius:6px;'>🏠 Verified Resident</span></div>" +
+          "<div style='font-size:11px; color:#475569;'>📍 <b>Address:</b> " + r.property_address + "</div>" +
+          "<div style='display:flex; gap:6px; margin-top:6px;'><a href='tel:" + r.phone_number + "' style='flex:1; text-align:center; background:#e0f2fe; color:#0369a1; padding:6px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>📞 Call (" + r.phone_number + ")</a><a href='https://wa.me/234" + r.phone_number.replace(/^0/, '') + "' target='_blank' style='flex:1; text-align:center; background:#dcfce7; color:#15803d; padding:6px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>💬 WhatsApp</a></div>" +
+        "</div>";
+      }).join('');
+    }
+
+    async function recordResidentPayment() {
+      var name = (document.getElementById("admin-due-name").value || "").trim();
+      var address = (document.getElementById("admin-due-address").value || "").trim();
+      var amount = (document.getElementById("admin-due-amount").value || "").trim();
+      var type = document.getElementById("admin-due-type").value;
+      var period = (document.getElementById("admin-due-period").value || "").trim();
+      var receipt = (document.getElementById("admin-due-receipt").value || "").trim();
+
+      if (!name || !address || !amount) { alert("Please fill in Resident Name, Address, and Amount."); return; }
+
+      var now = new Date();
+      var record = {
+        resident_name: name, property_address: address, levy_type: type,
+        amount: amount, period: period || "Current Period", status: "PAID",
+        receipt_no: receipt || ("REC-" + Math.floor(10000 + Math.random() * 90000)),
+        date_paid: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+      };
+
+      var { error } = await supabaseClient.from('estate_dues').insert([record]);
+      if (error) { alert("Error: " + error.message); return; }
+
+      document.getElementById("admin-due-name").value = "";
+      document.getElementById("admin-due-address").value = "";
+      document.getElementById("admin-due-amount").value = "";
+      playBeep('success'); alert("Payment recorded!"); switchTab('dues');
+    }
+
+    async function renderDuesFeed() {
+      var container = document.getElementById("dues-feed"); if (!container) return;
+      var query = (document.getElementById("dues-search-input").value || "").toLowerCase();
+      var { data, error } = await supabaseClient.from('estate_dues').select('*').order('id', { ascending: false });
+      if (error || !data || data.length === 0) { container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px;'>No dues records found.</p>"; return; }
+      
+      var filtered = data.filter(function(item) {
+        return item.resident_name.toLowerCase().includes(query) || item.property_address.toLowerCase().includes(query);
+      });
+      container.innerHTML = filtered.map(function(item) {
+        return "<div style='background:#f0fdf4; border:1.5px solid #86efac; padding:12px; border-radius:12px; display:flex; flex-direction:column; gap:4px;'>" +
+          "<div style='display:flex; justify-content:space-between;'><span style='font-size:13px; font-weight:800;'>👤 " + item.resident_name + "</span><span style='font-size:10px; font-weight:800; background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:6px;'>✅ PAID</span></div>" +
+          "<div style='font-size:11px; color:#475569;'>🏠 <b>Property:</b> " + item.property_address + "</div>" +
+          "<div style='font-size:11px; color:#0369a1; font-weight:700;'>💳 <b>" + item.levy_type + ":</b> " + item.amount + " (" + item.period + ")</div>" +
+        "</div>";
+      }).join('');
+    }
+
+    async function submitComplaint() {
+      var author = (document.getElementById("complaint-author").value || "").trim();
+      var phone = (document.getElementById("complaint-phone").value || "").trim();
+      var address = (document.getElementById("complaint-address").value || "").trim();
+      var msg = (document.getElementById("complaint-msg").value || "").trim();
+      var imgUrl = (document.getElementById("complaint-image").value || "").trim();
+
+      if (!author || !phone || !address || !msg) { alert("Please fill in your Name, Phone Number, House Address, and Message."); return; }
+
+      registerResidentProfile(author, phone, address);
+
+      var now = new Date();
+      var record = {
+        message: msg, author: author + " (" + address + ")", image_url: imgUrl,
+        date_string: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
+        time_string: now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+      };
+
+      var { error } = await supabaseClient.from('nitel_complaints').insert([record]);
+      if (error) { alert("Error: " + error.message); return; }
+
+      document.getElementById("complaint-msg").value = "";
+      document.getElementById("complaint-image").value = "";
+      document.getElementById("complaint-file-input").value = "";
+      document.getElementById("complaint-img-preview").style.display = "none";
+      renderComplaints(); playBeep('success');
+      alert("Posted successfully and saved to resident directory!");
+    }
+
+    async function renderComplaints() {
+      var container = document.getElementById("complaints-feed"); if (!container) return;
+      var { data, error } = await supabaseClient.from('nitel_complaints').select('*').order('id', { ascending: false }).limit(50);
+      if (error || !data || data.length === 0) { container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px;'>No posts yet.</p>"; return; }
+      
+      container.innerHTML = data.map(function(item) {
+        var imageTag = item.image_url ? "<div style='margin-top:8px; border-radius:10px; overflow:hidden;'><img src='" + item.image_url + "' style='width:100%; max-height:260px; object-fit:cover;' /></div>" : "";
+        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:14px; display:flex; flex-direction:column; gap:6px;'>" +
+          "<div style='display:flex; justify-content:space-between;'><span style='font-size:12px; font-weight:800; color:#0284c7;'>👤 " + item.author + "</span><span style='font-size:10px; color:#64748b;'>" + item.date_string + "</span></div>" +
+          "<div style='font-size:13px; color:#0f172a;'>" + item.message + "</div>" + imageTag +
+        "</div>";
+      }).join('');
+    }
+
+    async function getNewsStorage() {
+      var { data, error } = await supabaseClient.from('estate_news').select('*').order('created_at', { ascending: false });
+      if (error || !data || data.length === 0) return [{ id: "news_1", title: "🏗️ Welcome to NITEL Estate", author: "CDA Executive", image_url: "", content: "Official social community hub active.", date: "August 18, 2026" }];
+      return data;
+    }
+
+    async function publishEstateNews() {
+      var title = (document.getElementById("admin-news-title").value || "").trim();
+      var author = (document.getElementById("admin-news-author").value || "").trim();
+      var content = (document.getElementById("admin-news-content").value || "").trim();
+      var imgUrl = (document.getElementById("admin-news-image").value || "").trim();
+      if (!title || !content) { alert("Fill headline and content."); return; }
+      
+      var now = new Date();
+      var { error } = await supabaseClient.from('estate_news').insert([{
+        id: "news_" + Date.now(), title: title, author: author || "CDA", image_url: imgUrl, content: content,
+        date: now.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })
+      }]);
+      if (error) { alert("Error: " + error.message); return; }
+      document.getElementById("admin-news-title").value = ""; document.getElementById("admin-news-content").value = "";
+      document.getElementById("admin-news-image").value = ""; document.getElementById("admin-news-file-input").value = "";
+      document.getElementById("admin-img-preview").style.display = "none";
+      playBeep('success'); alert("Published!"); switchTab('news');
+    }
+
+    async function postNewsComment(newsId) {
+      var inputField = document.getElementById("comment_input_" + newsId);
+      var authorField = document.getElementById("comment_author_" + newsId);
+      if (!inputField) return;
+      var text = inputField.value.trim(); var author = authorField ? authorField.value.trim() : "";
+      if (!text) { alert("Type a comment."); return; }
+      var now = new Date();
+      
+      var secretToken = "token_" + Math.random().toString(36).substring(2) + Date.now();
+      var { data, error } = await supabaseClient.from('news_comments').insert([{
+        news_id: newsId, author: author || "Resident", text: text, parent_id: replyingToCommentId, author_token: secretToken,
+        time_string: now.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + " " + now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+      }]).select();
+
+      if (error) { alert("Error: " + error.message); return; }
+      if (data && data[0]) {
+        var myTokens = getMyTokens(); myTokens[data[0].id] = secretToken;
+        try { localStorage.setItem("nitel_my_tokens", JSON.stringify(myTokens)); } catch(e){}
+      }
+      inputField.value = ""; if (authorField) authorField.value = ""; replyingToCommentId = null;
+      renderNewsFeed(); playBeep('success');
+    }
+
+    async function deleteComment(id) {
+      if (!confirm("Delete comment?")) return;
+      await supabaseClient.from('news_comments').delete().eq('id', id); renderNewsFeed();
+    }
+
+    async function editComment(id, oldText) {
+      var newText = prompt("Edit comment:", oldText);
+      if (!newText || !newText.trim()) return;
+      await supabaseClient.from('news_comments').update({ text: newText.trim() }).eq('id', id); renderNewsFeed();
+    }
+
+    async function renderNewsFeed() {
+      var container = document.getElementById("news-feed"); if (!container) return;
+      var newsList = await getNewsStorage(); var myTokens = getMyTokens();
+      
+      var htmlSegments = [];
+      for (var i = 0; i < newsList.length; i++) {
+        var item = newsList[i];
+        var { data: comments } = await supabaseClient.from('news_comments').select('*').eq('news_id', item.id).order('id', { ascending: true });
+        var commentsList = comments || [];
+        
+        var parents = commentsList.filter(function(c) { return !c.parent_id; });
+        var commentsHTML = parents.map(function(c) {
+          var isOwner = myTokens[c.id] || false;
+          var ownerBtns = isOwner ? " <span style='cursor:pointer; color:#0284c7; font-weight:700;' onclick='editComment(" + c.id + ", \"" + c.text.replace(/"/g, '&quot;') + "\")'>Edit</span> • <span style='cursor:pointer; color:#ef4444; font-weight:700;' onclick='deleteComment(" + c.id + ")'>Delete</span>" : "";
+          
+          var replies = commentsList.filter(function(r) { return r.parent_id === c.id; }).map(function(r) {
+            var rOwner = myTokens[r.id] || false;
+            var rBtns = rOwner ? " <span style='cursor:pointer; color:#0284c7;' onclick='editComment(" + r.id + ", \"" + r.text.replace(/"/g, '&quot;') + "\")'>Edit</span> • <span style='cursor:pointer; color:#ef4444;' onclick='deleteComment(" + r.id + ")'>Delete</span>" : "";
+            return "<div style='background:#ffffff; padding:6px; border-radius:6px; font-size:10.5px; margin-top:4px; border-left:2px solid #0284c7;'>" +
+              "<div style='font-weight:700; color:#0284c7;'>" + r.author + "</div><div>" + r.text + "</div><div style='font-size:9.5px;'>" + rBtns + "</div>" +
+            "</div>";
+          }).join('');
+
+          return "<div style='background:#f1f5f9; padding:8px; border-radius:8px; font-size:11px; margin-top:6px;'>" +
+            "<div style='font-weight:700; color:#0284c7;'>" + c.author + "</div>" +
+            "<div>" + c.text + "</div>" +
+            "<div style='margin-top:4px; font-size:10px;'><span style='cursor:pointer; color:#16a34a; font-weight:700;' onclick='replyingToCommentId=" + c.id + "; alert(\"Replying to " + c.author + ". Type below and post.\");'>Reply</span>" + ownerBtns + "</div>" +
+            "<div style='margin-left:10px;'>" + repliesHTML + "</div>" +
+          "</div>";
+        }).join('');
+
+        var imageTag = item.image_url ? "<div style='margin-top:8px; border-radius:10px; overflow:hidden;'><img src='" + item.image_url + "' style='width:100%; max-height:260px; object-fit:cover;' /></div>" : "";
+
+        htmlSegments.push(
+          "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:14px; display:flex; flex-direction:column; gap:6px;'>" +
+            "<div style='font-size:15px; font-weight:800; color:#0f2b5c;'>" + item.title + "</div>" +
+            "<div style='font-size:11px; color:#0284c7; font-weight:700;'>✍️ " + item.author + " • 📅 " + item.date + "</div>" +
+            imageTag +
+            "<div style='font-size:12px; color:#334155; line-height:1.4;'>" + item.content + "</div>" +
+            "<div style='margin-top:10px; border-top:1px dashed #cbd5e1; padding-top:10px;'>" +
+              "<div style='font-size:11px; font-weight:800; color:#0f2b5c;'>💬 Discussion (" + commentsList.length + ")</div>" +
+              "<div style='max-height:160px; overflow-y:auto;'>" + (commentsHTML || "<i style='color:#64748b;'>No comments yet.</i>") + "</div>" +
+              "<div style='margin-top:8px; display:flex; flex-direction:column; gap:6px;'>" +
+                "<input id='comment_author_" + item.id + "' type='text' placeholder='Your Name' style='padding:8px; font-size:11px;' />" +
+                "<div style='display:flex; gap:6px;'><input id='comment_input_" + item.id + "' type='text' placeholder='Write comment or reply...' style='padding:8px; font-size:11px; flex:1;' /><button type='button' class='btn-action btn-blue' style='margin-top:0; padding:8px;' onclick='postNewsComment(\"" + item.id + "\")'>Post</button></div>" +
+              "</div>" +
+            "</div>" +
+          "</div>"
+        );
+      }
+      container.innerHTML = htmlSegments.join('');
+    }
+
+    function switchTab(tab) {
+      stopScannerSafely();
+      document.getElementById("view-visitor").style.display = (tab === 'visitor') ? 'block' : 'none';
+      document.getElementById("view-resident").style.display = (tab === 'resident') ? 'block' : 'none';
+      document.getElementById("view-dues").style.display = (tab === 'dues') ? 'block' : 'none';
+      document.getElementById("view-residents-directory").style.display = (tab === 'residents-directory') ? 'block' : 'none';
+      document.getElementById("view-directory").style.display = (tab === 'directory') ? 'block' : 'none';
+      document.getElementById("view-complaints").style.display = (tab === 'complaints') ? 'block' : 'none';
+      document.getElementById("view-news").style.display = (tab === 'news') ? 'block' : 'none';
+      document.getElementById("view-admin-post").style.display = (tab === 'admin-post') ? 'block' : 'none';
+      document.getElementById("view-guard").style.display = (tab === 'guard') ? 'block' : 'none';
+
+      if (tab === 'guard') renderLogs();
+      if (tab === 'dues') renderDuesFeed();
+      if (tab === 'residents-directory') renderResidentsDirectory();
+      if (tab === 'directory') renderDirectory();
+      if (tab === 'complaints') renderComplaints();
+      if (tab === 'news') renderNewsFeed();
+      window.scrollTo({ top: 380, behavior: 'smooth' });
+    }
+
+    function switchAdminSubtab(subtab) {
+      document.getElementById("admin-sub-news").style.display = (subtab === 'news') ? 'block' : 'none';
+      document.getElementById("admin-sub-dues").style.display = (subtab === 'dues') ? 'block' : 'none';
+      document.getElementById("admin-tab-btn-news").className = (subtab === 'news') ? 'admin-subtab-btn active' : 'admin-subtab-btn';
+      document.getElementById("admin-tab-btn-dues").className = (subtab === 'dues') ? 'admin-subtab-btn active' : 'admin-subtab-btn';
+    }
+
+    function unlockAdminPortal() {
+      if ((document.getElementById("admin-master-pin").value || "").trim() === ADMIN_MASTER_PIN) {
+        document.getElementById("admin-auth-box").style.display = "none";
+        document.getElementById("admin-form-box").style.display = "block"; playBeep('success');
+      } else { alert("Incorrect Admin PIN"); }
+    }
+    function lockAdminPortal() { document.getElementById("admin-auth-box").style.display = "block"; document.getElementById("admin-form-box").style.display = "none"; }
+    function stopScannerSafely() { if (qrScannerInstance) { try { qrScannerInstance.stop(); } catch(e){} qrScannerInstance = null; } document.getElementById("qr-reader-container").style.display = "none"; }
+    function toggleQrScanner() {
+      var box = document.getElementById("qr-reader-container");
+      if (box.style.display === "none" || !box.style.display) {
+        box.style.display = "block";
+        try {
+          if (!qrScannerInstance) qrScannerInstance = new Html5Qrcode("qr-reader");
+          qrScannerInstance.start({ facingMode: "environment" }, { fps: 10, qrbox: 200 }, function(text) {
+            var code = text.replace("NITEL-PASS:", "").trim();
+            if (code.length === 6) { enteredPin = code; document.getElementById("pin-display").innerText = code; stopScannerSafely(); verifyGatePass(); }
+          }, function(){});
+        } catch(e) { box.style.display = "none"; }
+      } else { stopScannerSafely(); }
+    }
+
+    function renderDirectory() {
+      var container = document.getElementById("directory-listings-feed"); if (!container) return;
+      var estateDirectoryData = [
+        { name: "NITEL Health Pharmacy", category: "PHARMACY", location: "Road C", phone: "08012345678", desc: "Prescription drugs & first aid" },
+        { name: "Mama Simi Kitchen", category: "FOOD", location: "Avenue 2", phone: "08087654321", desc: "Fresh local meals" }
+      ];
+      container.innerHTML = estateDirectoryData.map(function(item) {
+        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px;'>" +
+          "<div style='font-weight:800;'>" + item.name + "</div><div style='font-size:11px; color:#475569;'>📍 " + item.location + "</div>" +
+          "<div style='margin-top:6px;'><a href='tel:" + item.phone + "' style='background:#e0f2fe; color:#0369a1; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none;'>📞 Call (" + item.phone + ")</a></div>" +
+        "</div>";
+      }).join('');
+    }
+
+    function generateVisitorPass() {
+      var passcode = document.getElementById("res-passcode-auth").value.trim().toUpperCase();
+      var visitor = document.getElementById("res-visitor-name").value.trim();
+      if (passcode !== RESIDENT_PASSCODE) { alert("Invalid passcode: NITEL2026"); return; }
+      if (!visitor) { alert("Enter visitor name."); return; }
+      
+      var code = String(Math.floor(100000 + Math.random() * 900000));
+      currentPassCode = code; currentVisitorName = visitor;
+      currentHostInfo = (document.getElementById("res-host-name").value || "Host") + " (" + document.getElementById("res-zone-select").value + ")";
+      
+      var records = getStorage();
+      records.unshift({ code: code, visitor: visitor, host: currentHostInfo, status: "ACTIVE", type: 'VISITOR', dateString: new Date().toLocaleDateString() });
+      saveStorage(records);
+
+      document.getElementById("visitor-code-display").innerText = code;
+      document.getElementById("visitor-name-display").innerText = "Visitor: " + visitor;
+      document.getElementById("visitor-host-display").innerText = "Host: " + currentHostInfo;
+      
+      var qrBox = document.getElementById("qrcode-box"); qrBox.innerHTML = "";
+      new QRCode(qrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130 });
+      document.getElementById("visitor-result").style.display = "block";
+      playBeep('success');
+    }
+
+    function generateResidentID() {
+      var passcode = document.getElementById("res-id-passcode").value.trim().toUpperCase();
+      var name = document.getElementById("resident-own-name").value.trim();
+      if (passcode !== RESIDENT_PASSCODE || !name) { alert("Check passcode or name."); return; }
+      var code = "77" + String(Math.floor(1000 + Math.random() * 9000));
+      
+      var records = getStorage();
+      records.unshift({ code: code, visitor: "Resident: " + name, host: document.getElementById("resident-own-zone").value, status: "ACTIVE", type: 'RESIDENT' });
+      saveStorage(records);
+
+      document.getElementById("resident-badge-code").innerText = code;
+      document.getElementById("resident-badge-name").innerText = "Name: " + name;
+      document.getElementById("resident-badge-address").innerText = "Residence: " + document.getElementById("resident-own-zone").value;
+      
+      var rqrBox = document.getElementById("resident-qrcode-box"); rqrBox.innerHTML = "";
+      new QRCode(rqrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130 });
+      document.getElementById("resident-id-result").style.display = "block";
+      playBeep('success');
+    }
+
+    function generateGuardGateSidePass() {
+      var name = document.getElementById("guard-emg-name").value.trim();
+      var code = "88" + String(Math.floor(1000 + Math.random() * 9000));
+      var records = getStorage();
+      records.unshift({ code: code, visitor: "⚡ [OVERRIDE] " + (name || "Personnel"), host: document.getElementById("guard-emg-dest").value || "NITEL", status: "USED", type: 'EMERGENCY' });
+      saveStorage(records);
+      document.getElementById("guard-emg-code").innerText = code;
+      document.getElementById("guard-emg-success").style.display = "block";
+      playBeep('success'); renderLogs();
+    }
+
+    function sharePassWhatsApp() { window.open("https://wa.me/?text=" + encodeURIComponent("NITEL Gate Pass PIN: " + currentPassCode), "_blank"); }
+    function alertGateWhatsApp() { window.open("https://wa.me/" + GATE_PHONE_NUMBER + "?text=" + encodeURIComponent("Gate Alert! PIN: " + currentPassCode + " for " + currentVisitorName), "_blank"); }
+    function downloadPassSlipImage() { alert("Pass saved!"); }
+    function downloadResidentBadgeSlip() { alert("Badge saved!"); }
+
+    function unlockTerminal() {
+      if (document.getElementById("guard-master-pin").value.trim() === GUARD_MASTER_PIN) {
+        document.getElementById("guard-auth-box").style.display = "none";
+        document.getElementById("guard-terminal-box").style.display = "block";
+        playBeep('success'); renderLogs();
+      } else { alert("Incorrect PIN"); }
+    }
+    function lockTerminal() { stopScannerSafely(); document.getElementById("guard-auth-box").style.display = "block"; document.getElementById("guard-terminal-box").style.display = "none"; }
+    function pressKey(n) { if (enteredPin.length < 6) { enteredPin += n; document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-"); } }
+    function clearPin() { enteredPin = ""; document.getElementById("pin-display").innerText = "------"; document.getElementById("gate-result").style.display = "none"; }
+
+    function verifyGatePass() {
+      var res = document.getElementById("gate-result"); res.style.display = "block";
+      var records = getStorage(); var found = records.find(function(r) { return r.code === enteredPin; });
+      if (!found) { res.style.background = "#fee2e2"; res.style.color = "#991b1b"; res.innerHTML = "<b>ACCESS DENIED (Invalid Code)</b>"; playBeep('error'); }
+      else {
+        found.status = 'USED'; saveStorage(records);
+        res.style.background = "#dcfce7"; res.style.color = "#166534";
+        res.innerHTML = "<b>ACCESS GRANTED</b><br><small>" + found.visitor + " → " + found.host + "</small>";
+        playBeep('success'); renderLogs();
+      }
+    }
+
+    function renderLogs() {
+      var container = document.getElementById("audit-log-feed"); if (!container) return;
+      var records = getStorage();
+      container.innerHTML = records.map(function(item) {
+        return "<div class='log-item'><div style='display:flex; justify-content:space-between;'><span style='font-weight:800;'>" + item.visitor + "</span><span class='log-badge badge-used'>" + item.status + "</span></div><div style='font-size:11px; color:#475569;'>📍 " + item.host + "</div></div>";
+      }).join('');
+    }
+
+    function exportLogsToCSV() {
+      var records = getStorage(); var csv = "Code,Visitor,Host,Status\n" + records.map(function(r){ return r.code + ',"' + r.visitor + '","' + r.host + '",' + r.status; }).join("\n");
+      var link = document.createElement('a'); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = "NITEL_Logs.csv"; link.click();
+    }
+
+    window.onload = function() {
+      renderDirectory(); renderComplaints(); renderNewsFeed(); renderDuesFeed(); renderResidentsDirectory();
+    };
+  </script>
+</body>
+</html>
