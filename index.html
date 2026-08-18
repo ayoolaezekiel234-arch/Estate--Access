@@ -1026,7 +1026,6 @@
       document.getElementById("admin-tab-btn-dues").className = (subtab === 'dues') ? 'admin-subtab-btn active' : 'admin-subtab-btn';
     }
 
-    // STAGE 3 UPGRADE: Secure Database-Backed Admin Authentication
     async function unlockAdminPortal() {
       var err = document.getElementById("admin-error-banner");
       var pin = (document.getElementById("admin-master-pin").value || "").trim();
@@ -1282,7 +1281,6 @@
       var link = document.createElement('a'); link.download = 'NITEL_Resident_Badge_' + code + '.png'; link.href = canvas.toDataURL('image/png'); link.click();
     }
 
-    // STAGE 3 UPGRADE: Secure Database-Backed Guard Authentication
     async function unlockTerminal() {
       var pin = (document.getElementById("guard-master-pin").value || "").trim();
       
@@ -1335,6 +1333,12 @@
         res.innerHTML = "<b>⚠️ ACCESS DENIED: Pass Already Used</b><br><small>" + found.visitor + " was already admitted.</small>"; 
         playBeep('error');
       }
+      else if (found.status === 'EXITED') {
+        res.style.background = "#fef3c7"; 
+        res.style.color = "#b45309"; 
+        res.innerHTML = "<b>⚠️ ACCESS DENIED: Pass Already Exited</b><br><small>" + found.visitor + " has already checked out.</small>"; 
+        playBeep('error');
+      }
       else if (now > found.expiry) {
         found.status = 'EXPIRED'; 
         saveStorage(records); 
@@ -1354,11 +1358,56 @@
       renderLogs();
     }
 
-    function renderLogs() {
-      var container = document.getElementById("audit-log-feed"); if (!container) return;
+    // CHECKOUT FUNCTIONALITY
+    function checkoutVisitor(code) {
       var records = getStorage();
+      var found = records.find(function(r) { return r.code === code; });
+      if (found) {
+        found.status = 'EXITED';
+        found.checkoutTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        saveStorage(records);
+        playBeep('success');
+        renderLogs();
+      }
+    }
+
+    // UPDATED RENDER LOGS WITH CHECKOUT BUTTON
+    function renderLogs() {
+      var container = document.getElementById("audit-log-feed"); 
+      if (!container) return;
+      var records = getStorage();
+      var now = Date.now();
+
       container.innerHTML = records.map(function(item) {
-        return "<div class='log-item'><div style='display:flex; justify-content:space-between;'><span style='font-weight:800;'>" + item.visitor + "</span><span>" + item.status + "</span></div><div style='font-size:11px; color:#475569;'>📍 " + item.host + "</div></div>";
+        var isOverstayed = (item.status === 'USED' || item.status === 'ACTIVE') && (now > item.expiry);
+        var statusBadge = "";
+        var actionBtn = "";
+
+        if (item.status === 'EXITED') {
+          statusBadge = "<span class='log-badge badge-exit'>🚪 EXITED</span>";
+        } else if (isOverstayed) {
+          statusBadge = "<span class='log-badge badge-overstay'>⚠️ OVERSTAYED</span>";
+          actionBtn = "<button onclick='checkoutVisitor(\"" + item.code + "\")' style='background:#15803d; color:#ffffff; border:none; padding:3px 8px; font-size:9px; font-weight:800; border-radius:6px; cursor:pointer;'>🚪 Checkout</button>";
+        } else if (item.status === 'USED') {
+          statusBadge = "<span class='log-badge badge-used'>✅ INSIDE</span>";
+          actionBtn = "<button onclick='checkoutVisitor(\"" + item.code + "\")' style='background:#15803d; color:#ffffff; border:none; padding:3px 8px; font-size:9px; font-weight:800; border-radius:6px; cursor:pointer;'>🚪 Checkout</button>";
+        } else {
+          statusBadge = "<span class='log-badge badge-active'>" + item.status + "</span>";
+        }
+
+        var itemClass = isOverstayed ? "log-item overstay-alert" : "log-item";
+
+        return "<div class='" + itemClass + "'>" +
+          "<div style='display:flex; justify-content:space-between; align-items:center;'>" +
+            "<span style='font-weight:800; font-size:12px; color:#0f172a;'>" + item.visitor + "</span>" +
+            "<div>" + statusBadge + "</div>" +
+          "</div>" +
+          "<div style='font-size:11px; color:#475569;'>📍 " + item.host + "</div>" +
+          "<div style='display:flex; justify-content:space-between; align-items:center; margin-top:2px; font-size:10px; color:#64748b;'>" +
+            "<span>📅 " + item.dateString + " " + item.timeString + (item.checkoutTime ? " (Out: " + item.checkoutTime + ")" : "") + "</span>" +
+            actionBtn +
+          "</div>" +
+        "</div>";
       }).join('');
     }
 
