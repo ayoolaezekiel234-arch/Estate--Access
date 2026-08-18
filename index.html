@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,6 +90,7 @@
     .badge-exit { background: #f1f5f9; color: #64748b; }
 
     .hotline-banner { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 9px; margin-top: 10px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; color: #be123c; font-size: 11px; font-weight: 800; text-decoration: none; }
+    .network-badge { font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: #dcfce7; color: #15803d; }
 
     .admin-subtab-btn { flex: 1; padding: 9px; font-size: 11px; font-weight: 800; border-radius: 8px; border: 1.5px solid #cbd5e1; background: #f8fafc; color: #475569; cursor: pointer; }
     .admin-subtab-btn.active { background: #7c2d12; color: #ffffff; border-color: #7c2d12; }
@@ -102,6 +104,7 @@
 
     <div class="top-bar">
       <div class="icon-btn" onclick="switchTab('visitor')">☰</div>
+      <div id="network-indicator" class="network-badge">🟢 Online</div>
       <div class="header-icons">
         <div class="icon-btn" onclick="switchTab('news')">📰</div>
         <div class="icon-btn notif-badge" onclick="switchTab('guard')">
@@ -626,6 +629,37 @@
 
   </div>
 
+  <!-- FIRST-TIME RESIDENT ONBOARDING MODAL -->
+  <div id="onboard-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding:16px;">
+    <div style="background:#ffffff; width:100%; max-width:390px; border-radius:20px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+      <div style="font-size:18px; font-weight:900; color:#0f2b5c; margin-bottom:4px;">👋 Welcome to NITEL Estate</div>
+      <div style="font-size:12px; color:#64748b; margin-bottom:14px;">Please register your resident details to access community features and dues tracking.</div>
+      
+      <div class="form-group">
+        <label>Full Name</label>
+        <input id="onboard-name" type="text" placeholder="e.g. Chief Owueme Mitchelle" />
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input id="onboard-phone" type="tel" placeholder="e.g. 08108429710" />
+      </div>
+      <div class="form-row form-group">
+        <div>
+          <label>Avenue / Road</label>
+          <select id="onboard-zone">
+            <option value="Avenue 1">Avenue 1</option><option value="Avenue 2">Avenue 2</option><option value="Avenue 3">Avenue 3</option><option value="Avenue 4">Avenue 4</option><option value="Avenue 5">Avenue 5</option>
+            <option value="Road A">Road A</option><option value="Road B">Road B</option><option value="Road C">Road C</option><option value="Road D">Road D</option><option value="Road E">Road E</option><option value="Road F">Road F</option><option value="Road G">Road G</option><option value="Road H">Road H</option><option value="Road I">Road I</option><option value="Road J">Road J</option><option value="Road K">Road K</option><option value="Road L">Road L</option><option value="Road M">Road M</option><option value="Road N">Road N</option><option value="Road O">Road O</option><option value="Road P">Road P</option><option value="Road Q">Road Q</option><option value="Road R">Road R</option><option value="Road S">Road S</option><option value="Road T">Road T</option><option value="Road U">Road U</option>
+          </select>
+        </div>
+        <div>
+          <label>Plot / House No.</label>
+          <input id="onboard-house" type="text" placeholder="e.g. Plot 14" />
+        </div>
+      </div>
+      <button type="button" class="btn-action btn-emerald" style="margin-top:16px;" onclick="submitResidentOnboarding()">Save & Enter Community Hub</button>
+    </div>
+  </div>
+
   <script>
     var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
     var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
@@ -712,15 +746,40 @@
       catch (e) { return {}; }
     }
 
-    function saveMyToken(commentId) {
-      var tokens = getMyTokens();
-      var secretToken = "token_" + Math.random().toString(36).substring(2) + Date.now();
-      tokens[commentId] = secretToken;
-      try { localStorage.setItem("nitel_my_tokens", JSON.stringify(tokens)); } catch(e){}
-      return secretToken;
+    // --- ONBOARDING & RESIDENT REGISTRATION ---
+    function checkResidentOnboarding() {
+      var savedResident = localStorage.getItem("nitel_resident_profile");
+      if (!savedResident) {
+        var modal = document.getElementById("onboard-modal");
+        if (modal) modal.style.display = "flex";
+      }
     }
 
-    // --- ESTATE DUES FUNCTIONS ---
+    async function submitResidentOnboarding() {
+      var name = (document.getElementById("onboard-name").value || "").trim();
+      var phone = (document.getElementById("onboard-phone").value || "").trim();
+      var zone = document.getElementById("onboard-zone").value;
+      var house = (document.getElementById("onboard-house").value || "").trim();
+
+      if (!name || !phone || !house) {
+        alert("Please fill in all registration fields.");
+        return;
+      }
+
+      var profile = { full_name: name, phone: phone, address: zone + " - " + house, registered_at: Date.now() };
+      localStorage.setItem("nitel_resident_profile", JSON.stringify(profile));
+
+      try {
+        await supabaseClient.from('profiles').insert([{ full_name: name, phone: phone, address: profile.address, role: 'resident' }]);
+      } catch(e) {}
+
+      var modal = document.getElementById("onboard-modal");
+      if (modal) modal.style.display = "none";
+      playBeep('success');
+      alert("Welcome, " + name + "! Your resident profile is now saved securely.");
+    }
+
+    // --- ESTATE DUES FUNCTIONS WITH SEARCH ---
     async function recordResidentPayment() {
       var name = (document.getElementById("admin-due-name").value || "").trim();
       var address = (document.getElementById("admin-due-address").value || "").trim();
@@ -763,7 +822,7 @@
 
       var { data, error } = await supabaseClient.from('estate_dues').select('*').order('id', { ascending: false });
       if (error || !data || data.length === 0) {
-        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px; font-style:italic;'>No dues payment records found.</p>";
+        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px; font-style:italic;'>No dues payment records found in database.</p>";
         return;
       }
 
@@ -836,7 +895,7 @@
       }).join('');
     }
 
-    // --- MAGAZINE & DISCUSSIONS WITH REPLIES, EDIT, DELETE & PHOTOS ---
+    // --- MAGAZINE & DISCUSSIONS ---
     async function getNewsStorage() {
       var { data, error } = await supabaseClient.from('estate_news').select('*').order('created_at', { ascending: false });
       if (error || !data || data.length === 0) return defaultNewsData;
@@ -1172,7 +1231,6 @@
       document.getElementById("visitor-validity-display").innerText = "⏱️ Authorized for " + durationHours + " Hours";
 
       var qrBox = document.getElementById("qrcode-box"); qrBox.innerHTML = "";
-      // STAGE 4 UPGRADE: Secure QR Token containing only the prefix and PIN
       new QRCode(qrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130, colorDark : "#0f172a", colorLight : "#ffffff" });
 
       var resBox = document.getElementById("visitor-result"); resBox.style.display = "block";
@@ -1213,7 +1271,6 @@
       document.getElementById("resident-badge-vehicle").innerText = "🚗 Vehicle: " + (vehicle || "None");
 
       var rqrBox = document.getElementById("resident-qrcode-box"); rqrBox.innerHTML = "";
-      // STAGE 4 UPGRADE: Secure Resident QR Token (Hiding plain text name/phone from public scans)
       new QRCode(rqrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130, colorDark : "#0f172a", colorLight : "#ffffff" });
 
       var resBox = document.getElementById("resident-id-result"); resBox.style.display = "block";
@@ -1418,7 +1475,13 @@
     }
 
     window.onload = function() {
+      checkResidentOnboarding();
       renderDirectory(); renderComplaints(); renderNewsFeed(); renderDuesFeed();
+      
+      // Network status listener
+      var netBadge = document.getElementById("network-indicator");
+      window.addEventListener('online', function() { if(netBadge) { netBadge.innerText = "🟢 Online"; netBadge.style.background = "#dcfce7"; netBadge.style.color = "#15803d"; } });
+      window.addEventListener('offline', function() { if(netBadge) { netBadge.innerText = "🔴 Offline Mode"; netBadge.style.background = "#fee2e2"; netBadge.style.color = "#b91c1c"; } });
     };
   </script>
 </body>
