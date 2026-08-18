@@ -1026,18 +1026,36 @@
       document.getElementById("admin-tab-btn-dues").className = (subtab === 'dues') ? 'admin-subtab-btn active' : 'admin-subtab-btn';
     }
 
-    function unlockAdminPortal() {
+    // STAGE 3 UPGRADE: Secure Database-Backed Admin Authentication
+    async function unlockAdminPortal() {
       var err = document.getElementById("admin-error-banner");
       var pin = (document.getElementById("admin-master-pin").value || "").trim();
       if (err) err.style.display = "none";
+
       if (pin === ADMIN_MASTER_PIN) {
         document.getElementById("admin-auth-box").style.display = "none";
         document.getElementById("admin-form-box").style.display = "block";
         playBeep('success');
-      } else {
-        if (err) { err.innerText = "❌ Incorrect Admin PIN"; err.style.display = "block"; }
-        playBeep('error');
+        return;
       }
+
+      try {
+        var { data, error } = await supabaseClient
+          .from('profiles')
+          .select('role')
+          .eq('pin_code', pin)
+          .single();
+
+        if (!error && data && ['admin', 'executive'].includes(data.role)) {
+          document.getElementById("admin-auth-box").style.display = "none";
+          document.getElementById("admin-form-box").style.display = "block";
+          playBeep('success');
+          return;
+        }
+      } catch (e) {}
+
+      if (err) { err.innerText = "❌ Unauthorized Admin Credentials"; err.style.display = "block"; }
+      playBeep('error');
     }
 
     function lockAdminPortal() {
@@ -1124,7 +1142,6 @@
       if (passKey !== RESIDENT_PASSCODE) { if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; } playBeep('error'); return; }
       if (!visitor) { if (err) { err.innerText = "⚠️ Please type Visitor Name."; err.style.display = "block"; } playBeep('error'); return; }
 
-      // STAGE 2 UPGRADE: Cryptographically Secure PIN Generation
       var array = new Uint32Array(1);
       window.crypto.getRandomValues(array);
       var code = String(100000 + (array[0] % 900000));
@@ -1175,7 +1192,6 @@
       if (passKey !== RESIDENT_PASSCODE) { if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; } playBeep('error'); return; }
       if (!name) { if (err) { err.innerText = "⚠️ Please type your Full Name."; err.style.display = "block"; } playBeep('error'); return; }
 
-      // STAGE 2 UPGRADE: Secure PIN for Resident ID
       var array = new Uint32Array(1);
       window.crypto.getRandomValues(array);
       var code = "77" + String(1000 + (array[0] % 9000));
@@ -1266,20 +1282,40 @@
       var link = document.createElement('a'); link.download = 'NITEL_Resident_Badge_' + code + '.png'; link.href = canvas.toDataURL('image/png'); link.click();
     }
 
-    function unlockTerminal() {
+    // STAGE 3 UPGRADE: Secure Database-Backed Guard Authentication
+    async function unlockTerminal() {
       var pin = (document.getElementById("guard-master-pin").value || "").trim();
+      
       if (pin === GUARD_MASTER_PIN) {
         document.getElementById("guard-auth-box").style.display = "none";
         document.getElementById("guard-terminal-box").style.display = "block";
         playBeep('success'); renderLogs();
-      } else { alert("Incorrect Master PIN"); }
+        return;
+      }
+
+      try {
+        var { data, error } = await supabaseClient
+          .from('profiles')
+          .select('role, full_name')
+          .eq('pin_code', pin)
+          .single();
+
+        if (!error && data && ['guard', 'admin', 'executive'].includes(data.role)) {
+          document.getElementById("guard-auth-box").style.display = "none";
+          document.getElementById("guard-terminal-box").style.display = "block";
+          playBeep('success'); renderLogs();
+          return;
+        }
+      } catch (e) {}
+
+      alert("❌ Incorrect Guard Credentials");
+      playBeep('error');
     }
 
     function lockTerminal() { stopScannerSafely(); document.getElementById("guard-auth-box").style.display = "block"; document.getElementById("guard-terminal-box").style.display = "none"; }
     function pressKey(n) { if (enteredPin.length < 6) { enteredPin += n; document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-"); } }
     function clearPin() { enteredPin = ""; document.getElementById("pin-display").innerText = "------"; document.getElementById("gate-result").style.display = "none"; }
 
-    // STAGE 2 UPGRADE: Strict Expiration & Single-Use Gate Verification
     function verifyGatePass() {
       var res = document.getElementById("gate-result"); 
       res.style.display = "block";
