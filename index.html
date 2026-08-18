@@ -455,12 +455,16 @@
                         <i class="fa-solid fa-lock"></i>
                     </div>
                     <h3 class="font-bold text-xl text-nitelGreen-dark">Executive Admin Portal</h3>
-                    <p class="text-xs text-gray-500">Enter secure admin passcode to access management tools.</p>
+                    <p class="text-xs text-gray-500">Sign in with your Supabase executive account credentials.</p>
                 </div>
                 <form id="admin-login-form" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Admin Passcode</label>
-                        <input type="password" id="admin-pin-input" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2.5 text-center font-mono text-xl tracking-widest" placeholder="••••">
+                        <label class="block text-sm font-medium text-gray-700">Admin Email</label>
+                        <input type="email" id="admin-email-input" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2.5 text-sm" placeholder="admin@nitelestate.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="admin-pin-input" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2.5 text-sm" placeholder="••••••••">
                     </div>
                     <button type="submit" class="w-full bg-nitelGreen text-white font-semibold py-3 px-4 rounded-md shadow hover:bg-nitelGreen-light transition">
                         Authenticate Admin
@@ -556,19 +560,23 @@
 
         <!-- ================= 8. SECURITY GATE TERMINAL ================= -->
         <section id="gate-terminal" class="tab-content space-y-6">
-            <!-- Gate PIN Auth or Terminal View -->
+            <!-- Gate Auth or Terminal View -->
             <div id="gate-login-box" class="max-w-md mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-8 mt-12">
                 <div class="text-center mb-6">
                     <div class="bg-nitelGold text-nitelGreen-dark w-12 h-12 mx-auto rounded-full flex items-center justify-center font-bold text-xl mb-2">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <h3 class="font-bold text-xl text-nitelGreen-dark">Security Gate Terminal</h3>
-                    <p class="text-xs text-gray-500">Enter Security Guard PIN to activate gate verification terminal.</p>
+                    <p class="text-xs text-gray-500">Sign in with your Supabase guard account credentials.</p>
                 </div>
                 <form id="gate-login-form" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Guard Passcode</label>
-                        <input type="password" id="gate-pin-input" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2.5 text-center font-mono text-xl tracking-widest" placeholder="••••">
+                        <label class="block text-sm font-medium text-gray-700">Guard Email</label>
+                        <input type="email" id="gate-email-input" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2.5 text-sm" placeholder="guard@nitelestate.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="gate-pin-input" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2.5 text-sm" placeholder="••••••••">
                     </div>
                     <button type="submit" class="w-full bg-nitelGreen text-white font-semibold py-3 px-4 rounded-md shadow hover:bg-nitelGreen-light transition">
                         Activate Gate Terminal
@@ -699,17 +707,21 @@
     <!-- JavaScript Application Logic -->
     <script>
         // --- SUPABASE CONFIGURATION ---
-        // Replace with your actual Supabase URL and Anon Key if connected
         const SUPABASE_URL = 'https://your-project.supabase.co';
         const SUPABASE_ANON_KEY = 'your-anon-key';
         
         let supabaseClient = null;
+        let loggedInGuardUser = null;
+
         try {
             if (window.supabase && SUPABASE_URL !== 'https://your-project.supabase.co') {
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                document.getElementById('connection-status').classList.remove('hidden');
             }
         } catch (e) {
             console.warn("Supabase init failed, running in localStorage fallback mode.", e);
+            document.getElementById('connection-status').classList.remove('hidden');
         }
 
         // Helper for safe HTML escaping to prevent XSS
@@ -786,8 +798,12 @@
                 status: 'active'
             };
 
-            // Save to Supabase or localStorage fallback
             if (supabaseClient) {
+                // If user is authenticated, associate pass with them
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    currentPassData.resident_id = user.id;
+                }
                 const { error } = await supabaseClient.from('estate_passes').insert([currentPassData]);
                 if (error) console.error("Error saving pass to Supabase:", error);
             } else {
@@ -796,7 +812,6 @@
                 localStorage.setItem('nitel_passes', JSON.stringify(localPasses));
             }
 
-            // Render Pass Result
             document.getElementById('pass-display-pin').innerText = pin;
             document.getElementById('pass-display-expiry').innerText = new Date(expiresAt).toLocaleString();
             document.getElementById('pass-display-visitor').innerText = visitorName;
@@ -805,7 +820,6 @@
             document.getElementById('pass-display-host').innerText = hostName;
             document.getElementById('pass-display-address').innerText = `${avenue}, Plot ${plot}`;
 
-            // Generate QR Code
             const qrContainer = document.getElementById('pass-qrcode');
             qrContainer.innerHTML = '';
             QRCode.toCanvas(qrContainer, JSON.stringify({ pin, type: 'visitor_pass', expires: expiresAt }), { width: 140 }, function (err) {
@@ -856,9 +870,7 @@
 
         // --- 3. ESTATE DUES & LEVIES ---
         async function loadDuesRecords() {
-            const tbody = document.getElementById('dues-table-body');
             let dues = [];
-
             if (supabaseClient) {
                 const { data, error } = await supabaseClient.from('estate_dues').select('*');
                 if (!error && data) dues = data;
@@ -871,7 +883,6 @@
                     ];
                 }
             }
-
             renderDuesTable(dues);
         }
 
@@ -901,22 +912,19 @@
 
         function searchDuesRecords() {
             const query = document.getElementById('dues-search-input').value.toLowerCase();
-            let dues = [];
             if (supabaseClient) {
                 supabaseClient.from('estate_dues').select('*').then(({data}) => {
-                    if (data) renderDuesTable(data.filter(d => d.resident_name.toLowerCase().includes(query) || d.property_address.toLowerCase().includes(query)));
+                    if (data) renderDuesTable(data.filter(d => (d.resident_name || '').toLowerCase().includes(query) || (d.property_address || '').toLowerCase().includes(query)));
                 });
             } else {
-                dues = JSON.parse(localStorage.getItem('nitel_dues') || '[]');
-                renderDuesTable(dues.filter(d => d.resident_name.toLowerCase().includes(query) || d.property_address.toLowerCase().includes(query)));
+                let dues = JSON.parse(localStorage.getItem('nitel_dues') || '[]');
+                renderDuesTable(dues.filter(d => (d.resident_name || '').toLowerCase().includes(query) || (d.property_address || '').toLowerCase().includes(query)));
             }
         }
 
         // --- 4. OFFICIAL RESIDENTS DIRECTORY ---
         async function loadResidentsDirectory() {
-            const grid = document.getElementById('directory-grid');
             let directory = [];
-
             if (supabaseClient) {
                 const { data } = await supabaseClient.from('estate_residents').select('*');
                 if (data) directory = data;
@@ -930,7 +938,6 @@
                     ];
                 }
             }
-
             renderDirectoryGrid(directory);
         }
 
@@ -961,11 +968,8 @@
 
         function filterDirectory() {
             const query = document.getElementById('dir-search-input').value.toLowerCase();
-            const cards = document.querySelectorAll('#directory-grid > div');
-            // Simple DOM filter
-            cards.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                card.style.display = text.includes(query) ? 'block' : 'none';
+            document.querySelectorAll('#directory-grid > div').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(query) ? 'block' : 'none';
             });
         }
 
@@ -978,17 +982,20 @@
             const content = document.getElementById('post-content').value;
             const imageInput = document.getElementById('post-image');
 
-            let imageUrl = '';
-            // If image is attached, convert to Base64 or Supabase Storage
+            let authorId = null;
+            if (supabaseClient) {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) authorId = user.id;
+            }
+
             if (imageInput.files && imageInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = async function(uploadEvent) {
-                    imageUrl = uploadEvent.target.result;
-                    await savePost({ name, phone, address, content, image_url: imageUrl, created_at: new Date().toISOString() });
+                    await savePost({ author_id: authorId, name, phone, address, content, image_url: uploadEvent.target.result, created_at: new Date().toISOString() });
                 };
                 reader.readAsDataURL(imageInput.files[0]);
             } else {
-                await savePost({ name, phone, address, content, image_url: null, created_at: new Date().toISOString() });
+                await savePost({ author_id: authorId, name, phone, address, content, image_url: null, created_at: new Date().toISOString() });
             }
         });
 
@@ -1007,7 +1014,6 @@
         async function loadSocialFeed() {
             const stream = document.getElementById('social-feed-stream');
             let posts = [];
-
             if (supabaseClient) {
                 const { data } = await supabaseClient.from('nitel_complaints').select('*').order('created_at', { ascending: false });
                 if (data) posts = data;
@@ -1031,8 +1037,8 @@
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-bold text-base text-nitelGreen-dark">${escapeHtml(p.name)}</h4>
-                                <p class="text-xs text-gray-500">${escapeHtml(p.address)} &bull; ${new Date(p.created_at).toLocaleDateString()}</p>
+                                <h4 class="font-bold text-base text-nitelGreen-dark">${escapeHtml(p.name || 'Resident')}</h4>
+                                <p class="text-xs text-gray-500">${escapeHtml(p.address || '')} &bull; ${new Date(p.created_at).toLocaleDateString()}</p>
                             </div>
                             <span class="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">Resident Notice</span>
                         </div>
@@ -1047,7 +1053,6 @@
         async function loadMagazineArticles() {
             const container = document.getElementById('magazine-articles-container');
             let articles = [];
-
             if (supabaseClient) {
                 const { data } = await supabaseClient.from('estate_news').select('*').order('created_at', { ascending: false });
                 if (data) articles = data;
@@ -1083,33 +1088,72 @@
             alert("Comment and discussion thread for article #" + articleId);
         }
 
-        // --- 7. EXECUTIVE ADMIN PORTAL ---
-        document.getElementById('admin-login-form').addEventListener('submit', function(e) {
+        // --- 7. EXECUTIVE ADMIN PORTAL (SECURE SUPABASE AUTH) ---
+        document.getElementById('admin-login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const pin = document.getElementById('admin-pin-input').value;
-            if (pin === '2026' || pin === '1234') { // Secure PIN check
-                document.getElementById('admin-login-box').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-            } else {
-                alert('Invalid Admin Passcode.');
+            const email = document.getElementById('admin-email-input').value;
+            const password = document.getElementById('admin-pin-input').value;
+
+            if (!supabaseClient) {
+                // Fallback for offline/local testing
+                if (password === '2026' || password === '1234') {
+                    document.getElementById('admin-login-box').classList.add('hidden');
+                    document.getElementById('admin-dashboard').classList.remove('hidden');
+                    return;
+                }
+                alert('Supabase client not initialized. Use local code 2026 or 1234.');
+                return;
             }
+
+            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (authError) {
+                alert('Authentication failed: ' + authError.message);
+                return;
+            }
+
+            const { data: profile, error: profileError } = await supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', authData.user.id)
+                .single();
+
+            if (profileError || !['executive', 'admin'].includes(profile?.role)) {
+                await supabaseClient.auth.signOut();
+                alert('Access denied: Executive privileges required.');
+                return;
+            }
+
+            document.getElementById('admin-login-box').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
         });
 
-        function adminLogout() {
+        async function adminLogout() {
+            if (supabaseClient) await supabaseClient.auth.signOut();
             document.getElementById('admin-dashboard').classList.add('hidden');
             document.getElementById('admin-login-box').classList.remove('hidden');
+            document.getElementById('admin-email-input').value = '';
             document.getElementById('admin-pin-input').value = '';
         }
 
         document.getElementById('admin-article-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const title = document.getElementById('admin-article-title').value;
-            const cover_image = document.getElementById('admin-article-image').value;
-            const body = document.getElementById('admin-article-body').value;
-
-            const newArticle = { title, cover_image, body, created_at: new Date().toISOString() };
+            let authorId = null;
             if (supabaseClient) {
-                await supabaseClient.from('estate_news').insert([newArticle]);
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) authorId = user.id;
+            }
+
+            const newArticle = {
+                author_id: authorId,
+                title: document.getElementById('admin-article-title').value,
+                cover_image: document.getElementById('admin-article-image').value,
+                body: document.getElementById('admin-article-body').value,
+                created_at: new Date().toISOString()
+            };
+
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('estate_news').insert([newArticle]);
+                if (error) { alert('Error publishing: ' + error.message); return; }
             } else {
                 let news = JSON.parse(localStorage.getItem('nitel_news') || '[]');
                 news.unshift(newArticle);
@@ -1135,7 +1179,8 @@
             };
 
             if (supabaseClient) {
-                await supabaseClient.from('estate_dues').insert([paymentRecord]);
+                const { error } = await supabaseClient.from('estate_dues').insert([paymentRecord]);
+                if (error) { alert('Error saving payment: ' + error.message); return; }
             } else {
                 let dues = JSON.parse(localStorage.getItem('nitel_dues') || '[]');
                 dues.unshift(paymentRecord);
@@ -1146,30 +1191,64 @@
             loadDuesRecords();
         });
 
-        // --- 8. SECURITY GATE TERMINAL ---
+        // --- 8. SECURITY GATE TERMINAL (SECURE SUPABASE AUTH) ---
+        let loggedInGuardId = null;
         let activeGuard = null;
         let html5QrCode = null;
         let lastVerifiedPass = null;
 
-        document.getElementById('gate-login-form').addEventListener('submit', function(e) {
+        document.getElementById('gate-login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const pin = document.getElementById('gate-pin-input').value;
-            if (pin === '9999' || pin === '1234') { // Guard PIN
-                activeGuard = 'Guard Station Alpha';
-                document.getElementById('gate-login-box').classList.add('hidden');
-                document.getElementById('gate-dashboard').classList.remove('hidden');
-                loadAuditLogs();
-            } else {
-                alert('Invalid Guard Passcode.');
+            const email = document.getElementById('gate-email-input').value;
+            const password = document.getElementById('gate-pin-input').value;
+
+            if (!supabaseClient) {
+                if (password === '9999' || password === '1234') {
+                    activeGuard = 'Guard Station Alpha';
+                    document.getElementById('guard-identity-badge').innerText = `Guard: ${activeGuard}`;
+                    document.getElementById('gate-login-box').classList.add('hidden');
+                    document.getElementById('gate-dashboard').classList.remove('hidden');
+                    loadAuditLogs();
+                    return;
+                }
+                alert('Supabase client not initialized. Use local guard code 9999 or 1234.');
+                return;
             }
+
+            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (authError) {
+                alert('Guard Authentication failed: ' + authError.message);
+                return;
+            }
+
+            const { data: profile, error: profileError } = await supabaseClient
+                .from('profiles')
+                .select('role, full_name')
+                .eq('id', authData.user.id)
+                .single();
+
+            if (profileError || !['guard', 'executive', 'admin'].includes(profile?.role)) {
+                await supabaseClient.auth.signOut();
+                alert('Access denied: Guard credentials required.');
+                return;
+            }
+
+            loggedInGuardId = authData.user.id;
+            activeGuard = profile.full_name || 'Gate Guard';
+            document.getElementById('guard-identity-badge').innerText = `Guard: ${activeGuard}`;
+            document.getElementById('gate-login-box').classList.add('hidden');
+            document.getElementById('gate-dashboard').classList.remove('hidden');
+            loadAuditLogs();
         });
 
-        function gateLogout() {
+        async function gateLogout() {
             if (html5QrCode) {
                 html5QrCode.stop().catch(err => console.log(err));
             }
+            if (supabaseClient) await supabaseClient.auth.signOut();
             document.getElementById('gate-dashboard').classList.add('hidden');
             document.getElementById('gate-login-box').classList.remove('hidden');
+            document.getElementById('gate-email-input').value = '';
             document.getElementById('gate-pin-input').value = '';
         }
 
@@ -1193,7 +1272,7 @@
                     }
                     html5QrCode.stop();
                 },
-                (errorMessage) => { /* scanning */ }
+                (errorMessage) => {}
             ).catch(err => {
                 alert("Camera access denied or unavailable. Use manual 6-digit PIN verification.");
             });
@@ -1231,10 +1310,8 @@
                 return;
             }
 
-            // Check expiration
             const now = new Date();
-            const expiry = new Date(pass.expires_at);
-            const isExpired = now > expiry;
+            const isExpired = now > new Date(pass.expires_at);
 
             if (isExpired || pass.status === 'expired') {
                 statusBanner.className = "p-4 rounded-lg mb-4 text-center font-bold text-lg bg-amber-100 text-amber-800";
@@ -1258,15 +1335,18 @@
         async function logGateEntry(isGranted) {
             if (!lastVerifiedPass && !isGranted) return;
             const logEntry = {
+                guard_id: loggedInGuardId,
+                pass_id: lastVerifiedPass ? lastVerifiedPass.id : null,
                 timestamp: new Date().toISOString(),
                 visitor_name: lastVerifiedPass ? lastVerifiedPass.visitor_name : 'Emergency Visitor',
                 details: lastVerifiedPass ? `${lastVerifiedPass.host_address} (Host: ${lastVerifiedPass.host_name})` : 'Gate Entry',
                 status: isGranted ? 'GRANTED' : 'DENIED',
-                guard: activeGuard
+                guard: activeGuard || 'Gate Guard'
             };
 
             if (supabaseClient) {
-                await supabaseClient.from('estate_audit_logs').insert([logEntry]);
+                const { error } = await supabaseClient.from('estate_audit_logs').insert([logEntry]);
+                if (error) { alert('Error logging entry: ' + error.message); return; }
             } else {
                 let logs = JSON.parse(localStorage.getItem('nitel_audit_logs') || '[]');
                 logs.unshift(logEntry);
@@ -1280,19 +1360,18 @@
 
         document.getElementById('emergency-override-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const category = document.getElementById('override-category').value;
-            const notes = document.getElementById('override-notes').value;
-
             const logEntry = {
+                guard_id: loggedInGuardId,
                 timestamp: new Date().toISOString(),
-                visitor_name: `[EMERGENCY OVERRIDE] ${category}`,
-                details: notes,
+                visitor_name: `[EMERGENCY OVERRIDE] ${document.getElementById('override-category').value}`,
+                details: document.getElementById('override-notes').value,
                 status: 'OVERRIDE GRANTED',
-                guard: activeGuard
+                guard: activeGuard || 'Gate Guard'
             };
 
             if (supabaseClient) {
-                await supabaseClient.from('estate_audit_logs').insert([logEntry]);
+                const { error } = await supabaseClient.from('estate_audit_logs').insert([logEntry]);
+                if (error) { alert('Error logging override: ' + error.message); return; }
             } else {
                 let logs = JSON.parse(localStorage.getItem('nitel_audit_logs') || '[]');
                 logs.unshift(logEntry);
@@ -1313,7 +1392,6 @@
         async function loadAuditLogs() {
             const tbody = document.getElementById('audit-logs-tbody');
             let logs = [];
-
             if (supabaseClient) {
                 const { data } = await supabaseClient.from('estate_audit_logs').select('*').order('timestamp', { ascending: false }).limit(50);
                 if (data) logs = data;
@@ -1334,21 +1412,35 @@
                         <td class="px-3 py-2 font-medium text-gray-900">${escapeHtml(l.visitor_name)}</td>
                         <td class="px-3 py-2 text-gray-600">${escapeHtml(l.details)}</td>
                         <td class="px-3 py-2 text-center font-bold ${l.status.includes('GRANTED') ? 'text-green-600' : 'text-red-600'}">${escapeHtml(l.status)}</td>
-                        <td class="px-3 py-2 text-right text-gray-500">${escapeHtml(l.guard)}</td>
+                        <td class="px-3 py-2 text-right text-gray-500">${escapeHtml(l.guard || 'Guard')}</td>
                     </tr>
                 `;
             });
         }
 
         function exportAuditLogsCsv() {
-            let logs = JSON.parse(localStorage.getItem('nitel_audit_logs') || '[]');
+            let logs = [];
+            if (supabaseClient) {
+                // For Supabase mode, fetch from table or fallback to stored logs
+                supabaseClient.from('estate_audit_logs').select('*').then(({data}) => {
+                    generateAndDownloadCsv(data || []);
+                });
+            } else {
+                logs = JSON.parse(localStorage.getItem('nitel_audit_logs') || '[]');
+                generateAndDownloadCsv(logs);
+            }
+        }
+
+        function generateAndDownloadCsv(logs) {
             if (logs.length === 0) {
                 alert('No audit logs available for export.');
                 return;
             }
             let csv = 'Timestamp,Visitor,Details,Status,Guard\n';
             logs.forEach(l => {
-                csv += `"${l.timestamp}","${l.visitor_name}","${l.details}","${l.status}","${l.guard}"\n`;
+                const cleanVisitor = (l.visitor_name || '').replace(/"/g, '""');
+                const cleanDetails = (l.details || '').replace(/"/g, '""');
+                csv += `"${l.timestamp}","${cleanVisitor}","${cleanDetails}","${l.status}","${l.guard || ''}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
@@ -1358,7 +1450,6 @@
             a.click();
         }
 
-        // Initialize app data on load
         window.addEventListener('DOMContentLoaded', () => {
             loadDuesRecords();
             loadResidentsDirectory();
