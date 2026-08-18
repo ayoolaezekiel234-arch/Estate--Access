@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>NITEL Estate — Digital Access Control</title>
+  <title>NITEL Estate — Social Community Hub</title>
   
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#ffffff" />
   <link rel="apple-touch-icon" href="/nitel-logo.png" />
 
-  <!-- Standalone QR Code Generator, Scanner & Supabase Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -116,22 +115,22 @@
       <div class="brand-title">
         <span>NiT<span class="brand-accent">E</span>L</span> Estate
       </div>
-      <div class="brand-sub">Digital Access Control & Community Hub</div>
+      <div class="brand-sub">Social Access Control & Community Hub</div>
     </div>
 
     <!-- Main Navigation Grid -->
     <div class="quick-grid">
       <div class="grid-card card-dark" onclick="switchTab('visitor')">
         <div class="card-icon">🚗</div>
-        <div class="card-title">Generate Pass</div>
+        <div class="card-title">Pass</div>
       </div>
       <div class="grid-card card-dark" onclick="switchTab('resident')">
         <div class="card-icon">📍</div>
-        <div class="card-title">Resident ID</div>
+        <div class="card-title">ID Badge</div>
       </div>
       <div class="grid-card card-dues" onclick="switchTab('dues')">
         <div class="card-icon">💰</div>
-        <div class="card-title">Estate Dues</div>
+        <div class="card-title">Dues</div>
       </div>
       <div class="grid-card card-light" onclick="switchTab('directory')">
         <div class="card-icon">🏢</div>
@@ -139,7 +138,7 @@
       </div>
       <div class="grid-card card-light" onclick="switchTab('complaints')">
         <div class="card-icon">📢</div>
-        <div class="card-title">Notices</div>
+        <div class="card-title">Community</div>
       </div>
       <div class="grid-card card-accent" onclick="switchTab('news')">
         <div class="card-icon">📰</div>
@@ -147,11 +146,11 @@
       </div>
       <div class="grid-card card-guard" onclick="switchTab('guard')">
         <div class="card-icon">🛡️</div>
-        <div class="card-title">Gate Terminal</div>
+        <div class="card-title">Guard</div>
       </div>
       <div class="grid-card card-admin" onclick="switchTab('admin-post')">
         <div class="card-icon">👑</div>
-        <div class="card-title">Admin Hub</div>
+        <div class="card-title">Admin</div>
       </div>
     </div>
 
@@ -169,8 +168,8 @@
       <div class="panel-sub">Authorize guests, site workers, artisans and deliveries</div>
 
       <div class="form-group" style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; padding: 10px; margin-top: 10px;">
-        <label style="color: #166534;">📝 Visit Details / Specific Instructions (Optional)</label>
-        <input id="res-custom-notes" type="text" placeholder="e.g. Pure water supply, plumber, groceries delivery" style="background: #ffffff;" />
+        <label style="color: #166534;">📝 Visit Details / Instructions (Optional)</label>
+        <input id="res-custom-notes" type="text" placeholder="e.g. Pure water supply, plumber, groceries" style="background: #ffffff;" />
       </div>
 
       <div class="passcode-box">
@@ -201,27 +200,7 @@
               <option value="Avenue 5">Avenue 5</option>
             </optgroup>
             <optgroup label="Roads (A – U)">
-              <option value="Road A">Road A</option>
-              <option value="Road B">Road B</option>
-              <option value="Road C">Road C</option>
-              <option value="Road D">Road D</option>
-              <option value="Road E">Road E</option>
-              <option value="Road F">Road F</option>
-              <option value="Road G">Road G</option>
-              <option value="Road H">Road H</option>
-              <option value="Road I">Road I</option>
-              <option value="Road J">Road J</option>
-              <option value="Road K">Road K</option>
-              <option value="Road L">Road L</option>
-              <option value="Road M">Road M</option>
-              <option value="Road N">Road N</option>
-              <option value="Road O">Road O</option>
-              <option value="Road P">Road P</option>
-              <option value="Road Q">Road Q</option>
-              <option value="Road R">Road R</option>
-              <option value="Road S">Road S</option>
-              <option value="Road T">Road T</option>
-              <option value="Road U">Road U</option>
+              <option value="Road A">Road A</option><option value="Road B">Road B</option><option value="Road C">Road C</option><option value="Road D">Road D</option><option value="Road E">Road E</option><option value="Road F">Road F</option><option value="Road G">Road G</option><option value="Road H">Road H</option><option value="Road I">Road I</option><option value="Road J">Road J</option><option value="Road K">Road K</option><option value="Road L">Road L</option><option value="Road M">Road M</option><option value="Road N">Road N</option><option value="Road O">Road O</option><option value="Road P">Road P</option><option value="Road Q">Road Q</option><option value="Road R">Road R</option><option value="Road S">Road S</option><option value="Road T">Road T</option><option value="Road U">Road U</option>
             </optgroup>
           </select>
         </div>
@@ -232,7 +211,7 @@
       </div>
 
       <div class="form-group">
-        <label>Visitor / Lead Worker Name</label>
+        <label>Visitor / Worker Name</label>
         <input id="res-visitor-name" type="text" placeholder="e.g. Emmanuel Chukwu" />
       </div>
 
@@ -254,16 +233,12 @@
       </div>
 
       <div class="form-group">
-        <label>Purpose & Stay Duration</label>
+        <label>Purpose & Duration</label>
         <select id="res-pass-type">
           <option value="RESIDENTIAL">Residential Guest (24 Hours)</option>
           <option value="LABORER">Site Laborer / Worker (8 Hours)</option>
-          <option value="CONTRACTOR">Contractor / Heavy Site Work (12 Hours)</option>
+          <option value="CONTRACTOR">Contractor / Heavy Work (12 Hours)</option>
           <option value="ARTISAN">Artisan / Short Delivery (2 Hours)</option>
-          <option value="MOSQUE">Mosque Service (4 Hours)</option>
-          <option value="CHURCH">Church Service (4 Hours)</option>
-          <option value="SUPERMARKET">Supermarket / Retail (1 Hour)</option>
-          <option value="HOTEL">Hotel / Short-let (7 Days)</option>
         </select>
       </div>
 
@@ -318,32 +293,7 @@
         <div>
           <label>Avenue / Road</label>
           <select id="resident-own-zone">
-            <option value="Avenue 1">Avenue 1</option>
-            <option value="Avenue 2">Avenue 2</option>
-            <option value="Avenue 3">Avenue 3</option>
-            <option value="Avenue 4">Avenue 4</option>
-            <option value="Avenue 5">Avenue 5</option>
-            <option value="Road A">Road A</option>
-            <option value="Road B">Road B</option>
-            <option value="Road C">Road C</option>
-            <option value="Road D">Road D</option>
-            <option value="Road E">Road E</option>
-            <option value="Road F">Road F</option>
-            <option value="Road G">Road G</option>
-            <option value="Road H">Road H</option>
-            <option value="Road I">Road I</option>
-            <option value="Road J">Road J</option>
-            <option value="Road K">Road K</option>
-            <option value="Road L">Road L</option>
-            <option value="Road M">Road M</option>
-            <option value="Road N">Road N</option>
-            <option value="Road O">Road O</option>
-            <option value="Road P">Road P</option>
-            <option value="Road Q">Road Q</option>
-            <option value="Road R">Road R</option>
-            <option value="Road S">Road S</option>
-            <option value="Road T">Road T</option>
-            <option value="Road U">Road U</option>
+            <option value="Avenue 1">Avenue 1</option><option value="Avenue 2">Avenue 2</option><option value="Avenue 3">Avenue 3</option><option value="Avenue 4">Avenue 4</option><option value="Avenue 5">Avenue 5</option><option value="Road A">Road A</option><option value="Road B">Road B</option><option value="Road C">Road C</option><option value="Road D">Road D</option><option value="Road E">Road E</option><option value="Road F">Road F</option><option value="Road G">Road G</option><option value="Road H">Road H</option><option value="Road I">Road I</option><option value="Road J">Road J</option><option value="Road K">Road K</option><option value="Road L">Road L</option><option value="Road M">Road M</option><option value="Road N">Road N</option><option value="Road O">Road O</option><option value="Road P">Road P</option><option value="Road Q">Road Q</option><option value="Road R">Road R</option><option value="Road S">Road S</option><option value="Road T">Road T</option><option value="Road U">Road U</option>
           </select>
         </div>
         <div>
@@ -382,7 +332,7 @@
     <!-- 3. ESTATE DUES & LEVY TRACKER PANEL -->
     <div id="view-dues" class="panel-card" style="display: none;">
       <div class="panel-title">💰 Estate Dues & Levy Clearance</div>
-      <div class="panel-sub">Verify payment clearance for security, development, and sanitation levies</div>
+      <div class="panel-sub">Verify payment clearance for security and development levies</div>
 
       <div class="form-group" style="margin-top: 10px;">
         <input id="dues-search-input" type="text" placeholder="🔍 Search by Resident Name, Avenue, or Plot No..." onkeyup="renderDuesFeed()" />
@@ -394,7 +344,7 @@
     <!-- 4. ESTATE BUSINESS DIRECTORY PANEL -->
     <div id="view-directory" class="panel-card" style="display: none;">
       <div class="panel-title">🏢 Estate Business Directory</div>
-      <div class="panel-sub">Find verified vendors, salons, food, tailors and services in NITEL Estate</div>
+      <div class="panel-sub">Find verified vendors, salons, food, tailors and services</div>
 
       <div class="form-group" style="margin-top: 10px;">
         <input id="directory-search-input" type="text" placeholder="🔍 Search pharmacy, salon, tailor, food, gas..." onkeyup="filterDirectory()" />
@@ -417,19 +367,24 @@
       <div id="directory-listings-feed" style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow-y: auto;"></div>
     </div>
 
-    <!-- 5. NOTICE & COMPLAINTS PANEL -->
+    <!-- 5. SOCIAL COMMUNITY NOTICE & COMPLAINTS BOARD -->
     <div id="view-complaints" class="panel-card" style="display: none;">
-      <div class="panel-title">📢 Community Notice & Complaints Board</div>
-      <div class="panel-sub">Report maintenance issues, neighborhood feedback, or local business notes</div>
+      <div class="panel-title">📢 NITEL Social Feed & Community Board</div>
+      <div class="panel-sub">Share notices, neighborhood updates, and photos with residents</div>
 
       <div class="form-group" style="margin-top: 10px;">
-        <label>Complaint / Notice Message</label>
-        <textarea id="complaint-msg" rows="3" placeholder="e.g. Street light on Road C is out, or drainage blocked near Avenue 2..."></textarea>
+        <label>What's happening in the estate?</label>
+        <textarea id="complaint-msg" rows="3" placeholder="e.g. Security alert, power restored, or item found..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>🖼️ Attach Photo (Image URL or Link)</label>
+        <input id="complaint-image" type="url" placeholder="https://example.com/photo.jpg (Optional)" />
       </div>
 
       <div class="form-row form-group">
         <div>
-          <label>Your Name / Plot (Optional)</label>
+          <label>Your Name / Plot</label>
           <input id="complaint-author" type="text" placeholder="e.g. Mr. Adeleke (Road B)" />
         </div>
         <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
@@ -439,28 +394,28 @@
         </div>
       </div>
 
-      <button type="button" class="btn-action btn-blue" onclick="submitComplaint()">Submit to Community Board</button>
+      <button type="button" class="btn-action btn-blue" onclick="submitComplaint()">🚀 Post to Community Social Feed</button>
 
       <div style="margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
-        <div style="font-size: 12px; font-weight: 800; color: #0f2b5c; margin-bottom: 8px; text-transform: uppercase;">Recent Estate Feed</div>
-        <div id="complaints-feed" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
+        <div style="font-size: 12px; font-weight: 800; color: #0f2b5c; margin-bottom: 8px; text-transform: uppercase;">Live Community Social Wall</div>
+        <div id="complaints-feed" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;"></div>
       </div>
     </div>
 
-    <!-- 6. ESTATE NEWS & MAGAZINE PANEL -->
+    <!-- 6. ESTATE NEWS & MAGAZINE PANEL (WITH REPLIES, EDIT, DELETE & PHOTOS) -->
     <div id="view-news" class="panel-card" style="display: none;">
-      <div class="panel-title">📰 Estate News & Community Magazine</div>
-      <div class="panel-sub">Official announcements, project updates, and resident discussions</div>
+      <div class="panel-title">📰 Estate Magazine & Discussions</div>
+      <div class="panel-sub">Official announcements, photo stories, and resident discussions</div>
 
-      <div id="news-feed" style="margin-top: 10px; display: flex; flex-direction: column; gap: 14px; max-height: 400px; overflow-y: auto;"></div>
+      <div id="news-feed" style="margin-top: 10px; display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto;"></div>
     </div>
 
-    <!-- 7. ADMIN EXECUTIVE PORTAL (NEWS & DUES POSTING) -->
+    <!-- 7. ADMIN EXECUTIVE PORTAL -->
     <div id="view-admin-post" class="panel-card" style="display: none;">
       <div id="admin-auth-box" style="text-align: center; padding: 10px 0;">
         <div style="font-size: 34px;">👑</div>
         <div class="panel-title" style="margin-top: 6px;">Executive Admin Portal</div>
-        <div class="panel-sub">Enter Admin PIN to manage news and resident levy payments</div>
+        <div class="panel-sub">Enter Admin PIN to publish magazine articles and log dues</div>
         <input id="admin-master-pin" type="password" maxlength="4" style="width: 130px; margin: 10px auto; text-align: center; font-size: 22px; font-family: monospace; letter-spacing: 5px;" placeholder="••••" autocomplete="off" />
         <div id="admin-error-banner" class="error-banner" style="margin-bottom:8px;"></div>
         <button type="button" class="btn-action btn-emerald" onclick="unlockAdminPortal()">Unlock Admin Portal</button>
@@ -473,40 +428,44 @@
         </div>
 
         <div style="display: flex; gap: 6px; margin-bottom: 14px;">
-          <button id="admin-tab-btn-news" type="button" class="admin-subtab-btn active" onclick="switchAdminSubtab('news')">📰 Post News</button>
+          <button id="admin-tab-btn-news" type="button" class="admin-subtab-btn active" onclick="switchAdminSubtab('news')">📰 Post Magazine</button>
           <button id="admin-tab-btn-dues" type="button" class="admin-subtab-btn" onclick="switchAdminSubtab('dues')">💰 Log Payment</button>
         </div>
 
-        <!-- Admin Sub-Panel: Post News -->
+        <!-- Admin Sub-Panel: Post Magazine with Image -->
         <div id="admin-sub-news">
           <div class="form-group">
-            <label>News Headline / Title</label>
-            <input id="admin-news-title" type="text" placeholder="e.g. 🏗️ Annual General Meeting Scheduled" />
+            <label>Magazine Headline / Title</label>
+            <input id="admin-news-title" type="text" placeholder="e.g. 🏗️ Annual General Meeting Photo Report" />
           </div>
           <div class="form-group">
             <label>Author / Committee</label>
             <input id="admin-news-author" type="text" value="NITEL Estate CDA Executive" />
           </div>
           <div class="form-group">
-            <label>News Content / Announcement Body</label>
+            <label>🖼️ Cover Photo Image URL (Optional)</label>
+            <input id="admin-news-image" type="url" placeholder="https://example.com/magazine-photo.jpg" />
+          </div>
+          <div class="form-group">
+            <label>Article Body Content</label>
             <textarea id="admin-news-content" rows="4" placeholder="Type official announcement details here..."></textarea>
           </div>
-          <button type="button" class="btn-action btn-emerald" onclick="publishEstateNews()">🚀 Publish to Magazine</button>
+          <button type="button" class="btn-action btn-emerald" onclick="publishEstateNews()">🚀 Publish Magazine Article</button>
         </div>
 
         <!-- Admin Sub-Panel: Log Resident Payment -->
         <div id="admin-sub-dues" style="display: none;">
           <div class="form-group">
-            <label>Resident / Landlord Full Name</label>
+            <label>Resident Full Name</label>
             <input id="admin-due-name" type="text" placeholder="e.g. Chief Adeleke O." />
           </div>
           <div class="form-row form-group">
             <div>
-              <label>Avenue / Road & House No.</label>
+              <label>Property Address</label>
               <input id="admin-due-address" type="text" placeholder="e.g. Road C Plot 12" />
             </div>
             <div>
-              <label>Amount Paid (₦)</label>
+              <label>Amount (₦)</label>
               <input id="admin-due-amount" type="text" placeholder="e.g. ₦15,000" />
             </div>
           </div>
@@ -522,13 +481,13 @@
               </select>
             </div>
             <div>
-              <label>Period / Month Covered</label>
-              <input id="admin-due-period" type="text" placeholder="e.g. August 2026 / Year 2026" />
+              <label>Period / Month</label>
+              <input id="admin-due-period" type="text" placeholder="e.g. August 2026" />
             </div>
           </div>
           <div class="form-group">
-            <label>Receipt No. / Bank Reference (Optional)</label>
-            <input id="admin-due-receipt" type="text" placeholder="e.g. REC-84920 / GTB-Transfer" />
+            <label>Receipt Reference</label>
+            <input id="admin-due-receipt" type="text" placeholder="e.g. REC-84920" />
           </div>
           <button type="button" class="btn-action btn-emerald" onclick="recordResidentPayment()">💾 Post Verified Payment</button>
         </div>
@@ -686,6 +645,7 @@
     var currentNotesInfo = "";
     var currentExpiry = 0;
     var qrScannerInstance = null;
+    var replyingToCommentId = null;
 
     var estateDirectoryData = [
       { name: "NITEL Health Pharmacy", category: "PHARMACY", location: "Road C - Plot 4", phone: "08012345678", desc: "Prescription drugs, first aid & medical supplies" },
@@ -704,14 +664,8 @@
         title: "🏗️ New Perimeter Solar Lighting Project Commences",
         date: "August 16, 2026",
         author: "NITEL Estate CDA Executive",
-        content: "The executive committee is pleased to announce that installation of solar security floodlights along Road A through Road H has officially begun. This project aims to boost nighttime visibility and security across all residential zones."
-      },
-      {
-        id: "news_2",
-        title: "🧹 Monthly Estate Environmental Sanitation Exercise",
-        date: "August 10, 2026",
-        author: "Sanitation Committee",
-        content: "Residents are reminded that our monthly environmental sanitation exercise holds this Saturday from 7:00 AM to 10:00 AM. Movement of vehicles will be restricted during this period to allow proper clearing of gutters and common walkways."
+        image_url: "",
+        content: "The executive committee is pleased to announce that installation of solar security floodlights along Road A through Road H has officially begun."
       }
     ];
 
@@ -753,7 +707,20 @@
       catch (e) {}
     }
 
-    // --- SUPABASE DUES & LEVIES FUNCTIONS ---
+    function getMyTokens() {
+      try { return JSON.parse(localStorage.getItem("nitel_my_tokens") || "{}"); } 
+      catch (e) { return {}; }
+    }
+
+    function saveMyToken(commentId) {
+      var tokens = getMyTokens();
+      var secretToken = "token_" + Math.random().toString(36).substring(2) + Date.now();
+      tokens[commentId] = secretToken;
+      try { localStorage.setItem("nitel_my_tokens", JSON.stringify(tokens)); } catch(e){}
+      return secretToken;
+    }
+
+    // --- ESTATE DUES FUNCTIONS ---
     async function recordResidentPayment() {
       var name = (document.getElementById("admin-due-name").value || "").trim();
       var address = (document.getElementById("admin-due-address").value || "").trim();
@@ -768,24 +735,15 @@
       }
 
       var now = new Date();
-      var dateStr = now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-
       var record = {
-        resident_name: name,
-        property_address: address,
-        levy_type: type,
-        amount: amount,
-        period: period || "Current Period",
-        status: "PAID",
+        resident_name: name, property_address: address, levy_type: type,
+        amount: amount, period: period || "Current Period", status: "PAID",
         receipt_no: receipt || ("REC-" + Math.floor(10000 + Math.random() * 90000)),
-        date_paid: dateStr
+        date_paid: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
       };
 
       var { error } = await supabaseClient.from('estate_dues').insert([record]);
-      if (error) {
-        alert("Error saving payment: " + error.message);
-        return;
-      }
+      if (error) { alert("Error saving payment: " + error.message); return; }
 
       document.getElementById("admin-due-name").value = "";
       document.getElementById("admin-due-address").value = "";
@@ -794,7 +752,7 @@
       document.getElementById("admin-due-receipt").value = "";
 
       playBeep('success');
-      alert("Payment recorded successfully! It is now live in the Estate Dues directory.");
+      alert("Payment recorded successfully!");
       switchTab('dues');
     }
 
@@ -803,110 +761,85 @@
       if (!container) return;
       var query = (document.getElementById("dues-search-input").value || "").toLowerCase();
 
-      var { data, error } = await supabaseClient
-        .from('estate_dues')
-        .select('*')
-        .order('id', { ascending: false });
-
+      var { data, error } = await supabaseClient.from('estate_dues').select('*').order('id', { ascending: false });
       if (error || !data || data.length === 0) {
-        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px; font-style:italic;'>No dues or levy payment records found. Payments logged by Admin will appear here.</p>";
+        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px; font-style:italic;'>No dues payment records found.</p>";
         return;
       }
 
       var filtered = data.filter(function(item) {
-        return item.resident_name.toLowerCase().includes(query) ||
-               item.property_address.toLowerCase().includes(query) ||
-               (item.receipt_no && item.receipt_no.toLowerCase().includes(query)) ||
-               item.levy_type.toLowerCase().includes(query);
+        return item.resident_name.toLowerCase().includes(query) || item.property_address.toLowerCase().includes(query) || item.levy_type.toLowerCase().includes(query);
       });
-
-      if (filtered.length === 0) {
-        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px;'>No payments match your search.</p>";
-        return;
-      }
 
       container.innerHTML = filtered.map(function(item) {
         return "<div style='background:#f0fdf4; border:1.5px solid #86efac; padding:12px; border-radius:12px; display:flex; flex-direction:column; gap:4px;'>" +
           "<div style='display:flex; justify-content:space-between; align-items:center;'>" +
             "<span style='font-size:13px; font-weight:800; color:#0f172a;'>👤 " + item.resident_name + "</span>" +
-            "<span style='font-size:10px; font-weight:800; background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:6px; border:1px solid #86efac;'>✅ " + item.status + "</span>" +
+            "<span style='font-size:10px; font-weight:800; background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:6px;'>✅ " + item.status + "</span>" +
           "</div>" +
           "<div style='font-size:11px; color:#475569;'>🏠 <b>Property:</b> " + item.property_address + "</div>" +
           "<div style='font-size:11px; color:#0369a1; font-weight:700;'>💳 <b>" + item.levy_type + ":</b> " + item.amount + " (" + item.period + ")</div>" +
           "<div style='display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:10px; color:#64748b;'>" +
-            "<span>🧾 <b>Receipt:</b> " + (item.receipt_no || 'Verified') + "</span>" +
-            "<span>📅 " + item.date_paid + "</span>" +
+            "<span>🧾 <b>Receipt:</b> " + (item.receipt_no || 'Verified') + "</span><span>📅 " + item.date_paid + "</span>" +
           "</div>" +
         "</div>";
       }).join('');
     }
 
-    // --- SUPABASE LIVE COMPLAINTS FUNCTIONS ---
+    // --- SOCIAL COMMUNITY FEED WITH PHOTOS ---
     async function submitComplaint() {
       var msg = (document.getElementById("complaint-msg").value || "").trim();
       var authorInput = (document.getElementById("complaint-author").value || "").trim();
+      var imgUrl = (document.getElementById("complaint-image").value || "").trim();
       var isAnon = document.getElementById("complaint-anon").checked;
-      if (!msg) { alert("Please write your complaint or notice message."); return; }
+      if (!msg) { alert("Please write a message for the social feed."); return; }
       var author = isAnon ? "Anonymous Resident" : (authorInput || "Resident");
       var now = new Date();
       
       var record = {
-        message: msg,
-        author: author,
+        message: msg, author: author, image_url: imgUrl,
         date_string: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
         time_string: now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
       };
 
       var { error } = await supabaseClient.from('nitel_complaints').insert([record]);
-      if (error) {
-        alert("Error posting complaint: " + error.message);
-        return;
-      }
+      if (error) { alert("Error posting: " + error.message); return; }
 
       document.getElementById("complaint-msg").value = "";
       document.getElementById("complaint-author").value = "";
+      document.getElementById("complaint-image").value = "";
       document.getElementById("complaint-anon").checked = false;
       renderComplaints();
       playBeep('success');
-      alert("Your message has been posted live to the community board!");
     }
 
     async function renderComplaints() {
       var container = document.getElementById("complaints-feed");
       if (!container) return;
 
-      var { data, error } = await supabaseClient
-        .from('nitel_complaints')
-        .select('*')
-        .order('id', { ascending: false })
-        .limit(50);
-
+      var { data, error } = await supabaseClient.from('nitel_complaints').select('*').order('id', { ascending: false }).limit(50);
       if (error || !data || data.length === 0) {
-        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px; font-style:italic;'>No complaints or notices posted yet. Be the first!</p>";
+        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px; font-style:italic;'>No community posts yet. Be the first!</p>";
         return;
       }
 
       container.innerHTML = data.map(function(item) {
-        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; display:flex; flex-direction:column; gap:4px;'>" +
-          "<div style='font-size:13px; color:#0f172a; font-weight:600; line-height:1.3;'>" + item.message + "</div>" +
-          "<div style='display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:10px; color:#64748b;'>" +
-            "<span>👤 <b>Posted by:</b> " + item.author + "</span>" +
-            "<span>📅 " + item.date_string + " " + item.time_string + "</span>" +
+        var imageTag = item.image_url ? "<div style='margin-top:8px; border-radius:10px; overflow:hidden; border:1px solid #e2e8f0;'><img src='" + item.image_url + "' style='width:100%; max-height:260px; object-fit:cover;' onerror='this.style.display=\"none\"' /></div>" : "";
+        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:14px; display:flex; flex-direction:column; gap:6px;'>" +
+          "<div style='display:flex; justify-content:space-between; align-items:center;'>" +
+            "<span style='font-size:12px; font-weight:800; color:#0284c7;'>👤 " + item.author + "</span>" +
+            "<span style='font-size:10px; color:#64748b;'>📅 " + item.date_string + " " + item.time_string + "</span>" +
           "</div>" +
+          "<div style='font-size:13px; color:#0f172a; line-height:1.4;'>" + item.message + "</div>" +
+          imageTag +
         "</div>";
       }).join('');
     }
 
-    // --- SUPABASE LIVE NEWS & MAGAZINE FUNCTIONS ---
+    // --- MAGAZINE & DISCUSSIONS WITH REPLIES, EDIT, DELETE & PHOTOS ---
     async function getNewsStorage() {
-      var { data, error } = await supabaseClient
-        .from('estate_news')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error || !data || data.length === 0) {
-        return defaultNewsData;
-      }
+      var { data, error } = await supabaseClient.from('estate_news').select('*').order('created_at', { ascending: false });
+      if (error || !data || data.length === 0) return defaultNewsData;
       return data;
     }
 
@@ -914,33 +847,26 @@
       var title = (document.getElementById("admin-news-title").value || "").trim();
       var author = (document.getElementById("admin-news-author").value || "").trim();
       var content = (document.getElementById("admin-news-content").value || "").trim();
+      var imgUrl = (document.getElementById("admin-news-image").value || "").trim();
 
-      if (!title || !content) {
-        alert("Please provide both a headline and news content.");
-        return;
-      }
+      if (!title || !content) { alert("Please provide headline and content."); return; }
 
       var now = new Date();
-      var dateStr = now.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
       var newNewsItem = {
-        id: "news_" + Date.now(),
-        title: title,
-        date: dateStr,
-        author: author || "NITEL Estate CDA Executive",
-        content: content
+        id: "news_" + Date.now(), title: title, author: author || "NITEL Estate CDA Executive",
+        image_url: imgUrl, content: content,
+        date: now.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })
       };
 
       var { error } = await supabaseClient.from('estate_news').insert([newNewsItem]);
-      if (error) {
-        alert("Error publishing news: " + error.message);
-        return;
-      }
+      if (error) { alert("Error publishing: " + error.message); return; }
 
       document.getElementById("admin-news-title").value = "";
       document.getElementById("admin-news-content").value = "";
+      document.getElementById("admin-news-image").value = "";
 
       playBeep('success');
-      alert("News published live to Supabase! All residents can now see it.");
+      alert("Magazine article published live!");
       switchTab('news');
     }
 
@@ -950,70 +876,119 @@
       if (!inputField) return;
       var commentText = inputField.value.trim();
       var authorName = authorField ? authorField.value.trim() : "";
-      if (!commentText) { alert("Please type a comment before posting."); return; }
+      if (!commentText) { alert("Please type a comment."); return; }
       var now = new Date();
       
+      var secretToken = "token_" + Math.random().toString(36).substring(2) + Date.now();
       var newComment = {
-        news_id: newsId,
-        author: authorName || "Resident",
-        text: commentText,
+        news_id: newsId, author: authorName || "Resident", text: commentText,
+        parent_id: replyingToCommentId, author_token: secretToken,
         time_string: now.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + " " + now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
       };
 
-      var { error } = await supabaseClient.from('news_comments').insert([newComment]);
-      if (error) {
-        alert("Error posting comment: " + error.message);
-        return;
+      var { data, error } = await supabaseClient.from('news_comments').insert([newComment]).select();
+      if (error) { alert("Error posting comment: " + error.message); return; }
+
+      if (data && data[0]) {
+        var myTokens = getMyTokens();
+        myTokens[data[0].id] = secretToken;
+        try { localStorage.setItem("nitel_my_tokens", JSON.stringify(myTokens)); } catch(e){}
       }
 
       inputField.value = "";
       if (authorField) authorField.value = "";
+      replyingToCommentId = null;
       renderNewsFeed();
       playBeep('success');
+    }
+
+    async function deleteComment(commentId) {
+      if (!confirm("Delete this comment?")) return;
+      var { error } = await supabaseClient.from('news_comments').delete().eq('id', commentId);
+      if (error) { alert("Error deleting: " + error.message); return; }
+      renderNewsFeed();
+    }
+
+    async function editComment(commentId, oldText) {
+      var newText = prompt("Edit your comment:", oldText);
+      if (newText === null || !newText.trim()) return;
+      var { error } = await supabaseClient.from('news_comments').update({ text: newText.trim() }).eq('id', commentId);
+      if (error) { alert("Error updating: " + error.message); return; }
+      renderNewsFeed();
+    }
+
+    function setReplyTo(commentId, authorName) {
+      replyingToCommentId = commentId;
+      var el = document.getElementById("replying_banner_" + commentId.toString().split('_')[0]);
+      if (el) el.innerHTML = "↩️ Replying to <b>" + authorName + "</b> <span style='cursor:pointer; color:#ef4444; margin-left:6px;' onclick='cancelReply()'>[Cancel]</span>";
+    }
+
+    function cancelReply() {
+      replyingToCommentId = null;
     }
 
     async function renderNewsFeed() {
       var container = document.getElementById("news-feed");
       if (!container) return;
       var newsList = await getNewsStorage();
+      var myTokens = getMyTokens();
       
       var htmlSegments = [];
       for (var i = 0; i < newsList.length; i++) {
         var item = newsList[i];
         
-        var { data: comments } = await supabaseClient
-          .from('news_comments')
-          .select('*')
-          .eq('news_id', item.id)
-          .order('id', { ascending: true });
-
+        var { data: comments } = await supabaseClient.from('news_comments').select('*').eq('news_id', item.id).order('id', { ascending: true });
         var commentsList = comments || [];
-        var commentsHTML = commentsList.map(function(c) {
+
+        // Build comment tree (Parent comments and their replies)
+        var parentComments = commentsList.filter(function(c) { return !c.parent_id; });
+        var commentsHTML = parentComments.map(function(c) {
+          var isOwner = myTokens[c.id] || false;
+          var ownerBtns = isOwner ? " <span style='cursor:pointer; color:#0284c7; font-weight:700;' onclick='editComment(" + c.id + ", \"" + c.text.replace(/"/g, '&quot;') + "\")'>Edit</span> • <span style='cursor:pointer; color:#ef4444; font-weight:700;' onclick='deleteComment(" + c.id + ")'>Delete</span>" : "";
+          
+          var replies = commentsList.filter(function(r) { return r.parent_id === c.id; });
+          var repliesHTML = replies.map(function(r) {
+            var rOwner = myTokens[r.id] || false;
+            var rOwnerBtns = rOwner ? " <span style='cursor:pointer; color:#0284c7; font-weight:700;' onclick='editComment(" + r.id + ", \"" + r.text.replace(/"/g, '&quot;') + "\")'>Edit</span> • <span style='cursor:pointer; color:#ef4444; font-weight:700;' onclick='deleteComment(" + r.id + ")'>Delete</span>" : "";
+            return "<div style='background:#ffffff; padding:6px 8px; border-radius:6px; font-size:10.5px; margin-top:4px; border-left:2px solid #0284c7;'>" +
+              "<div style='display:flex; justify-content:space-between; color:#0284c7; font-weight:700;'><span>" + r.author + "</span><span style='color:#64748b; font-size:9px;'>" + r.time_string + "</span></div>" +
+              "<div style='color:#334155; margin-top:2px;'>" + r.text + "</div>" +
+              "<div style='margin-top:2px; font-size:9.5px;'>" + rOwnerBtns + "</div>" +
+            "</div>";
+          }).join('');
+
           return "<div style='background:#f1f5f9; padding:8px 10px; border-radius:8px; font-size:11px; margin-top:6px;'>" +
             "<div style='display:flex; justify-content:space-between; color:#0284c7; font-weight:700;'>" +
-              "<span>" + c.author + "</span>" +
-              "<span style='color:#64748b; font-size:9px;'>" + c.time_string + "</span>" +
+              "<span>" + c.author + "</span><span style='color:#64748b; font-size:9px;'>" + c.time_string + "</span>" +
             "</div>" +
             "<div style='color:#334155; margin-top:2px;'>" + c.text + "</div>" +
+            "<div style='margin-top:4px; display:flex; gap:8px; font-size:10px;'>" +
+              "<span style='cursor:pointer; color:#16a34a; font-weight:700;' onclick='setReplyTo(" + c.id + ", \"" + c.author + "\")'>Reply</span>" + ownerBtns +
+            "</div>" +
+            "<div style='margin-left:12px; margin-top:4px;'>" + repliesHTML + "</div>" +
           "</div>";
         }).join('');
 
-        if (commentsList.length === 0) {
-          commentsHTML = "<div style='font-size:11px; color:#64748b; font-style:italic; margin-top:6px;'>No comments yet. Be the first to comment!</div>";
+        if (parentComments.length === 0) {
+          commentsHTML = "<div style='font-size:11px; color:#64748b; font-style:italic; margin-top:6px;'>No comments yet. Start the discussion!</div>";
         }
+
+        var imageTag = item.image_url ? "<div style='margin-top:8px; border-radius:10px; overflow:hidden; border:1px solid #cbd5e1;'><img src='" + item.image_url + "' style='width:100%; max-height:280px; object-fit:cover;' onerror='this.style.display=\"none\"' /></div>" : "";
 
         htmlSegments.push(
           "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:14px; display:flex; flex-direction:column; gap:6px;'>" +
-            "<div style='font-size:14px; font-weight:800; color:#0f2b5c;'>" + item.title + "</div>" +
+            "<div style='font-size:15px; font-weight:800; color:#0f2b5c;'>" + item.title + "</div>" +
             "<div style='font-size:11px; color:#0284c7; font-weight:700;'>✍️ " + item.author + " • 📅 " + item.date + "</div>" +
-            "<div style='font-size:12px; color:#334155; line-height:1.4; margin-top:2px;'>" + item.content + "</div>" +
+            imageTag +
+            "<div style='font-size:12px; color:#334155; line-height:1.4; margin-top:4px;'>" + item.content + "</div>" +
             "<div style='margin-top:10px; border-top:1px dashed #cbd5e1; padding-top:10px;'>" +
               "<div style='font-size:11px; font-weight:800; color:#0f2b5c; margin-bottom:6px;'>💬 Discussion (" + commentsList.length + ")</div>" +
-              "<div style='max-height:160px; overflow-y:auto; display:flex; flex-direction:column; gap:4px;'>" + commentsHTML + "</div>" +
+              "<div style='max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;'>" + commentsHTML + "</div>" +
+              "<div id='replying_banner_" + item.id + "' style='font-size:10px; color:#16a34a; font-weight:700; margin-top:6px;'></div>" +
               "<div style='margin-top:8px; display:flex; flex-direction:column; gap:6px;'>" +
                 "<input id='comment_author_" + item.id + "' type='text' placeholder='Your Name / Plot (Optional)' style='padding:8px; font-size:11px;' />" +
                 "<div style='display:flex; gap:6px;'>" +
-                  "<input id='comment_input_" + item.id + "' type='text' placeholder='Write a comment...' style='padding:8px; font-size:11px; flex:1;' />" +
+                  "<input id='comment_input_" + item.id + "' type='text' placeholder='Write a comment or reply...' style='padding:8px; font-size:11px; flex:1;' />" +
                   "<button type='button' class='btn-action btn-blue' style='margin-top:0; padding:8px 12px; font-size:11px; width:auto;' onclick='postNewsComment(\"" + item.id + "\")'>Post</button>" +
                 "</div>" +
               "</div>" +
@@ -1027,7 +1002,6 @@
 
     function switchTab(tab) {
       stopScannerSafely();
-      
       document.getElementById("view-visitor").style.display = (tab === 'visitor') ? 'block' : 'none';
       document.getElementById("view-resident").style.display = (tab === 'resident') ? 'block' : 'none';
       document.getElementById("view-dues").style.display = (tab === 'dues') ? 'block' : 'none';
@@ -1075,78 +1049,41 @@
 
     function stopScannerSafely() {
       if (qrScannerInstance) {
-        try {
-          qrScannerInstance.stop().then(function() {
-            qrScannerInstance.clear();
-            qrScannerInstance = null;
-          }).catch(function() { qrScannerInstance = null; });
-        } catch (e) { qrScannerInstance = null; }
+        try { qrScannerInstance.stop().then(function() { qrScannerInstance.clear(); qrScannerInstance = null; }).catch(function() { qrScannerInstance = null; }); } 
+        catch (e) { qrScannerInstance = null; }
       }
       var box = document.getElementById("qr-reader-container");
       if (box) box.style.display = "none";
-      var btn = document.getElementById("toggle-camera-btn");
-      if (btn) btn.innerText = "📷 Open Camera QR Scanner";
     }
 
     function toggleQrScanner() {
       var qrContainer = document.getElementById("qr-reader-container");
       var btn = document.getElementById("toggle-camera-btn");
-
       if (qrContainer.style.display === "none" || !qrContainer.style.display) {
         qrContainer.style.display = "block";
         btn.innerText = "⏹️ Stop QR Scanner";
-
         setTimeout(function() {
           try {
-            if (!qrScannerInstance) {
-              qrScannerInstance = new Html5Qrcode("qr-reader");
-            }
-            qrScannerInstance.start(
-              { facingMode: "environment" },
-              { fps: 10, qrbox: { width: 200, height: 200 } },
-              function(decodedText) {
-                var code = decodedText.replace("NITEL-PASS:", "").trim();
-                if (code.length === 6) {
-                  enteredPin = code;
-                  document.getElementById("pin-display").innerText = code;
-                  stopScannerSafely();
-                  verifyGatePass();
-                }
-              },
-              function(errorMessage) {}
-            ).catch(function(err) {
-              stopScannerSafely();
-              alert("Camera access denied or unavailable.");
-            });
-          } catch(e) {
-            stopScannerSafely();
-          }
+            if (!qrScannerInstance) qrScannerInstance = new Html5Qrcode("qr-reader");
+            qrScannerInstance.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 200, height: 200 } }, function(text) {
+              var code = text.replace("NITEL-PASS:", "").trim();
+              if (code.length === 6) { enteredPin = code; document.getElementById("pin-display").innerText = code; stopScannerSafely(); verifyGatePass(); }
+            }, function(err){});
+          } catch(e) { stopScannerSafely(); }
         }, 150);
-      } else {
-        stopScannerSafely();
-      }
+      } else { stopScannerSafely(); }
     }
 
     function renderDirectory(filteredList) {
       var container = document.getElementById("directory-listings-feed");
       if (!container) return;
       var list = filteredList || estateDirectoryData;
-      if (list.length === 0) {
-        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px;'>No matching businesses found.</p>";
-        return;
-      }
       container.innerHTML = list.map(function(item) {
         return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; display:flex; flex-direction:column; gap:4px;'>" +
-          "<div style='display:flex; justify-content:space-between; align-items:center;'>" +
-            "<span style='font-size:13px; font-weight:800; color:#0f172a;'>" + item.name + "</span>" +
-            "<span style='font-size:9px; font-weight:800; background:#e0f2fe; color:#0369a1; padding:3px 6px; border-radius:6px;'>" + item.category + "</span>" +
-          "</div>" +
+          "<div style='display:flex; justify-content:space-between; align-items:center;'><span style='font-size:13px; font-weight:800; color:#0f172a;'>" + item.name + "</span><span style='font-size:9px; font-weight:800; background:#e0f2fe; color:#0369a1; padding:3px 6px; border-radius:6px;'>" + item.category + "</span></div>" +
           "<div style='font-size:11px; color:#475569;'>📍 <b>Location:</b> " + item.location + "</div>" +
           "<div style='font-size:11px; color:#15803d; font-weight:700;'>📝 " + item.desc + "</div>" +
-          "<div style='display:flex; gap:6px; margin-top:6px;'>" +
-            "<a href='tel:" + item.phone + "' style='flex:1; text-align:center; background:#e0f2fe; color:#0369a1; padding:7px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>📞 Call (" + item.phone + ")</a>" +
-            "<a href='https://wa.me/234" + item.phone.replace(/^0/, '') + "' target='_blank' style='flex:1; text-align:center; background:#dcfce7; color:#15803d; padding:7px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>💬 WhatsApp</a>" +
-          "</div>" +
+          "<div style='display:flex; gap:6px; margin-top:6px;'><a href='tel:" + item.phone + "' style='flex:1; text-align:center; background:#e0f2fe; color:#0369a1; padding:7px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>📞 Call</a><a href='https://wa.me/234" + item.phone.replace(/^0/, '') + "' target='_blank' style='flex:1; text-align:center; background:#dcfce7; color:#15803d; padding:7px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>💬 WhatsApp</a></div>" +
         "</div>";
       }).join('');
     }
@@ -1155,9 +1092,7 @@
       var query = (document.getElementById("directory-search-input").value || "").toLowerCase();
       var cat = document.getElementById("directory-category-select").value;
       var filtered = estateDirectoryData.filter(function(item) {
-        var matchQuery = item.name.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query) || item.location.toLowerCase().includes(query);
-        var matchCat = (cat === 'ALL' || item.category === cat);
-        return matchQuery && matchCat;
+        return (item.name.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query)) && (cat === 'ALL' || item.category === cat);
       });
       renderDirectory(filtered);
     }
@@ -1187,59 +1122,41 @@
 
       var err = document.getElementById("gen-error-banner");
       if (err) err.style.display = "none";
-      if (!passKey || passKey !== RESIDENT_PASSCODE) {
-        if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; }
-        playBeep('error');
-        return;
-      }
-      if (!visitor) {
-        if (err) { err.innerText = "⚠️ Please type Visitor / Worker Name."; err.style.display = "block"; }
-        playBeep('error');
-        return;
-      }
+      if (passKey !== RESIDENT_PASSCODE) { if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; } playBeep('error'); return; }
+      if (!visitor) { if (err) { err.innerText = "⚠️ Please type Visitor Name."; err.style.display = "block"; } playBeep('error'); return; }
+
       var code = String(Math.floor(100000 + Math.random() * 900000));
       var hostFull = (host || "Host Resident") + " (" + zone + (house ? " - " + house : "") + ")";
-      var durationHours = (type === 'HOTEL') ? 168 : ((type === 'CONTRACTOR') ? 12 : ((type === 'LABORER') ? 8 : ((type === 'MOSQUE' || type === 'CHURCH') ? 4 : ((type === 'ARTISAN') ? 2 : ((type === 'SUPERMARKET') ? 1 : 24)))));
+      var durationHours = (type === 'CONTRACTOR') ? 12 : ((type === 'LABORER') ? 8 : ((type === 'ARTISAN') ? 2 : 24));
       var now = new Date();
       var expiryTime = Date.now() + (durationHours * 3600 * 1000);
 
-      currentPassCode = code;
-      currentVisitorName = visitor;
-      currentHostInfo = hostFull;
-      currentHeadcount = headcount;
-      currentVehicleInfo = vehicle || "Pedestrian / None";
-      currentNotesInfo = notes;
-      currentExpiry = expiryTime;
+      currentPassCode = code; currentVisitorName = visitor; currentHostInfo = hostFull;
+      currentHeadcount = headcount; currentVehicleInfo = vehicle || "Pedestrian / None"; currentNotesInfo = notes;
 
-      var categoryType = (type === 'LABORER') ? 'LABORER' : ((type === 'CONTRACTOR') ? 'CONTRACTOR' : 'VISITOR');
       var recordData = {
         code: code, visitor: visitor, host: hostFull, headcount: headcount,
         generatorName: host || "Resident", generatorPhone: phone || "",
         vehicle: vehicle || "Pedestrian", notes: notes || "Standard Entry",
-        type: categoryType, status: "ACTIVE", timestamp: now.getTime(), expiry: expiryTime,
+        type: type, status: "ACTIVE", timestamp: now.getTime(), expiry: expiryTime,
         dateString: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
         timeString: now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
       };
-      var localArr = getStorage();
-      localArr.unshift(recordData);
-      saveStorage(localArr);
+      var localArr = getStorage(); localArr.unshift(recordData); saveStorage(localArr);
 
       document.getElementById("visitor-code-display").innerText = code;
       document.getElementById("visitor-name-display").innerText = "Visitor: " + visitor;
-      document.getElementById("visitor-host-display").innerText = "Host: " + hostFull + (phone ? " [Tel: " + phone + "]" : "");
+      document.getElementById("visitor-host-display").innerText = "Host: " + hostFull;
       document.getElementById("visitor-headcount-display").innerText = "👥 Headcount: " + headcount;
-      document.getElementById("visitor-vehicle-display").innerText = "🚗 Vehicle: " + (vehicle || "None (Pedestrian)");
+      document.getElementById("visitor-vehicle-display").innerText = "🚗 Vehicle: " + (vehicle || "None");
       document.getElementById("visitor-notes-display").innerText = notes ? "📝 Details: " + notes : "";
       document.getElementById("visitor-validity-display").innerText = "⏱️ Authorized for " + durationHours + " Hours";
 
-      var qrBox = document.getElementById("qrcode-box");
-      qrBox.innerHTML = "";
-      new QRCode(qrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130, colorDark : "#0f172a", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
+      var qrBox = document.getElementById("qrcode-box"); qrBox.innerHTML = "";
+      new QRCode(qrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130, colorDark : "#0f172a", colorLight : "#ffffff" });
 
-      var resBox = document.getElementById("visitor-result");
-      resBox.style.display = "block";
-      resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      playBeep('success');
+      var resBox = document.getElementById("visitor-result"); resBox.style.display = "block";
+      resBox.scrollIntoView({ behavior: "smooth" }); playBeep('success');
     }
 
     function generateResidentID() {
@@ -1252,19 +1169,11 @@
 
       var err = document.getElementById("res-error-banner");
       if (err) err.style.display = "none";
-      if (passKey !== RESIDENT_PASSCODE) {
-        if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; }
-        playBeep('error');
-        return;
-      }
-      if (!name) {
-        if (err) { err.innerText = "⚠️ Please type your Resident Full Name."; err.style.display = "block"; }
-        playBeep('error');
-        return;
-      }
+      if (passKey !== RESIDENT_PASSCODE) { if (err) { err.innerText = "⚠️ Enter valid passcode: NITEL2026"; err.style.display = "block"; } playBeep('error'); return; }
+      if (!name) { if (err) { err.innerText = "⚠️ Please type your Full Name."; err.style.display = "block"; } playBeep('error'); return; }
+
       var code = "77" + String(Math.floor(1000 + Math.random() * 9000));
-      var now = new Date();
-      var address = zone + (house ? " - " + house : "");
+      var now = new Date(); var address = zone + (house ? " - " + house : "");
       var recordData = {
         code: code, visitor: "Resident: " + name, host: address, headcount: "1 Resident",
         generatorName: name, generatorPhone: phone, vehicle: vehicle || "Resident Vehicle",
@@ -1273,23 +1182,18 @@
         dateString: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
         timeString: now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
       };
-      var localArr = getStorage();
-      localArr.unshift(recordData);
-      saveStorage(localArr);
+      var localArr = getStorage(); localArr.unshift(recordData); saveStorage(localArr);
 
       document.getElementById("resident-badge-code").innerText = code;
       document.getElementById("resident-badge-name").innerText = "Name: " + name;
-      document.getElementById("resident-badge-address").innerText = "Residence: " + address + (phone ? " [Tel: " + phone + "]" : "");
-      document.getElementById("resident-badge-vehicle").innerText = "🚗 Vehicle: " + (vehicle || "None Registered");
+      document.getElementById("resident-badge-address").innerText = "Residence: " + address;
+      document.getElementById("resident-badge-vehicle").innerText = "🚗 Vehicle: " + (vehicle || "None");
 
-      var rqrBox = document.getElementById("resident-qrcode-box");
-      rqrBox.innerHTML = "";
-      new QRCode(rqrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130, colorDark : "#0f172a", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M });
+      var rqrBox = document.getElementById("resident-qrcode-box"); rqrBox.innerHTML = "";
+      new QRCode(rqrBox, { text: "NITEL-PASS:" + code, width: 130, height: 130, colorDark : "#0f172a", colorLight : "#ffffff" });
 
-      var resBox = document.getElementById("resident-id-result");
-      resBox.style.display = "block";
-      resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      playBeep('success');
+      var resBox = document.getElementById("resident-id-result"); resBox.style.display = "block";
+      resBox.scrollIntoView({ behavior: "smooth" }); playBeep('success');
     }
 
     function generateGuardGateSidePass() {
@@ -1300,275 +1204,99 @@
       var notes = (document.getElementById("guard-emg-notes").value || "").trim();
       var code = "88" + String(Math.floor(1000 + Math.random() * 9000));
       var now = new Date();
-      var person = name || "Community / Site Personnel";
-      var plot = dest || "NITEL Estate Axis";
-      var typeTag = (type === 'OMO_ONILE') ? "🏗️ [COMMUNITY/LEVY] " : (type === 'SITE_LABOR' ? "🔨 [SITE LABOR (8H)] " : (type === 'DEAD_PHONE' ? "📱 [DEAD PHONE] " : "⚡ [OVERRIDE] "));
 
       var recordData = {
-        code: code, visitor: typeTag + person, host: plot, headcount: veh || "Gate Cleared",
-        generatorName: "SECURITY GATE POST (Manual Verification)", generatorPhone: "08108429710",
-        vehicle: veh || "Walk-in", notes: notes || "Gate Verified Cargo",
-        type: (type === 'SITE_LABOR') ? 'LABORER' : 'EMERGENCY', status: "USED",
+        code: code, visitor: "⚡ [OVERRIDE] " + (name || "Personnel"), host: dest || "NITEL Estate",
+        headcount: veh || "Cleared", generatorName: "SECURITY GATE POST", generatorPhone: "08108429710",
+        vehicle: veh || "Walk-in", notes: notes || "Gate Verified", type: 'EMERGENCY', status: "USED",
         timestamp: now.getTime(), expiry: Date.now() + (8 * 3600 * 1000),
         dateString: now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
         timeString: now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
       };
-      var localArr = getStorage();
-      localArr.unshift(recordData);
-      saveStorage(localArr);
+      var localArr = getStorage(); localArr.unshift(recordData); saveStorage(localArr);
 
       document.getElementById("guard-emg-code").innerText = code;
-      document.getElementById("guard-emg-details").innerText = person + " → " + plot + " (" + (veh || 'Cleared') + ")" + (notes ? " | Note: " + notes : "");
+      document.getElementById("guard-emg-details").innerText = (name || "Personnel") + " → " + (dest || "NITEL");
       document.getElementById("guard-emg-success").style.display = "block";
-      document.getElementById("guard-emg-name").value = "";
-      document.getElementById("guard-emg-dest").value = "";
-      document.getElementById("guard-emg-veh").value = "";
-      document.getElementById("guard-emg-notes").value = "";
-      playBeep('success');
-      renderLogs();
+      playBeep('success'); renderLogs();
     }
 
     function sharePassWhatsApp() {
       if (!currentPassCode) return;
-      var link = window.location.origin + window.location.pathname + "?code=" + currentPassCode;
-      var text = "*NITEL ESTATE DIGITAL PASS*\n\n*Visitor:* " + currentVisitorName + "\n*Destination:* " + currentHostInfo + "\n*Headcount:* " + currentHeadcount + "\n*Vehicle:* " + currentVehicleInfo + (currentNotesInfo ? "\n*Details:* " + currentNotesInfo : "") + "\n*Access PIN:* " + currentPassCode + "\n\n*Live Gate Link:*\n" + link;
+      var text = "*NITEL ESTATE DIGITAL PASS*\n\n*Visitor:* " + currentVisitorName + "\n*Destination:* " + currentHostInfo + "\n*Headcount:* " + currentHeadcount + "\n*Access PIN:* " + currentPassCode;
       window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
     }
 
     function alertGateWhatsApp() {
       if (!currentPassCode) return;
-      var text = "🚨 *NITEL ESTATE SECURITY GATE ALERT*\n\n*A visitor pass has been generated:*\n*Visitor:* " + currentVisitorName + "\n*Destination:* " + currentHostInfo + "\n*Headcount:* " + currentHeadcount + "\n*Vehicle:* " + currentVehicleInfo + (currentNotesInfo ? "\n*Details:* " + currentNotesInfo : "") + "\n*Authorized PIN:* " + currentPassCode + "\n\nPlease clear entry upon arrival.";
+      var text = "🚨 *NITEL ESTATE SECURITY GATE ALERT*\n\n*Visitor:* " + currentVisitorName + "\n*Destination:* " + currentHostInfo + "\n*PIN:* " + currentPassCode;
       window.open("https://wa.me/" + GATE_PHONE_NUMBER + "?text=" + encodeURIComponent(text), "_blank");
     }
 
     function downloadPassSlipImage() {
-      var canvas = document.createElement("canvas");
-      canvas.width = 600; canvas.height = 700;
-      var ctx = canvas.getContext("2d");
-      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 700);
+      var canvas = document.createElement("canvas"); canvas.width = 600; canvas.height = 700;
+      var ctx = canvas.getContext("2d"); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 700);
       ctx.fillStyle = "#0f2b5c"; ctx.fillRect(0, 0, 600, 100);
-      ctx.fillStyle = "#ffffff"; ctx.font = "bold 26px sans-serif"; ctx.textAlign = "center";
-      ctx.fillText("NITEL ESTATE — ACCESS PASS", 300, 50);
-      ctx.font = "14px sans-serif"; ctx.fillStyle = "#38bdf8"; ctx.fillText("DIGITAL ACCESS CONTROL", 300, 78);
-      ctx.fillStyle = "#f8fafc"; ctx.fillRect(40, 130, 520, 110);
-      ctx.strokeStyle = "#0ea5e9"; ctx.lineWidth = 3; ctx.strokeRect(40, 130, 520, 110);
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 26px sans-serif"; ctx.textAlign = "center"; ctx.fillText("NITEL ESTATE — ACCESS PASS", 300, 50);
       ctx.fillStyle = "#0f2b5c"; ctx.font = "bold 48px monospace"; ctx.fillText(currentPassCode || "000000", 300, 205);
       ctx.fillStyle = "#1e293b"; ctx.font = "bold 18px sans-serif"; ctx.textAlign = "left";
-      ctx.fillText("Name: " + currentVisitorName, 60, 280);
-      ctx.fillText("Host / Plot: " + currentHostInfo, 60, 330);
-      ctx.fillText("Headcount: " + currentHeadcount, 60, 380);
-      ctx.fillText("Vehicle / Plate: " + currentVehicleInfo, 60, 430);
-      if (currentNotesInfo) {
-        ctx.fillText("Details: " + currentNotesInfo, 60, 480);
-        ctx.fillText("Issued: " + new Date().toLocaleDateString('en-GB') + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 60, 530);
-      } else {
-        ctx.fillText("Issued: " + new Date().toLocaleDateString('en-GB') + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 60, 480);
-      }
-      ctx.fillStyle = "#64748b"; ctx.font = "italic 14px sans-serif"; ctx.textAlign = "center";
-      ctx.fillText("Security Hotline: 0810 842 9710 • Present to Gate Post", 300, 650);
-
-      var link = document.createElement('a');
-      link.download = 'NITEL_Pass_' + currentPassCode + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      ctx.fillText("Name: " + currentVisitorName, 60, 280); ctx.fillText("Host / Plot: " + currentHostInfo, 60, 330);
+      var link = document.createElement('a'); link.download = 'NITEL_Pass_' + currentPassCode + '.png'; link.href = canvas.toDataURL('image/png'); link.click();
     }
 
     function downloadResidentBadgeSlip() {
       var name = document.getElementById("resident-own-name").value || "Resident";
       var code = document.getElementById("resident-badge-code").innerText;
-      var zone = document.getElementById("resident-own-zone").value;
-      var house = document.getElementById("resident-own-house").value || "";
-      var veh = document.getElementById("resident-own-vehicle").value || "None";
-      var canvas = document.createElement("canvas");
-      canvas.width = 600; canvas.height = 600;
-      var ctx = canvas.getContext("2d");
-      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 600);
+      var canvas = document.createElement("canvas"); canvas.width = 600; canvas.height = 600;
+      var ctx = canvas.getContext("2d"); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 600, 600);
       ctx.fillStyle = "#0f2b5c"; ctx.fillRect(0, 0, 600, 100);
-      ctx.fillStyle = "#ffffff"; ctx.font = "bold 26px sans-serif"; ctx.textAlign = "center";
-      ctx.fillText("NITEL ESTATE — RESIDENT ID", 300, 50);
-      ctx.font = "14px sans-serif"; ctx.fillStyle = "#38bdf8"; ctx.fillText("VERIFIED RESIDENT ACCESS CARD", 300, 78);
-      ctx.fillStyle = "#eff6ff"; ctx.fillRect(40, 130, 520, 100);
-      ctx.strokeStyle = "#3b82f6"; ctx.lineWidth = 3; ctx.strokeRect(40, 130, 520, 100);
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 26px sans-serif"; ctx.textAlign = "center"; ctx.fillText("NITEL ESTATE — RESIDENT ID", 300, 50);
       ctx.fillStyle = "#1d4ed8"; ctx.font = "bold 44px monospace"; ctx.fillText(code, 300, 195);
-      ctx.fillStyle = "#1e293b"; ctx.font = "bold 18px sans-serif"; ctx.textAlign = "left";
-      ctx.fillText("Resident: " + name, 60, 280);
-      ctx.fillText("Address: " + zone + (house ? " - " + house : ""), 60, 330);
-      ctx.fillText("Vehicle: " + veh, 60, 380);
-      ctx.fillStyle = "#15803d"; ctx.font = "bold 16px sans-serif"; ctx.textAlign = "center";
-      ctx.fillText("✅ Verified NITEL Estate Community Member", 300, 480);
-
-      var link = document.createElement('a');
-      link.download = 'NITEL_Resident_Badge_' + code + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      ctx.fillStyle = "#1e293b"; ctx.font = "bold 18px sans-serif"; ctx.textAlign = "left"; ctx.fillText("Resident: " + name, 60, 280);
+      var link = document.createElement('a'); link.download = 'NITEL_Resident_Badge_' + code + '.png'; link.href = canvas.toDataURL('image/png'); link.click();
     }
 
     function unlockTerminal() {
-      var err = document.getElementById("guard-error-banner");
       var pin = (document.getElementById("guard-master-pin").value || "").trim();
-      if (err) err.style.display = "none";
       if (pin === GUARD_MASTER_PIN) {
         document.getElementById("guard-auth-box").style.display = "none";
         document.getElementById("guard-terminal-box").style.display = "block";
-        playBeep('success');
-        renderLogs();
-      } else {
-        if (err) { err.innerText = "❌ Incorrect Master PIN"; err.style.display = "block"; }
-        playBeep('error');
-      }
+        playBeep('success'); renderLogs();
+      } else { alert("Incorrect Master PIN"); }
     }
 
-    function lockTerminal() {
-      stopScannerSafely();
-      document.getElementById("guard-master-pin").value = "";
-      document.getElementById("guard-auth-box").style.display = "block";
-      document.getElementById("guard-terminal-box").style.display = "none";
-    }
-
-    function pressKey(n) {
-      if (enteredPin.length < 6) {
-        enteredPin += n;
-        document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-");
-      }
-    }
-
-    function clearPin() {
-      enteredPin = "";
-      document.getElementById("pin-display").innerText = "------";
-      document.getElementById("gate-result").style.display = "none";
-    }
+    function lockTerminal() { stopScannerSafely(); document.getElementById("guard-auth-box").style.display = "block"; document.getElementById("guard-terminal-box").style.display = "none"; }
+    function pressKey(n) { if (enteredPin.length < 6) { enteredPin += n; document.getElementById("pin-display").innerText = enteredPin.padEnd(6, "-"); } }
+    function clearPin() { enteredPin = ""; document.getElementById("pin-display").innerText = "------"; document.getElementById("gate-result").style.display = "none"; }
 
     function verifyGatePass() {
-      var res = document.getElementById("gate-result");
-      if (enteredPin.length !== 6) {
-        res.style.display = "block";
-        res.style.background = "#fee2e2"; res.style.color = "#991b1b";
-        res.innerHTML = "<b>ENTER FULL 6-DIGIT PIN</b>";
-        playBeep('error');
-        return;
-      }
-      res.style.display = "block";
-      var records = getStorage();
-      var found = records.find(function(r) { return r.code === enteredPin; });
-
-      if (!found) {
-        res.style.background = "#fee2e2"; res.style.color = "#991b1b";
-        res.innerHTML = "<b>ACCESS DENIED</b><br><small>Invalid Code</small>";
-        playBeep('error');
-      } else if (found.type === 'RESIDENT') {
+      var res = document.getElementById("gate-result"); res.style.display = "block";
+      var records = getStorage(); var found = records.find(function(r) { return r.code === enteredPin; });
+      if (!found) { res.style.background = "#fee2e2"; res.style.color = "#991b1b"; res.innerHTML = "<b>ACCESS DENIED</b>"; playBeep('error'); }
+      else {
+        found.status = 'USED'; saveStorage(records);
         res.style.background = "#dcfce7"; res.style.color = "#166534";
-        res.innerHTML = "<b>RESIDENT ENTRY GRANTED</b><br><small>" + found.visitor + " | " + found.host + "</small>";
-        playBeep('success');
-      } else if (found.status === 'USED') {
-        res.style.background = "#fef3c7"; res.style.color = "#92400e";
-        res.innerHTML = "<b>ACCESS DENIED</b><br><small>Pass Already Verified Earlier</small>";
-        playBeep('error');
-      } else {
-        found.status = 'USED';
-        found.verifiedTime = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-        saveStorage(records);
-        res.style.background = "#dcfce7"; res.style.color = "#166534";
-        res.innerHTML = "<b>ACCESS GRANTED</b><br><small><b>Visitor:</b> " + found.visitor + " (" + (found.headcount || '1 Person') + ")<br><b>Destination / Host:</b> " + found.host + "<br><b>Purpose:</b> " + (found.notes || 'Standard Entry') + "</small>";
-        playBeep('success');
-        renderLogs();
+        res.innerHTML = "<b>ACCESS GRANTED</b><br><small>" + found.visitor + " → " + found.host + "</small>";
+        playBeep('success'); renderLogs();
       }
     }
 
     function renderLogs() {
-      var container = document.getElementById("audit-log-feed");
-      if (!container) return;
-      var timeline = document.getElementById("log-timeline-filter").value;
-      var catFilter = document.getElementById("log-status-filter").value;
+      var container = document.getElementById("audit-log-feed"); if (!container) return;
       var records = getStorage();
-      var now = new Date();
-      var curMonth = now.getMonth();
-      var curYear = now.getFullYear();
-
-      var filtered = records.filter(function(item) {
-        var d = new Date(item.timestamp || Date.now());
-        var matchTime = true;
-        if (timeline === 'MONTH') matchTime = (d.getMonth() === curMonth && d.getFullYear() === curYear);
-        if (timeline === 'YEAR') matchTime = (d.getFullYear() === curYear);
-        var isOverstay = (item.status === 'USED' && item.expiry && Date.now() > item.expiry && item.type !== 'RESIDENT');
-        var matchCat = true;
-        if (catFilter === 'OVERSTAY') matchCat = isOverstay;
-        else if (catFilter === 'RESIDENT') matchCat = (item.type === 'RESIDENT');
-        else if (catFilter === 'VISITOR') matchCat = (item.type === 'VISITOR');
-        else if (catFilter === 'LABORER') matchCat = (item.type === 'LABORER');
-        else if (catFilter === 'CONTRACTOR') matchCat = (item.type === 'CONTRACTOR');
-        else if (catFilter === 'EMERGENCY') matchCat = (item.type === 'EMERGENCY');
-        return matchTime && matchCat;
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px; font-style:italic;'>No logs matching filters.</p>";
-        return;
-      }
-
-      container.innerHTML = filtered.map(function(item) {
-        var isResident = item.type === 'RESIDENT';
-        var isLaborer = item.type === 'LABORER';
-        var isContractor = item.type === 'CONTRACTOR';
-        var isEmergency = item.type === 'EMERGENCY';
-        var isOverstay = (item.status === 'USED' && item.expiry && Date.now() > item.expiry && !isResident);
-        var badgeClass = isOverstay ? 'badge-overstay' : (item.status === 'EXITED' ? 'badge-exit' : (isEmergency ? 'badge-emergency' : (isLaborer || isContractor ? 'badge-contractor' : (isResident ? 'badge-resident' : (item.status === 'USED' ? 'badge-used' : 'badge-active')))));
-        var badgeText = isOverstay ? '⚠️ OVERSTAYED' : (item.status === 'EXITED' ? 'EXITED' : (isEmergency ? 'OVERRIDE' : (isLaborer ? 'LABORER (8H)' : (isContractor ? 'CONTRACTOR (12H)' : (isResident ? 'RESIDENT' : item.status)))));
-        var cardClass = isOverstay ? "log-item overstay-alert" : "log-item";
-        var callButton = (item.generatorPhone && !isResident) ? 
-          "<div style='display:flex; gap:6px; margin-top:6px;'>" +
-            "<a href='tel:" + item.generatorPhone + "' style='flex:1; text-align:center; background:#e0f2fe; color:#0369a1; padding:6px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>📞 Call Host</a>" +
-            "<a href='https://wa.me/234" + item.generatorPhone.replace(/^0/, '') + "' target='_blank' style='flex:1; text-align:center; background:#dcfce7; color:#15803d; padding:6px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>💬 WhatsApp</a>" +
-          "</div>" : "";
-        var notesDisplay = item.notes ? "<div style='font-size:11px; color:#15803d; margin-top:2px; font-weight:700;'>📝 <b>Details:</b> " + item.notes + "</div>" : "";
-
-        return "<div class='" + cardClass + "'>" +
-          "<div style='display:flex; justify-content:space-between; align-items:center;'>" +
-            "<span style='font-size:13px; font-weight:800; color:#0f172a;'>" + (isEmergency ? "⚡ " : (isLaborer ? "🔨 " : (isContractor ? "🏗️ " : (isResident ? "🏠 " : "👤 ")))) + item.visitor + "</span>" +
-            "<span class='log-badge " + badgeClass + "'>" + badgeText + "</span>" +
-          "</div>" +
-          "<div style='font-size:11px; color:#475569;'>📍 <b>Location:</b> " + item.host + "</div>" +
-          "<div style='font-size:11px; color:#b45309; font-weight:700;'>👥 <b>Headcount:</b> " + (item.headcount || '1 Person') + "</div>" +
-          "<div style='font-size:11px; color:#0284c7; font-weight:600;'>🔑 <b>Authorized By:</b> " + (item.generatorName || 'Resident') + "</div>" +
-          notesDisplay +
-          "<div style='font-size:10px; color:#64748b; margin-top:2px; font-family:monospace;'>" +
-            "<span>Code: " + item.code + " | 📅 " + (item.dateString || 'Today') + " " + (item.timeString || '') + "</span>" +
-          "</div>" +
-          callButton +
-        "</div>";
+      container.innerHTML = records.map(function(item) {
+        return "<div class='log-item'><div style='display:flex; justify-content:space-between;'><span style='font-weight:800;'>" + item.visitor + "</span><span>" + item.status + "</span></div><div style='font-size:11px; color:#475569;'>📍 " + item.host + "</div></div>";
       }).join('');
     }
 
     function exportLogsToCSV() {
-      var records = getStorage();
-      if (records.length === 0) return alert("No logs available to export.");
-      var csvContent = "data:text/csv;charset=utf-8,Pass Code,Name,Destination / Residence,Headcount,Authorized By,Contact Phone,Vehicle Plate,Visit Details / Notes,Type,Status,Date,Time\n";
-      records.forEach(function(r) {
-        var row = [
-          r.code, '"' + (r.visitor || '') + '"', '"' + (r.host || '') + '"',
-          '"' + (r.headcount || '1 Person') + '"', '"' + (r.generatorName || '') + '"',
-          '"' + (r.generatorPhone || '') + '"', '"' + (r.vehicle || '') + '"',
-          '"' + (r.notes || '') + '"', r.type || 'VISITOR', r.status,
-          r.dateString || '', r.timeString || ''
-        ].join(",");
-        csvContent += row + "\n";
-      });
-      var encodedUri = encodeURI(csvContent);
-      var link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "NITEL_Estate_Access_Audit_2026.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      var records = getStorage(); if (records.length === 0) return alert("No logs.");
+      var csv = "Code,Visitor,Host,Status\n" + records.map(function(r){ return r.code + ',"' + r.visitor + '","' + r.host + '",' + r.status; }).join("\n");
+      var link = document.createElement('a'); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = "NITEL_Logs.csv"; link.click();
     }
 
     window.onload = function() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').catch(function(){});
-      }
-      renderDirectory();
-      renderComplaints();
-      renderNewsFeed();
-      renderDuesFeed();
+      renderDirectory(); renderComplaints(); renderNewsFeed(); renderDuesFeed();
     };
   </script>
 </body>
