@@ -9,9 +9,8 @@
   <meta name="theme-color" content="#ffffff" />
   <link rel="apple-touch-icon" href="/nitel-logo.png" />
 
-  <!-- Standalone QR & Scanner Libraries -->
+  <!-- Standalone QR Code Generator -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -111,6 +110,7 @@
       <div class="brand-sub">Digital Access Control</div>
     </div>
 
+    <!-- Main Navigation Grid including Directory -->
     <div class="quick-grid">
       <div class="grid-card card-dark" onclick="switchTab('visitor')">
         <div class="card-icon">🚗</div>
@@ -120,13 +120,13 @@
         <div class="card-icon">📍</div>
         <div class="card-title">Resident<br>Badge</div>
       </div>
+      <div class="grid-card card-light" onclick="switchTab('directory')">
+        <div class="card-icon">🏢</div>
+        <div class="card-title">Business<br>Directory</div>
+      </div>
       <div class="grid-card card-light" onclick="switchTab('guard')">
         <div class="card-icon">🛡️</div>
         <div class="card-title">Gate Post<br>Terminal</div>
-      </div>
-      <div class="grid-card card-light" onclick="switchTab('pass')">
-        <div class="card-icon">⏱️</div>
-        <div class="card-title">Active<br>Pass Status</div>
       </div>
     </div>
 
@@ -353,7 +353,35 @@
       </div>
     </div>
 
-    <!-- 3. GUARD GATE POST & AUDIT TERMINAL -->
+    <!-- 3. ESTATE BUSINESS & SERVICES DIRECTORY PANEL -->
+    <div id="view-directory" class="panel-card" style="display: none;">
+      <div class="panel-title">🏢 Estate Business Directory</div>
+      <div class="panel-sub">Quickly find verified vendors, salons, food, and services in NITEL Estate</div>
+
+      <div class="form-group" style="margin-top: 10px;">
+        <input id="directory-search-input" type="text" placeholder="🔍 Search pharmacy, salon, tailor, food, gas..." onkeyup="filterDirectory()" />
+      </div>
+
+      <div class="form-group">
+        <select id="directory-category-select" onchange="filterDirectory()">
+          <option value="ALL">All Categories</option>
+          <option value="PHARMACY">💊 Pharmacy & Medical</option>
+          <option value="FOOD">🍲 Food Vendors & Restaurants</option>
+          <option value="FROZEN">🧊 Frozen Food Vendors</option>
+          <option value="SALON">💇 Hairdressers & Barbers</option>
+          <option value="CLOTHING">👗 Boutiques & Clothing</option>
+          <option value="TAILOR">🧵 Tailors & Seamstresses</option>
+          <option value="ARTISAN">🔨 Technicians & Artisans</option>
+          <option value="RETAIL">🛒 Retail & Provision Shops</option>
+        </select>
+      </div>
+
+      <div id="directory-listings-feed" style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow-y: auto;">
+        <!-- Populated via JavaScript -->
+      </div>
+    </div>
+
+    <!-- 4. GUARD GATE POST & AUDIT TERMINAL -->
     <div id="view-guard" class="panel-card" style="display: none;">
       
       <div id="guard-auth-box" style="text-align: center; padding: 10px 0;">
@@ -370,11 +398,6 @@
           <span style="font-size: 13px; font-weight: 800; color: #0f2b5c;">Gate Verification</span>
           <span style="font-size: 10px; font-weight: 800; color: #16a34a;">🟢 Instant Local Engine</span>
           <button type="button" onclick="lockTerminal()" style="background:none; border:none; color:#64748b; font-size:11px; font-weight:700; text-decoration:underline; cursor:pointer;">Lock</button>
-        </div>
-
-        <button id="toggle-camera-btn" type="button" class="btn-action btn-blue" style="margin-top: 10px; padding: 11px;" onclick="toggleQrScanner()">📷 Open Camera QR Scanner</button>
-        <div id="qr-reader-container" style="display:none; width: 100%; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1.5px solid #cbd5e1;">
-          <div id="qr-reader" style="width:100%;"></div>
         </div>
 
         <div style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 12px; border-radius: 12px; text-align:center; margin: 12px 0;">
@@ -483,31 +506,6 @@
       </div>
     </div>
 
-    <!-- 4. VISITOR LIVE PASS STATUS PANEL -->
-    <div id="view-pass" class="panel-card" style="display: none; text-align: center;">
-      <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase;">NITEL Digital Pass Status</div>
-      <div id="guest-code-hero" class="pin-hero" style="font-size: 34px; color: #0f2b5c;">------</div>
-      
-      <div id="guest-qr-box" class="qr-container"></div>
-
-      <div id="guest-name-box" style="font-size: 14px; font-weight: 800; color:#0f172a;"></div>
-      <div id="guest-dest-box" style="font-size: 12px; color: #64748b; margin-top: 2px;"></div>
-      <div id="guest-headcount-box" style="font-size: 12px; color: #b45309; font-weight: 700; margin-top: 2px;"></div>
-      <div id="guest-vehicle-box" style="font-size: 12px; color: #0369a1; margin-top: 2px;"></div>
-      <div id="guest-notes-box" style="font-size: 12px; color: #15803d; font-weight: 700; margin-top: 2px;"></div>
-
-      <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; padding: 14px; border-radius: 14px; margin: 14px 0;">
-        <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase;">Authorized Stay Remaining</div>
-        <div id="guest-countdown" class="timer-hero">00:00:00</div>
-        <div style="font-size: 11px; color: #94a3b8;">Present QR or PIN at Security Gate</div>
-      </div>
-
-      <button id="exit-estate-btn" type="button" class="btn-action btn-rose" onclick="checkoutVisitor()">🚪 I Have Left Estate</button>
-      <div id="exit-confirmed-msg" style="display:none; padding:12px; background:#f0fdf4; border:1.5px solid #22c55e; border-radius:12px; font-size:13px; color:#15803d; font-weight:800;">
-        ✅ Checked Out Successfully
-      </div>
-    </div>
-
   </div>
 
   <script>
@@ -523,7 +521,18 @@
     var currentNotesInfo = "";
     var currentExpiry = 0;
     var timerInterval = null;
-    var html5QrScanner = null;
+
+    // Estate Business & Services Directory Dataset
+    var estateDirectoryData = [
+      { name: "NITEL Health Pharmacy", category: "PHARMACY", location: "Road C - Plot 4", phone: "08012345678", desc: "Prescription drugs, first aid & medical supplies" },
+      { name: "Mama Simi Kitchen", category: "FOOD", location: "Avenue 2 - Plot 8", phone: "08087654321", desc: "Fresh local meals & home delivery within estate" },
+      { name: "Aunty B Fresh Frozen Foods", category: "FROZEN", location: "Road M - Plot 15", phone: "08033445566", desc: "Turkey, chicken, croaker fish & beef supplies" },
+      { name: "Classic Touch Barbershop & Salon", category: "SALON", location: "Avenue 3 - Shopping Complex", phone: "08077889900", desc: "Haircut, styling, weaving & barbing services" },
+      { name: "De-Grace Fashion Boutique", category: "CLOTHING", location: "Road A - Plot 2", phone: "08022334455", desc: "Ready-to-wear clothing, shoes & accessories" },
+      { name: "Stitches by Dupe Seamstress", category: "TAILOR", location: "Road K - Plot 9", phone: "08066554433", desc: "Custom native & English wear tailoring for men & women" },
+      { name: "Broda Wale Electrician", category: "ARTISAN", location: "Road M - Plot 12", phone: "08091122334", desc: "House wiring, inverter & solar setup" },
+      { name: "NITEL Express Provision Store", category: "RETAIL", location: "Avenue 1 Gate View", phone: "08055667788", desc: "Groceries, beverages & household essentials" }
+    ];
 
     var audioCtx = null;
     function playBeep(type) {
@@ -568,19 +577,53 @@
     function switchTab(tab) {
       document.getElementById("view-visitor").style.display = (tab === 'visitor') ? 'block' : 'none';
       document.getElementById("view-resident").style.display = (tab === 'resident') ? 'block' : 'none';
+      document.getElementById("view-directory").style.display = (tab === 'directory') ? 'block' : 'none';
       document.getElementById("view-guard").style.display = (tab === 'guard') ? 'block' : 'none';
-      document.getElementById("view-pass").style.display = (tab === 'pass') ? 'block' : 'none';
 
       if (tab === 'guard') renderLogs();
-      if (tab !== 'guard' && html5QrScanner) {
-        try { html5QrScanner.stop().catch(function(){}); } catch(e) {}
-        document.getElementById("qr-reader-container").style.display = "none";
-      }
+      if (tab === 'directory') renderDirectory();
       window.scrollTo({ top: 380, behavior: 'smooth' });
     }
 
-    function openMenu() {
-      switchTab('visitor');
+    // Directory Rendering Logic
+    function renderDirectory(filteredList) {
+      var container = document.getElementById("directory-listings-feed");
+      if (!container) return;
+
+      var list = filteredList || estateDirectoryData;
+
+      if (list.length === 0) {
+        container.innerHTML = "<p style='color:#64748b; font-size:12px; text-align:center; padding:16px;'>No matching businesses found.</p>";
+        return;
+      }
+
+      container.innerHTML = list.map(function(item) {
+        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; display:flex; flex-direction:column; gap:4px;'>" +
+          "<div style='display:flex; justify-content:space-between; align-items:center;'>" +
+            "<span style='font-size:13px; font-weight:800; color:#0f172a;'>" + item.name + "</span>" +
+            "<span style='font-size:9px; font-weight:800; background:#e0f2fe; color:#0369a1; padding:3px 6px; border-radius:6px;'>" + item.category + "</span>" +
+          "</div>" +
+          "<div style='font-size:11px; color:#475569;'>📍 <b>Location:</b> " + item.location + "</div>" +
+          "<div style='font-size:11px; color:#15803d; font-weight:700;'>📝 " + item.desc + "</div>" +
+          "<div style='display:flex; gap:6px; margin-top:6px;'>" +
+            "<a href='tel:" + item.phone + "' style='flex:1; text-align:center; background:#e0f2fe; color:#0369a1; padding:7px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>📞 Call (" + item.phone + ")</a>" +
+            "<a href='https://wa.me/234" + item.phone.replace(/^0/, '') + "' target='_blank' style='flex:1; text-align:center; background:#dcfce7; color:#15803d; padding:7px; border-radius:8px; font-size:11px; font-weight:700; text-decoration:none;'>💬 WhatsApp</a>" +
+          "</div>" +
+        "</div>";
+      }).join('');
+    }
+
+    function filterDirectory() {
+      var query = (document.getElementById("directory-search-input").value || "").toLowerCase();
+      var cat = document.getElementById("directory-category-select").value;
+
+      var filtered = estateDirectoryData.filter(function(item) {
+        var matchQuery = item.name.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query) || item.location.toLowerCase().includes(query);
+        var matchCat = (cat === 'ALL' || item.category === cat);
+        return matchQuery && matchCat;
+      });
+
+      renderDirectory(filtered);
     }
 
     function generateVisitorPass() {
@@ -796,7 +839,7 @@
       saveStorage(localArr);
 
       document.getElementById("guard-emg-code").innerText = code;
-      document.getElementById("guard-emg-details").innerText = person + " $\rightarrow$ " + plot + " (" + (veh || 'Cleared') + ")" + (notes ? " | Note: " + notes : "");
+      document.getElementById("guard-emg-details").innerText = person + " → " + plot + " (" + (veh || 'Cleared') + ")" + (notes ? " | Note: " + notes : "");
       document.getElementById("guard-emg-success").style.display = "block";
 
       document.getElementById("guard-emg-name").value = "";
@@ -944,64 +987,6 @@
       document.getElementById("guard-master-pin").value = "";
       document.getElementById("guard-auth-box").style.display = "block";
       document.getElementById("guard-terminal-box").style.display = "none";
-      if (html5QrScanner) {
-        try { html5QrScanner.stop().catch(function(){}); } catch(e){}
-      }
-    }
-
-    function toggleQrScanner() {
-      var qrContainer = document.getElementById("qr-reader-container");
-      var btn = document.getElementById("toggle-camera-btn");
-
-      if (qrContainer.style.display === "none") {
-        qrContainer.style.display = "block";
-        btn.innerText = "⏹️ Stop QR Scanner";
-
-        try {
-          html5QrScanner = new Html5Qrcode("qr-reader");
-          html5QrScanner.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 220, height: 220 } },
-            function(decodedText) {
-              var code = decodedText.replace("NITEL-PASS:", "").trim();
-              if (code.length === 6) {
-                enteredPin = code;
-                document.getElementById("pin-display").innerText = code;
-                try {
-                  html5QrScanner.stop().then(function() {
-                    qrContainer.style.display = "none";
-                    btn.innerText = "📷 Open Camera QR Scanner";
-                    verifyGatePass();
-                  }).catch(function(){ verifyGatePass(); });
-                } catch(e) { verifyGatePass(); }
-              }
-            },
-            function(errorMessage) {}
-          ).catch(function(err) {
-            qrContainer.style.display = "none";
-            btn.innerText = "📷 Open Camera QR Scanner";
-            alert("Camera access error. Ensure permissions are allowed.");
-          });
-        } catch(e) {
-          qrContainer.style.display = "none";
-          btn.innerText = "📷 Open Camera QR Scanner";
-        }
-      } else {
-        if (html5QrScanner) {
-          try {
-            html5QrScanner.stop().then(function() {
-              qrContainer.style.display = "none";
-              btn.innerText = "📷 Open Camera QR Scanner";
-            }).catch(function(){
-              qrContainer.style.display = "none";
-              btn.innerText = "📷 Open Camera QR Scanner";
-            });
-          } catch(e) {
-            qrContainer.style.display = "none";
-            btn.innerText = "📷 Open Camera QR Scanner";
-          }
-        }
-      }
     }
 
     function pressKey(n) {
@@ -1166,80 +1151,11 @@
       document.body.removeChild(link);
     }
 
-    function checkoutVisitor() {
-      if (timerInterval) clearInterval(timerInterval);
-      document.getElementById("exit-estate-btn").style.display = "none";
-      document.getElementById("exit-confirmed-msg").style.display = "block";
-      document.getElementById("guest-countdown").innerText = "EXITED";
-      playBeep('success');
-
-      if (currentPassCode) {
-        var records = getStorage();
-        var found = records.find(function(r) { return r.code === currentPassCode; });
-        if (found) {
-          found.status = 'EXITED';
-          saveStorage(records);
-        }
-      }
-    }
-
-    function runTimer(exp) {
-      var disp = document.getElementById("guest-countdown");
-      if (timerInterval) clearInterval(timerInterval);
-      function update() {
-        var diff = exp - Date.now();
-        if (diff <= 0) {
-          clearInterval(timerInterval);
-          disp.innerText = "EXPIRED";
-          disp.style.color = "#dc2626";
-          return;
-        }
-        var s = Math.floor(diff / 1000);
-        var hrs = Math.floor(s / 3600);
-        var mins = Math.floor((s % 3600) / 60);
-        var secs = s % 60;
-        disp.innerText = (hrs < 10 ? '0' : '') + hrs + ":" + (mins < 10 ? '0' : '') + mins + ":" + (secs < 10 ? '0' : '') + secs;
-      }
-      update();
-      timerInterval = setInterval(update, 1000);
-    }
-
     window.onload = function() {
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(function(){});
       }
-
-      var urlParams = new URLSearchParams(window.location.search);
-      var code = urlParams.get("code");
-      var name = urlParams.get("name");
-      var host = urlParams.get("host");
-      var head = urlParams.get("head");
-      var veh = urlParams.get("veh");
-      var notes = urlParams.get("notes");
-      var exp = urlParams.get("exp");
-
-      if (code) {
-        switchTab("pass");
-        document.getElementById("guest-code-hero").innerText = code;
-        if (name) document.getElementById("guest-name-box").innerText = "Visitor: " + name;
-        if (host) document.getElementById("guest-dest-box").innerText = "Host: " + host;
-        if (head) document.getElementById("guest-headcount-box").innerText = "👥 Headcount: " + head;
-        if (veh) document.getElementById("guest-vehicle-box").innerText = "🚗 Vehicle: " + veh;
-        if (notes) document.getElementById("guest-notes-box").innerText = "📝 Note: " + notes;
-
-        var gQrBox = document.getElementById("guest-qr-box");
-        gQrBox.innerHTML = "";
-        new QRCode(gQrBox, {
-          text: "NITEL-PASS:" + code,
-          width: 130,
-          height: 130,
-          colorDark : "#0f172a",
-          colorLight : "#ffffff",
-          correctLevel : QRCode.CorrectLevel.M
-        });
-
-        runTimer(exp ? parseInt(exp) : (Date.now() + 4 * 3600 * 1000));
-      }
+      renderDirectory();
     };
   </script>
 </body>
