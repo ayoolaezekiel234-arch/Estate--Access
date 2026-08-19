@@ -29,8 +29,8 @@
     .brand-accent { color: #0ea5e9; font-weight: 900; }
     .brand-sub { font-size: 13px; font-weight: 600; color: #64748b; margin-top: 1px; }
 
-    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
-    .grid-card { border-radius: 12px; padding: 10px 3px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent; min-height: 80px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 16px; }
+    .grid-card { border-radius: 10px; padding: 8px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent; min-height: 72px; }
     .grid-card:active { transform: scale(0.97); }
     
     .card-dark { background: #3b506e; color: #ffffff; }
@@ -38,9 +38,10 @@
     .card-admin { background: #7c2d12; color: #ffffff; }
     .card-guard { background: #065f46; color: #ffffff; }
     .card-business { background: #78350f; color: #ffffff; }
+    .card-resident { background: #1e40af; color: #ffffff; }
     
-    .grid-card .card-icon { font-size: 18px; margin-bottom: 3px; }
-    .grid-card .card-title { font-size: 9px; font-weight: 700; line-height: 1.15; }
+    .grid-card .card-icon { font-size: 16px; margin-bottom: 2px; }
+    .grid-card .card-title { font-size: 8.5px; font-weight: 700; line-height: 1.15; }
 
     .btn-hero { width: 100%; padding: 14px; background: #1e2e4a; color: #ffffff; border-radius: 14px; font-size: 13px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(30, 46, 74, 0.25); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
     .btn-hero:active { background: #0f1c30; transform: scale(0.98); }
@@ -97,6 +98,7 @@
       <div id="network-indicator" class="network-badge">🟢 Online</div>
       <div class="header-icons">
         <div class="icon-btn" onclick="switchTab('directory')">🏢</div>
+        <div class="icon-btn" onclick="switchTab('resident')">📍</div>
         <div class="icon-btn" onclick="switchTab('admin-post')">👑</div>
         <div class="icon-btn" onclick="switchTab('guard')">🛡️</div>
       </div>
@@ -119,9 +121,9 @@
         <div class="card-icon">🏪</div>
         <div class="card-title">Business</div>
       </div>
-      <div class="grid-card card-light" onclick="switchTab('directory')">
-        <div class="card-icon">🏢</div>
-        <div class="card-title">Directory</div>
+      <div class="grid-card card-resident" onclick="switchTab('resident')">
+        <div class="card-icon">🏠</div>
+        <div class="card-title">Resident</div>
       </div>
       <div class="grid-card card-guard" onclick="switchTab('guard')">
         <div class="card-icon">🛡️</div>
@@ -141,7 +143,7 @@
       🚨 Gate Security Hotline: 0810 842 9710
     </a>
 
-    <!-- 1. VISITOR PASS PANEL -->
+    <!-- PHASE A: VISITOR PASS PANEL -->
     <div id="view-visitor" class="panel-card" style="display: block;">
       <div class="panel-title">Create Visitor / Venue Pass</div>
       <div class="panel-sub">Authorize guests, suppliers, event vendors securely</div>
@@ -212,7 +214,7 @@
       </div>
     </div>
 
-    <!-- 1A. BUSINESS REGISTRATION PANEL (PHASE B) -->
+    <!-- PHASE B: BUSINESS REGISTRATION PANEL -->
     <div id="view-business-portal" class="panel-card" style="display: none;">
       <div class="panel-title">🏪 NITEL Business & Shop Registration</div>
       <div class="panel-sub">Submit your shop for Admin review and 6-month credential issuance</div>
@@ -281,14 +283,107 @@
       <div id="business-submit-result" style="display:none; margin-top:12px; padding:10px; background:#fef3c7; border-radius:8px; font-size:12px; text-align:center; font-weight:700; color:#92400e;"></div>
     </div>
 
-    <!-- 4. BUSINESS DIRECTORY -->
+    <!-- PHASE C: RESIDENT MANAGEMENT PANEL -->
+    <div id="view-resident" class="panel-card" style="display: none;">
+      <div class="panel-title">🏠 Resident Profile & Household Hub</div>
+      <div class="panel-sub">Manage your permanent resident ID, registered vehicles, and household members</div>
+
+      <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-top: 10px;">
+        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🪪 Primary Resident Profile</div>
+        <form id="resident-profile-form" onsubmit="saveResidentProfile(event); return false;">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input id="res-profile-name" type="text" placeholder="e.g. Chief Owueme Mitchelle" required style="background:#fff;" />
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Phone Number</label>
+              <input id="res-profile-phone" type="tel" placeholder="08108429710" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Emergency Contact</label>
+              <input id="res-profile-emergency" type="tel" placeholder="Next of kin phone" style="background:#fff;" />
+            </div>
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Avenue / Road</label>
+              <input id="res-profile-avenue" type="text" placeholder="Avenue 2" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Plot / House No.</label>
+              <input id="res-profile-plot" type="text" placeholder="Plot 14" required style="background:#fff;" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Registered Vehicles (Comma separated)</label>
+            <input id="res-profile-vehicles" type="text" placeholder="e.g. KSF-123AA, BDG-456XY" style="background:#fff;" />
+          </div>
+          <button type="submit" class="btn-action btn-blue" style="margin-top:12px;">Save Resident Profile</button>
+        </form>
+      </div>
+
+      <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 14px; margin-top: 16px;">
+        <div style="font-size: 12px; font-weight: 800; color: #166534; margin-bottom: 6px; text-transform: uppercase;">👨‍👩‍👧‍👦 Household & Family Badges</div>
+        <form id="family-badge-form" onsubmit="generateFamilyMemberBadge(event); return false;">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label>Family Surname</label>
+            <input id="fam-surname" type="text" placeholder="e.g. Mitchelle Family" required style="background:#fff;" />
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Member Name</label>
+              <input id="fam-member-name" type="text" placeholder="e.g. Simi Mitchelle" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Role</label>
+              <select id="fam-member-role" style="background:#fff;">
+                <option value="Spouse">Spouse</option>
+                <option value="Child">Child / Dependent</option>
+                <option value="Relative">Relative</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn-action btn-emerald" style="margin-top:8px;">Generate Household Badge</button>
+        </form>
+        <div id="family-members-list" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;"></div>
+      </div>
+
+      <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; margin-top: 16px;">
+        <div style="font-size: 12px; font-weight: 800; color: #92400e; margin-bottom: 6px; text-transform: uppercase;">🧹 Domestic Staff & Regular Help</div>
+        <form id="domestic-staff-form" onsubmit="registerDomesticStaff(event); return false;">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label>Staff Full Name</label>
+            <input id="staff-name" type="text" placeholder="e.g. Mary Okon" required style="background:#fff;" />
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Role</label>
+              <select id="staff-role" style="background:#fff;">
+                <option value="Nanny / House Help">Nanny / House Help</option>
+                <option value="Private Driver">Private Driver</option>
+                <option value="Gardener / Cleaner">Gardener / Cleaner</option>
+              </select>
+            </div>
+            <div>
+              <label>Phone Number</label>
+              <input id="staff-phone" type="tel" placeholder="08012345678" required style="background:#fff;" />
+            </div>
+          </div>
+          <button type="submit" class="btn-action btn-amber" style="margin-top:8px; background:#d97706;">Register Staff Access</button>
+        </form>
+        <div id="domestic-staff-list" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;"></div>
+      </div>
+    </div>
+
+    <!-- BUSINESS DIRECTORY -->
     <div id="view-directory" class="panel-card" style="display: none;">
       <div class="panel-title">🏢 Estate Business Directory</div>
       <div class="panel-sub">Verified in-estate shops and approved vendors</div>
       <div id="directory-listings-feed" style="margin-top:10px;"></div>
     </div>
 
-    <!-- 7. ADMIN PORTAL (PHASE B APPROVALS) -->
+    <!-- ADMIN PORTAL (PHASE B APPROVALS) -->
     <div id="view-admin-post" class="panel-card" style="display: none;">
       <div id="admin-auth-box" style="text-align: center; padding: 10px 0;">
         <div style="font-size: 34px;">👑</div>
@@ -307,7 +402,7 @@
       </div>
     </div>
 
-    <!-- 8. GUARD GATE TERMINAL -->
+    <!-- GUARD GATE TERMINAL -->
     <div id="view-guard" class="panel-card" style="display: none;">
       <div id="guard-auth-box" style="text-align: center; padding: 10px 0;">
         <div style="font-size: 34px;">🛡️</div>
@@ -359,7 +454,8 @@
     const NITEL_STORAGE = {
       passes: "nitel_passes",
       businesses: "nitel_businesses",
-      auditLogs: "nitel_audit_logs"
+      auditLogs: "nitel_audit_logs",
+      residentProfile: "nitel_resident_profile"
     };
 
     var GUARD_MASTER_PIN = "6232";
@@ -387,14 +483,31 @@
       } catch(e) {}
     }
 
+    function updateNetworkStatus() {
+      var indicator = document.getElementById("network-indicator");
+      if (!indicator) return;
+      if (navigator.onLine) {
+        indicator.textContent = "🟢 Online";
+        indicator.style.color = "#15803d";
+        indicator.style.background = "#dcfce7";
+      } else {
+        indicator.textContent = "🔴 Offline Mode";
+        indicator.style.color = "#b91c1c";
+        indicator.style.background = "#fee2e2";
+      }
+    }
+    window.addEventListener("online", updateNetworkStatus);
+    window.addEventListener("offline", updateNetworkStatus);
+
     function switchTab(tab) {
-      var views = ['visitor', 'business-portal', 'directory', 'admin-post', 'guard'];
+      var views = ['visitor', 'business-portal', 'resident', 'directory', 'admin-post', 'guard'];
       views.forEach(function(v) {
         var el = document.getElementById("view-" + v);
         if (el) el.style.display = (v === tab) ? 'block' : 'none';
       });
       if (tab === 'guard') renderLogs();
       if (tab === 'directory') renderDirectory();
+      if (tab === 'resident') { renderFamilyMembersList(); renderDomesticStaffList(); loadResidentProfile(); }
       if (tab === 'admin-post') renderAdminPendingBusinesses();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -543,6 +656,189 @@
       }
     }
 
+    // --- PHASE C: RESIDENT MANAGEMENT LOGIC ---
+    function saveResidentProfile(event) {
+      if (event) event.preventDefault();
+      try {
+        var name = document.getElementById("res-profile-name")?.value.trim();
+        var phone = document.getElementById("res-profile-phone")?.value.trim();
+        var emergency = document.getElementById("res-profile-emergency")?.value.trim();
+        var avenue = document.getElementById("res-profile-avenue")?.value.trim();
+        var plot = document.getElementById("res-profile-plot")?.value.trim();
+        var vehicles = document.getElementById("res-profile-vehicles")?.value.trim();
+
+        if (!name || !phone || !avenue || !plot) {
+          alert("Please fill in all required resident fields.");
+          return;
+        }
+
+        var profile = {
+          full_name: name,
+          phone: phone,
+          emergency_contact: emergency || "None",
+          address: avenue + " - " + plot,
+          vehicles: vehicles ? vehicles.split(',').map(function(v){ return v.trim(); }) : [],
+          registered_at: new Date().toISOString()
+        };
+
+        localStorage.setItem(NITEL_STORAGE.residentProfile, JSON.stringify(profile));
+        playBeep('success');
+        alert("Resident profile saved successfully!");
+      } catch(e) {
+        alert("Error saving resident profile.");
+      }
+    }
+
+    function loadResidentProfile() {
+      try {
+        var profile = JSON.parse(localStorage.getItem(NITEL_STORAGE.residentProfile) || "{}");
+        if (!profile.full_name) return;
+        
+        var nameEl = document.getElementById("res-profile-name");
+        var phoneEl = document.getElementById("res-profile-phone");
+        var emgEl = document.getElementById("res-profile-emergency");
+        var vehEl = document.getElementById("res-profile-vehicles");
+
+        if (nameEl && !nameEl.value) nameEl.value = profile.full_name;
+        if (phoneEl && !phoneEl.value) phoneEl.value = profile.phone;
+        if (emgEl && !emgEl.value) emgEl.value = profile.emergency_contact;
+        if (vehEl && !vehEl.value && profile.vehicles) vehEl.value = profile.vehicles.join(', ');
+      } catch(e) {}
+    }
+
+    function generateFamilyMemberBadge(event) {
+      if (event) event.preventDefault();
+      try {
+        var surname = document.getElementById("fam-surname")?.value.trim();
+        var name = document.getElementById("fam-member-name")?.value.trim();
+        var role = document.getElementById("fam-member-role")?.value;
+        var resident = JSON.parse(localStorage.getItem(NITEL_STORAGE.residentProfile) || "{}");
+
+        if (!surname || !name) { alert("Enter family surname and member name."); return; }
+        if (!resident.full_name) { alert("Please save your primary resident profile first."); return; }
+
+        var code = "55" + String(Math.floor(1000 + Math.random() * 9000));
+        var record = {
+          pin: code,
+          secure_token: "NITEL-FAM-" + code,
+          familyName: surname,
+          visitor_name: surname + " Family — " + name + " (" + role + ")",
+          host_name: resident.address,
+          vehicle: "Family Member",
+          pass_type: 'FAMILY_MEMBER',
+          status: 'ACTIVE',
+          created_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 365*24*3600*1000).toISOString()
+        };
+
+        var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
+        passes.unshift(record);
+        localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
+
+        document.getElementById("fam-member-name").value = "";
+        playBeep('success');
+        alert("Household Family Badge generated successfully! PIN: " + code);
+        renderFamilyMembersList();
+      } catch(e) {
+        alert("Error generating family badge.");
+      }
+    }
+
+    function renderFamilyMembersList() {
+      try {
+        var container = document.getElementById("family-members-list");
+        if (!container) return;
+        var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
+        var familyPasses = passes.filter(function(r) { return r.pass_type === 'FAMILY_MEMBER'; });
+
+        if (familyPasses.length === 0) {
+          container.innerHTML = "<small style='color:#64748b;'>No family members registered yet.</small>";
+          return;
+        }
+
+        container.innerHTML = familyPasses.map(function(item) {
+          var isRev = item.status === 'REVOKED';
+          return "<div style='background:#fff; border:1px solid #cbd5e1; padding:6px 8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px;'>" +
+            "<div><b>" + escapeHtml(item.visitor_name) + "</b><br><span style='font-family:monospace; color:" + (isRev ? 'red' : 'green') + "; font-weight:800;'>PIN: " + escapeHtml(item.pin) + " [" + escapeHtml(item.status) + "]</span></div>" +
+            (!isRev ? "<button type='button' onclick='revokePass(\"" + item.pin + "\")' style='background:#fee2e2; color:#b91c1c; border:none; padding:3px 6px; border-radius:4px; font-weight:800; cursor:pointer;'>Revoke</button>" : "") +
+          "</div>";
+        }).join('');
+      } catch(e) {}
+    }
+
+    function registerDomesticStaff(event) {
+      if (event) event.preventDefault();
+      try {
+        var name = document.getElementById("staff-name")?.value.trim();
+        var role = document.getElementById("staff-role")?.value;
+        var phone = document.getElementById("staff-phone")?.value.trim();
+        var resident = JSON.parse(localStorage.getItem(NITEL_STORAGE.residentProfile) || "{}");
+
+        if (!name || !phone) { alert("Enter staff name and phone number."); return; }
+        if (!resident.full_name) { alert("Please save your primary resident profile first."); return; }
+
+        var code = "44" + String(Math.floor(1000 + Math.random() * 9000));
+        var record = {
+          pin: code,
+          secure_token: "NITEL-STF-" + code,
+          visitor_name: name + " (" + role + " for " + resident.full_name + ")",
+          host_name: resident.address,
+          vehicle: "Domestic Staff",
+          pass_type: 'DOMESTIC_STAFF',
+          status: 'ACTIVE',
+          created_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 365*24*3600*1000).toISOString()
+        };
+
+        var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
+        passes.unshift(record);
+        localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
+
+        document.getElementById("staff-name").value = "";
+        document.getElementById("staff-phone").value = "";
+        playBeep('success');
+        alert("Domestic Staff access registered! PIN: " + code);
+        renderDomesticStaffList();
+      } catch(e) {
+        alert("Error registering domestic staff.");
+      }
+    }
+
+    function renderDomesticStaffList() {
+      try {
+        var container = document.getElementById("domestic-staff-list");
+        if (!container) return;
+        var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
+        var staffPasses = passes.filter(function(r) { return r.pass_type === 'DOMESTIC_STAFF'; });
+
+        if (staffPasses.length === 0) {
+          container.innerHTML = "<small style='color:#64748b;'>No domestic staff registered yet.</small>";
+          return;
+        }
+
+        container.innerHTML = staffPasses.map(function(item) {
+          var isRev = item.status === 'REVOKED';
+          return "<div style='background:#fff; border:1px solid #cbd5e1; padding:6px 8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px;'>" +
+            "<div><b>" + escapeHtml(item.visitor_name) + "</b><br><span style='font-family:monospace; color:" + (isRev ? 'red' : 'green') + "; font-weight:800;'>PIN: " + escapeHtml(item.pin) + "</span></div>" +
+            (!isRev ? "<button type='button' onclick='revokePass(\"" + item.pin + "\")' style='background:#fee2e2; color:#b91c1c; border:none; padding:3px 6px; border-radius:4px; font-weight:800; cursor:pointer;'>Revoke</button>" : "") +
+          "</div>";
+        }).join('');
+      } catch(e) {}
+    }
+
+    function revokePass(pinCode) {
+      var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
+      var found = passes.find(function(p) { return p.pin === pinCode; });
+      if (found) {
+        found.status = 'REVOKED';
+        localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
+        playBeep('error');
+        renderFamilyMembersList();
+        renderDomesticStaffList();
+        alert("Pass revoked successfully.");
+      }
+    }
+
     // --- ADMIN APPROVAL WORKFLOW ---
     function unlockAdminPortal() {
       var pin = document.getElementById("admin-master-pin")?.value.trim();
@@ -578,7 +874,7 @@
         return "<div style='background:#fef3c7; border:1px solid #fde68a; padding:10px; border-radius:8px; font-size:11px;'>" +
           "<b>" + escapeHtml(item.business_name) + "</b> (" + escapeHtml(item.category) + ")<br>" +
           "👤 Owner: " + escapeHtml(item.owner_name) + " | 📍 " + escapeHtml(item.location) + "<br>" +
-          "<button onclick='approveBusiness(\"" + item.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; margin-top:6px; cursor:pointer;'>Approve & Issue 6-Month Passes ✅</button>" +
+          "<button type='button' onclick='approveBusiness(\"" + item.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; margin-top:6px; cursor:pointer;'>Approve & Issue 6-Month Passes ✅</button>" +
         "</div>";
       }).join('');
     }
@@ -693,7 +989,7 @@
       res.style.display = "block";
 
       var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
-      var found = passes.find(function(p) { return p.pin === enteredPin || p.secure_token === "NITEL-PASS-" + enteredPin || p.secure_token === "NITEL-BIZ-" + enteredPin || p.secure_token === "NITEL-WRK-" + enteredPin; });
+      var found = passes.find(function(p) { return p.pin === enteredPin || p.secure_token === "NITEL-PASS-" + enteredPin || p.secure_token === "NITEL-BIZ-" + enteredPin || p.secure_token === "NITEL-WRK-" + enteredPin || p.secure_token === "NITEL-FAM-" + enteredPin || p.secure_token === "NITEL-STF-" + enteredPin; });
       var now = new Date();
 
       if (!found) {
@@ -704,7 +1000,7 @@
         res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
         res.innerHTML = "<b>❌ ACCESS DENIED — PASS REVOKED</b>";
         playBeep('error');
-      } else if (found.status === "USED" && found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "BUSINESS_WORKER") {
+      } else if (found.status === "USED" && found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "BUSINESS_WORKER" && found.pass_type !== "FAMILY_MEMBER" && found.pass_type !== "DOMESTIC_STAFF") {
         res.style.background = "#fff1f2"; res.style.color = "#be123c";
         res.innerHTML = "<b>⚠️ ACCESS DENIED: Visitor Pass Already Used</b>";
         playBeep('error');
@@ -715,13 +1011,17 @@
         res.innerHTML = "<b>⏱️ ACCESS DENIED: Pass Expired</b>";
         playBeep('error');
       } else {
-        // Keep business & worker passes active for multi-entry; mark standard visitor passes used
-        if (found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "BUSINESS_WORKER") {
+        // Keep multi-entry passes active; mark single-use visitor passes as used
+        if (found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "BUSINESS_WORKER" && found.pass_type !== "FAMILY_MEMBER" && found.pass_type !== "DOMESTIC_STAFF") {
           found.status = "USED";
         }
         localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
 
-        var credentialBadge = found.pass_type === "BUSINESS_OWNER" ? "🏪 BUSINESS OWNER (6-Month)" : (found.pass_type === "BUSINESS_WORKER" ? "👷 REGISTERED WORKER (6-Month)" : "🟢 STANDARD VISITOR");
+        var credentialBadge = "🟢 STANDARD VISITOR";
+        if (found.pass_type === "BUSINESS_OWNER") credentialBadge = "🏪 BUSINESS OWNER (6-Month)";
+        else if (found.pass_type === "BUSINESS_WORKER") credentialBadge = "👷 REGISTERED WORKER (6-Month)";
+        else if (found.pass_type === "FAMILY_MEMBER") credentialBadge = "👨‍👩‍👧 HOUSEHOLD DEPENDENT";
+        else if (found.pass_type === "DOMESTIC_STAFF") credentialBadge = "🧹 DOMESTIC STAFF";
 
         res.style.background = "#dcfce7"; res.style.color = "#166534";
         res.innerHTML = "<b>🟢 ACCESS GRANTED ✅ [" + credentialBadge + "]</b><br><small><b>" + escapeHtml(found.visitor_name) + "</b><br>📍 " + escapeHtml(found.host_name) + "</small>";
@@ -749,6 +1049,12 @@
         "</div>";
       }).join('');
     }
+
+    window.onload = function() {
+      updateNetworkStatus();
+      loadResidentProfile();
+      renderDirectory();
+    };
   </script>
 </body>
 </html>
