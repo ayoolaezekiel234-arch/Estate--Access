@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>NITEL Estate — Security Intelligence Platform</title>
   
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="apple-touch-icon" href="/nitel-logo.png" />
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,6 +21,8 @@
     .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; }
     .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
     .header-icons { display: flex; gap: 8px; align-items: center; }
+    .notif-badge { position: relative; }
+    .notif-dot { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; }
 
     .brand-section { margin-bottom: 18px; }
     .brand-title { font-size: 26px; font-weight: 900; color: #0f2b5c; letter-spacing: -0.5px; display: flex; align-items: center; gap: 4px; }
@@ -500,7 +506,6 @@
           return;
         }
 
-        // Gather workers if any
         var workers = [];
         var workerRows = document.querySelectorAll(".worker-row");
         workerRows.forEach(function(row) {
@@ -589,7 +594,6 @@
       var now = new Date();
       var expiry = new Date(now);
       expiry.setMonth(expiry.getMonth() + 6);
-      var expiryTime = expiry.getTime();
 
       var ownerPin = "99" + String(Math.floor(1000 + Math.random() * 9000));
       var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
@@ -689,7 +693,7 @@
       res.style.display = "block";
 
       var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
-      var found = passes.find(function(p) { return p.pin === enteredPin || p.secure_token === "NITEL-PASS-" + enteredPin; });
+      var found = passes.find(function(p) { return p.pin === enteredPin || p.secure_token === "NITEL-PASS-" + enteredPin || p.secure_token === "NITEL-BIZ-" + enteredPin || p.secure_token === "NITEL-WRK-" + enteredPin; });
       var now = new Date();
 
       if (!found) {
@@ -700,9 +704,9 @@
         res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
         res.innerHTML = "<b>❌ ACCESS DENIED — PASS REVOKED</b>";
         playBeep('error');
-      } else if (found.status === "USED") {
+      } else if (found.status === "USED" && found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "BUSINESS_WORKER") {
         res.style.background = "#fff1f2"; res.style.color = "#be123c";
-        res.innerHTML = "<b>⚠️ ACCESS DENIED: Pass Already Used</b>";
+        res.innerHTML = "<b>⚠️ ACCESS DENIED: Visitor Pass Already Used</b>";
         playBeep('error');
       } else if (found.expires_at && now >= new Date(found.expires_at)) {
         found.status = "EXPIRED";
@@ -711,15 +715,20 @@
         res.innerHTML = "<b>⏱️ ACCESS DENIED: Pass Expired</b>";
         playBeep('error');
       } else {
-        found.status = "USED";
+        // Keep business & worker passes active for multi-entry; mark standard visitor passes used
+        if (found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "BUSINESS_WORKER") {
+          found.status = "USED";
+        }
         localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
 
+        var credentialBadge = found.pass_type === "BUSINESS_OWNER" ? "🏪 BUSINESS OWNER (6-Month)" : (found.pass_type === "BUSINESS_WORKER" ? "👷 REGISTERED WORKER (6-Month)" : "🟢 STANDARD VISITOR");
+
         res.style.background = "#dcfce7"; res.style.color = "#166534";
-        res.innerHTML = "<b>🟢 ACCESS GRANTED ✅</b><br><small><b>" + escapeHtml(found.visitor_name) + "</b><br>📍 " + escapeHtml(found.host_name) + "</small>";
+        res.innerHTML = "<b>🟢 ACCESS GRANTED ✅ [" + credentialBadge + "]</b><br><small><b>" + escapeHtml(found.visitor_name) + "</b><br>📍 " + escapeHtml(found.host_name) + "</small>";
         playBeep('success');
 
         var logs = JSON.parse(localStorage.getItem(NITEL_STORAGE.auditLogs) || "[]");
-        logs.unshift({ visitor: found.visitor_name, host: found.host_name, time: now.toLocaleTimeString(), status: "GRANTED" });
+        logs.unshift({ visitor: found.visitor_name, host: found.host_name, time: now.toLocaleTimeString(), status: "GRANTED (" + found.pass_type + ")" });
         localStorage.setItem(NITEL_STORAGE.auditLogs, JSON.stringify(logs.slice(0, 50)));
       }
 
