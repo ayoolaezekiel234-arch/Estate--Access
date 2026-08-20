@@ -18,12 +18,12 @@
     .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
     .header-icons { display: flex; gap: 8px; align-items: center; }
 
-    .brand-section { margin-bottom: 18px; }
+    .brand-section { margin-bottom: 14px; }
     .brand-title { font-size: 26px; font-weight: 900; color: #0f2b5c; letter-spacing: -0.5px; display: flex; align-items: center; gap: 4px; }
     .brand-accent { color: #0ea5e9; font-weight: 900; }
     .brand-sub { font-size: 13px; font-weight: 600; color: #64748b; margin-top: 1px; }
 
-    .quick-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 16px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 12px; }
     .grid-card { border-radius: 10px; padding: 8px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent; min-height: 72px; }
     .grid-card:active { transform: scale(0.97); }
     
@@ -37,8 +37,12 @@
     .grid-card .card-icon { font-size: 16px; margin-bottom: 2px; }
     .grid-card .card-title { font-size: 8.5px; font-weight: 700; line-height: 1.15; }
 
-    .btn-hero { width: 100%; padding: 14px; background: #1e2e4a; color: #ffffff; border-radius: 14px; font-size: 13px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(30, 46, 74, 0.25); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .btn-hero { width: 100%; padding: 13px; background: #1e2e4a; color: #ffffff; border-radius: 14px; font-size: 13px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(30, 46, 74, 0.25); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
     .btn-hero:active { background: #0f1c30; transform: scale(0.98); }
+
+    .btn-sos { width: 100%; padding: 14px; background: #dc2626; color: #ffffff; border-radius: 14px; font-size: 14px; font-weight: 900; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; animation: pulseSOS 2s infinite; }
+    .btn-sos:active { background: #991b1b; transform: scale(0.98); }
+    @keyframes pulseSOS { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
 
     .panel-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px; margin-top: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
     .panel-title { font-size: 15px; font-weight: 800; color: #0f2b5c; margin-bottom: 2px; }
@@ -73,7 +77,7 @@
     .log-badge { font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 6px; text-transform: uppercase; font-family: monospace; }
     .badge-used { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
 
-    .hotline-banner { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 9px; margin-top: 10px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; color: #be123c; font-size: 11px; font-weight: 800; text-decoration: none; }
+    .hotline-banner { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 9px; margin-top: 8px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; color: #be123c; font-size: 11px; font-weight: 800; text-decoration: none; }
     .network-badge { font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: #dcfce7; color: #15803d; }
   </style>
 </head>
@@ -138,6 +142,11 @@
 
     <button type="button" class="btn-hero" onclick="switchTab('visitor')">
       + Create Visitor Pass
+    </button>
+
+    <!-- SOS EMERGENCY PANIC BUTTON -->
+    <button type="button" class="btn-sos" onclick="triggerEmergencySOS()">
+      🚨 EMERGENCY SOS PANIC BUTTON
     </button>
 
     <a href="tel:08108429710" class="hotline-banner">
@@ -282,7 +291,7 @@
       <div id="business-submit-result" style="display:none; margin-top:12px; padding:10px; background:#fef3c7; border-radius:8px; font-size:12px; text-align:center; font-weight:700; color:#92400e;"></div>
     </div>
 
-    <!-- PHASE C: CLOUD RESIDENT MANAGEMENT PANEL (WITH DUES LEDGER) -->
+    <!-- PHASE C: CLOUD RESIDENT MANAGEMENT PANEL -->
     <div id="view-resident" class="panel-card" style="display: none;">
       <div class="panel-title">🏠 Resident Profile & Financial Dues</div>
       <div class="panel-sub">Cloud-synchronized resident profiles & levy payment ledger</div>
@@ -378,12 +387,20 @@
       <div id="news-feed" style="margin-top:10px;"></div>
     </div>
 
-    <!-- ADMIN PORTAL (WITH LEVY PUBLISHER & BUSINESS APPROVALS) -->
+    <!-- ADMIN PORTAL (WITH LEVY PUBLISHER & SOS ALERTS) -->
     <div id="view-admin-post" class="panel-card" style="display: none;">
       <div class="panel-title">👑 Executive Admin Command Center</div>
       <div class="panel-sub">Role-Restricted Cloud Management & Approvals</div>
       <div id="admin-auth-warning" style="color:#b91c1c; font-size:12px; font-weight:700; margin-bottom:10px;"></div>
       
+      <!-- LIVE EMERGENCY SOS ALERTS FEED -->
+      <div style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 900; color: #dc2626; margin-bottom: 8px; text-transform: uppercase;">🚨 Active Emergency SOS Feed</div>
+        <div id="admin-sos-feed" style="display:flex; flex-direction:column; gap:6px;">
+          <small style='color:#64748b;'>No active emergencies.</small>
+        </div>
+      </div>
+
       <!-- ADMIN LEVY PUBLISHER FORM -->
       <div style="background: #fef3c7; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
         <div style="font-size: 12px; font-weight: 800; color: #b45309; margin-bottom: 8px; text-transform: uppercase;">➕ Publish Resident Levy / Due</div>
@@ -423,10 +440,18 @@
       <div id="admin-cloud-feed" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;"></div>
     </div>
 
-    <!-- GUARD GATE TERMINAL -->
+    <!-- GUARD GATE TERMINAL (WITH SOS ALERTS FEED) -->
     <div id="view-guard" class="panel-card" style="display: none;">
       <div class="panel-title">🛡️ Secure Gate Terminal</div>
       <div class="panel-sub">Live QR Scanner & Server-Side Database Verification</div>
+
+      <!-- GUARD EMERGENCY SOS FEED -->
+      <div style="background:#fef2f2; border:1.5px solid #fecaca; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
+        <div style="font-size: 11px; font-weight: 900; color: #dc2626; text-transform: uppercase; margin-bottom: 6px;">🚨 Active SOS Emergency Alerts</div>
+        <div id="guard-sos-feed">
+          <small style="color:#64748b;">No active emergencies.</small>
+        </div>
+      </div>
 
       <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 10px; border-radius: 12px; text-align:center; margin-bottom: 12px;">
         <div id="qr-reader" style="width:100%;"></div>
@@ -510,10 +535,10 @@
         var el = document.getElementById("view-" + v);
         if (el) el.style.display = (v === tab) ? 'block' : 'none';
       });
-      if (tab === 'guard') renderCloudLogs();
+      if (tab === 'guard') { renderCloudLogs(); renderActiveSOSFeeds(); }
       if (tab === 'directory') renderCloudDirectory();
       if (tab === 'resident') { renderFamilyMembersList(); loadResidentProfile(); loadResidentDues(); }
-      if (tab === 'admin-post') loadCloudAdminData();
+      if (tab === 'admin-post') { loadCloudAdminData(); renderActiveSOSFeeds(); }
       if (tab === 'complaints') renderComplaints();
       if (tab === 'news') renderNewsFeed();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -556,6 +581,87 @@
       document.getElementById("sign-out-btn").style.display = "none";
       document.getElementById("auth-status-msg").innerText = "Signed out securely.";
       switchTab('auth');
+    }
+
+    // --- NEW: EMERGENCY SOS TRIGGER ---
+    async function triggerEmergencySOS() {
+      var session = await supabaseClient.auth.getSession();
+      if (!session.data.session) {
+        alert("Please sign in first so guards know who triggered the emergency!");
+        switchTab('auth');
+        return;
+      }
+
+      var confirmSOS = confirm("🚨 EMERGENCY CONFIRMATION:\n\nThis will instantly broadcast a high-priority red alert to all active Security Guards and Admins with your profile details. Are you in danger?");
+      if (!confirmSOS) return;
+
+      try {
+        var userId = session.data.session.user.id;
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).single();
+
+        var residentName = profile ? profile.full_name : session.data.session.user.email;
+        var address = profile ? profile.address : "Estate Resident";
+        var phone = profile ? profile.phone : "Not Provided";
+
+        var { error } = await supabaseClient.from('estate_sos_alerts').insert([{
+          user_id: userId,
+          resident_name: residentName,
+          address: address,
+          phone: phone,
+          status: 'ACTIVE'
+        }]);
+
+        if (error) { alert("SOS Error: " + error.message); return; }
+
+        playBeep('error');
+        alert("🚨 EMERGENCY SOS BROADCASTED!\n\nGuards and Administrators have been instantly alerted with your details.");
+        switchTab('guard');
+      } catch(e) {
+        alert("Unable to trigger SOS.");
+      }
+    }
+
+    // --- NEW: RENDER ACTIVE SOS FEEDS FOR GUARDS & ADMINS ---
+    async function renderActiveSOSFeeds() {
+      var feeds = ['guard-sos-feed', 'admin-sos-feed'];
+      
+      try {
+        var { data: activeSOS, error } = await supabaseClient
+          .from('estate_sos_alerts')
+          .select('*')
+          .eq('status', 'ACTIVE')
+          .order('created_at', { ascending: false });
+
+        feeds.forEach(function(feedId) {
+          var container = document.getElementById(feedId);
+          if (!container) return;
+
+          if (error || !activeSOS || activeSOS.length === 0) {
+            container.innerHTML = "<small style='color:#64748b;'>No active emergencies.</small>";
+            return;
+          }
+
+          container.innerHTML = activeSOS.map(function(sos) {
+            return "<div style='background:#ffffff; border:1px solid #fecaca; padding:8px; border-radius:8px; font-size:11px; margin-bottom:6px;'>" +
+              "<b>🚨 " + escapeHtml(sos.resident_name) + "</b><br>" +
+              "🏠 " + escapeHtml(sos.address) + " | 📞 <a href='tel:" + escapeHtml(sos.phone) + "'>" + escapeHtml(sos.phone) + "</a><br>" +
+              "<button type='button' onclick='resolveSOS(\"" + sos.id + "\")' style='background:#059669; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-weight:800; margin-top:4px; cursor:pointer;'>Cancel / Resolve False Alarm ✅</button>" +
+            "</div>";
+          }).join('');
+        });
+      } catch(e) {}
+    }
+
+    async function resolveSOS(sosId) {
+      var confirmResolve = confirm("Mark this emergency alert as resolved / false alarm?");
+      if (!confirmResolve) return;
+
+      var { error } = await supabaseClient.from('estate_sos_alerts').update({ status: 'RESOLVED' }).eq('id', sosId);
+      if (error) { alert("Error updating SOS."); return; }
+
+      playBeep('success');
+      alert("Emergency alert cleared.");
+      renderActiveSOSFeeds();
     }
 
     async function generateVisitorPass(event) {
@@ -709,7 +815,6 @@
       } catch(e) {}
     }
 
-    // --- NEW: LOAD RESIDENT DUES LEDGER ---
     async function loadResidentDues() {
       var container = document.getElementById("resident-dues-feed");
       if (!container) return;
@@ -721,7 +826,6 @@
           return;
         }
 
-        // Get resident's profile name to match against estate_dues records
         var { data: profile } = await supabaseClient.from('resident_profiles').select('full_name').eq('user_id', session.data.session.user.id).single();
         var searchName = profile ? profile.full_name : "";
 
@@ -753,7 +857,6 @@
       }
     }
 
-    // --- NEW: PUBLISH LEVY (ADMIN) ---
     async function publishEstateLevy(event) {
       if (event) event.preventDefault();
       try {
@@ -881,7 +984,6 @@
       "</div>";
     }
 
-    // --- HARDCODED EMAIL OVERRIDE ADMIN LOADER ---
     async function loadCloudAdminData() {
       var container = document.getElementById("admin-cloud-feed");
       var warningBox = document.getElementById("admin-auth-warning");
@@ -1074,6 +1176,7 @@
       renderCloudDirectory();
       renderComplaints();
       renderNewsFeed();
+      renderActiveSOSFeeds();
     };
   </script>
 </body>
