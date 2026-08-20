@@ -33,6 +33,7 @@
     .card-guard { background: #065f46; color: #ffffff; }
     .card-business { background: #78350f; color: #ffffff; }
     .card-resident { background: #1e40af; color: #ffffff; }
+    .card-biker { background: #0f766e; color: #ffffff; }
     
     .grid-card .card-icon { font-size: 16px; margin-bottom: 2px; }
     .grid-card .card-title { font-size: 8.5px; font-weight: 700; line-height: 1.15; }
@@ -60,6 +61,7 @@
     .btn-emerald { background: #059669; color: #ffffff; }
     .btn-amber { background: #d97706; color: #ffffff; }
     .btn-rose { background: #e11d48; color: #ffffff; }
+    .btn-teal { background: #0f766e; color: #ffffff; }
     .btn-outline { background: #ffffff; border: 1.5px solid #cbd5e1; color: #475569; padding: 7px 12px; font-size: 11px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
     .error-banner { display: none; padding: 10px; background: #fee2e2; border: 1px solid #ef4444; border-radius: 10px; color: #b91c1c; font-size: 12px; font-weight: 700; margin-top: 10px; }
@@ -92,6 +94,7 @@
         <div class="icon-btn" onclick="switchTab('news')">📰</div>
         <div class="icon-btn" onclick="switchTab('directory')">🏢</div>
         <div class="icon-btn" onclick="switchTab('resident')">📍</div>
+        <div class="icon-btn" onclick="switchTab('biker-portal')">🏍️</div>
         <div class="icon-btn" onclick="switchTab('admin-post')">👑</div>
         <div class="icon-btn" onclick="switchTab('guard')">🛡️</div>
       </div>
@@ -105,7 +108,7 @@
     </div>
 
     <!-- Navigation Grid -->
-    <div class="quick-grid" id="main-quick-grid">
+    <div class="quick-grid" id="main-quick-grid" style="grid-template-columns: repeat(6, 1fr);">
       <div class="grid-card card-dark" onclick="switchTab('visitor')">
         <div class="card-icon">🚗</div>
         <div class="card-title">Pass</div>
@@ -118,17 +121,9 @@
         <div class="card-icon">🏠</div>
         <div class="card-title">Resident</div>
       </div>
-      <div class="grid-card card-light" onclick="switchTab('directory')">
-        <div class="card-icon">🏢</div>
-        <div class="card-title">Directory</div>
-      </div>
-      <div class="grid-card card-light" onclick="switchTab('complaints')">
-        <div class="card-icon">💬</div>
-        <div class="card-title">Feed</div>
-      </div>
-      <div class="grid-card card-light" onclick="switchTab('news')">
-        <div class="card-icon">📰</div>
-        <div class="card-title">Magazine</div>
+      <div class="grid-card card-biker" onclick="switchTab('biker-portal')">
+        <div class="card-icon">🏍️</div>
+        <div class="card-title">Biker</div>
       </div>
       <div class="grid-card card-guard" onclick="switchTab('guard')">
         <div class="card-icon">🛡️</div>
@@ -192,12 +187,42 @@
       <div id="auth-status-msg" style="font-size:11px; margin-top:8px; text-align:center; font-weight:700; color:#0369a1;"></div>
     </div>
 
+    <!-- 🏍️ ESTATE BIKER RESIDENT & DRIVER PORTAL -->
+    <div id="view-biker-portal" class="panel-card" style="display: none;">
+      <div class="panel-title">🏍️ NITEL Estate Biker Service</div>
+      <div class="panel-sub">On-demand secure transit across estate roads</div>
+
+      <!-- Resident Request View -->
+      <div id="resident-biker-view" style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #166534; margin-bottom: 6px; text-transform: uppercase;">📍 Request an Estate Bike</div>
+        <div id="resident-pickup-display" style="font-size: 11px; color: #475569; margin-bottom: 10px;">Pickup Address: Loading your address...</div>
+        <button type="button" class="btn-action btn-emerald" id="request-bike-btn" onclick="requestEstateBike()">Request a Bike 🏍️</button>
+        <div id="biker-request-status-box" style="margin-top:10px; display:none; padding:10px; background:#fff; border-radius:8px; font-size:11px; text-align:center; font-weight:700;"></div>
+      </div>
+
+      <!-- Biker Dashboard View -->
+      <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #0f2b5c; margin-bottom: 6px; text-transform: uppercase;">🏍️ Registered Biker Dashboard</div>
+        <div class="form-group" style="margin-bottom: 8px;">
+          <label>Enter Your Bike ID to Activate Dashboard</label>
+          <input id="biker-login-id" type="text" placeholder="e.g. NITEL-BK-024" style="background:#fff;" />
+        </div>
+        <button type="button" class="btn-action btn-teal" onclick="loadBikerDashboard()">Open Biker Terminal 🟢</button>
+        
+        <div id="biker-live-terminal" style="display:none; margin-top:12px; border-top:1px solid #cbd5e1; padding-top:10px;">
+          <div style="font-size:11px; font-weight:800; color:#0f766e; margin-bottom:6px;">Status: 🟢 ONLINE — Accepting Requests</div>
+          <div id="incoming-biker-requests" style="display:flex; flex-direction:column; gap:6px;">
+            <small style='color:#64748b;'>Waiting for ride requests...</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- PHASE A: EXPANDED VISITOR PASS & PERMIT PANEL -->
     <div id="view-visitor" class="panel-card" style="display: none;">
       <div class="panel-title">Create Secure Visitor Permit</div>
       <div class="panel-sub">Select categorized permit type & duration</div>
 
-      <!-- Category Selector -->
       <div class="form-group">
         <label>Select Category</label>
         <select id="pass-category-group" onchange="updateCategoryOptions()">
@@ -230,7 +255,6 @@
       </div>
 
       <form id="pass-form" onsubmit="generateVisitorPass(event); return false;">
-        <!-- Dynamic Fields Container -->
         <div id="dynamic-permit-fields">
           <div class="form-row form-group">
             <div>
@@ -257,12 +281,11 @@
             </div>
             <div>
               <label>Vehicle Plate Number (Optional)</label>
-              <input id="visitor-vehicle" type="text" placeholder="e.g. KSF-123AA (Leave blank if none)" />
+              <input id="visitor-vehicle" type="text" placeholder="Leave blank if none" />
             </div>
           </div>
         </div>
 
-        <!-- Extra Duration Selector for Hotel/Shortlet -->
         <div id="hotel-duration-box" class="form-group" style="display:none;">
           <label>Shortlet Duration</label>
           <select id="hotel-days">
@@ -277,7 +300,6 @@
         </button>
       </form>
 
-      <!-- COLOR-GRADED RESULT CARD -->
       <div id="visitor-result" class="result-card hidden">
         <div id="pass-category-badge" style="font-size: 11px; font-weight: 900; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px;">Permit Authorized</div>
         <div id="pass-display-pin" class="pin-hero">000000</div>
@@ -411,113 +433,44 @@
       <div id="news-feed" style="margin-top:10px;"></div>
     </div>
 
-    <!-- ADMIN PORTAL -->
+    <!-- ADMIN PORTAL (WITH BIKER REGISTRATION) -->
     <div id="view-admin-post" class="panel-card" style="display: none;">
       <div class="panel-title">👑 Executive Admin Command Center</div>
       <div class="panel-sub">Role-Restricted Cloud Management & Approvals</div>
       <div id="admin-auth-warning" style="color:#b91c1c; font-size:12px; font-weight:700; margin-bottom:10px;"></div>
       
-      <!-- EVENT PERMIT CREATOR -->
+      <!-- REGISTER ESTATE BIKER -->
       <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
-        <div style="font-size: 12px; font-weight: 800; color: #166534; margin-bottom: 8px; text-transform: uppercase;">🎉 Create Event Center Permit</div>
-        <form id="admin-event-form" onsubmit="createEventPermit(event); return false;">
+        <div style="font-size: 12px; font-weight: 800; color: #166534; margin-bottom: 8px; text-transform: uppercase;">🏍️ Register Estate Biker</div>
+        <form id="admin-biker-form" onsubmit="registerEstateBiker(event); return false;">
           <div class="form-row form-group">
             <div>
-              <label>Event Name</label>
-              <input id="ev-name" type="text" placeholder="Birthday Ceremony" required style="background:#fff;" />
+              <label>Biker Full Name</label>
+              <input id="adm-biker-name" type="text" placeholder="Adewale" required style="background:#fff;" />
             </div>
             <div>
-              <label>Event Date</label>
-              <input id="ev-date" type="date" required style="background:#fff;" />
+              <label>Bike ID</label>
+              <input id="adm-bike-id" type="text" placeholder="NITEL-BK-024" required style="background:#fff;" />
             </div>
           </div>
-          <div class="form-row form-group">
-            <div>
-              <label>Start Time</label>
-              <input id="ev-start" type="time" required style="background:#fff;" />
-            </div>
-            <div>
-              <label>End Time</label>
-              <input id="ev-end" type="time" required style="background:#fff;" />
-            </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input id="adm-biker-phone" type="tel" placeholder="08031234567" required style="background:#fff;" />
           </div>
-          <div class="form-row form-group">
-            <div>
-              <label>Venue</label>
-              <input id="ev-venue" type="text" placeholder="Community Hall" required style="background:#fff;" />
-            </div>
-            <div>
-              <label>Organizer</label>
-              <input id="ev-org" type="text" placeholder="Chief Organizer" required style="background:#fff;" />
-            </div>
-          </div>
-          <button type="submit" class="btn-action btn-emerald" style="margin-top:8px;">Publish Event Pass & Grace Period (+1hr)</button>
+          <button type="submit" class="btn-action btn-emerald" style="margin-top:8px;">Register Active Biker 🏍️</button>
         </form>
+        <div id="admin-bikers-feed" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;"></div>
       </div>
 
-      <!-- BUSINESS STAFF CREDENTIAL MANAGER -->
-      <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
-        <div style="font-size: 12px; font-weight: 800; color: #b45309; margin-bottom: 8px; text-transform: uppercase;">🧑‍💼 Add Business Staff Credential</div>
-        <form id="admin-staff-form" onsubmit="createBusinessStaff(event); return false;">
-          <div class="form-row form-group">
-            <div>
-              <label>Select Verified Business</label>
-              <select id="staff-biz-select" style="background:#fff;"></select>
-            </div>
-            <div>
-              <label>Staff Full Name</label>
-              <input id="staff-name" type="text" placeholder="John Doe" required style="background:#fff;" />
-            </div>
-          </div>
-          <div class="form-row form-group">
-            <div>
-              <label>Phone Number</label>
-              <input id="staff-phone" type="tel" placeholder="08000000000" required style="background:#fff;" />
-            </div>
-            <div>
-              <label>Role / Position</label>
-              <input id="staff-role" type="text" placeholder="Cashier / Attendant" required style="background:#fff;" />
-            </div>
-          </div>
-          <button type="submit" class="btn-action btn-amber" style="margin-top:8px;">Issue 30-Day Staff Credential</button>
-        </form>
-      </div>
-
-      <!-- AUTHORIZED PROPERTY REPRESENTATIVE MANAGER -->
+      <!-- RESIDENT DIRECTORY SEARCH LOOKUP -->
       <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
-        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🛡️ Authorize Property Representative</div>
-        <form id="admin-rep-form" onsubmit="createPropertyRep(event); return false;">
-          <div class="form-row form-group">
-            <div>
-              <label>Representative Full Name</label>
-              <input id="rep-name" type="text" placeholder="Mr. Adewale XYZ" required style="background:#fff;" />
-            </div>
-            <div>
-              <label>Property / Plot Assignment</label>
-              <input id="rep-prop" type="text" placeholder="Plot 27, Road D" required style="background:#fff;" />
-            </div>
-          </div>
-          <button type="submit" class="btn-action btn-blue" style="margin-top:8px;">Grant 90-Day Property Rep Credential</button>
-        </form>
-      </div>
-
-      <!-- DEVICE PAIRING MANAGER -->
-      <div style="background: #fdf2f8; border: 1.5px solid #fbcfe8; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
-        <div style="font-size: 12px; font-weight: 800; color: #db2777; margin-bottom: 8px; text-transform: uppercase;">🛡️ Guard Terminal Pairing</div>
-        <form id="admin-terminal-form" onsubmit="createGuardTerminal(event); return false;">
-          <div class="form-row form-group">
-            <div>
-              <label>Terminal Name</label>
-              <input id="term-name" type="text" placeholder="Gate Terminal 01" required style="background:#fff;" />
-            </div>
-            <div>
-              <label>Location</label>
-              <input id="term-loc" type="text" placeholder="Main Gate" required style="background:#fff;" />
-            </div>
-          </div>
-          <button type="submit" class="btn-action btn-rose" style="margin-top:8px;">Generate Pairing Code ⚙️</button>
-        </form>
-        <div id="admin-terminals-feed" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;"></div>
+        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🔍 Resident Directory Lookup</div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <input id="resident-search-input" type="text" placeholder="Search resident name or road..." onkeyup="searchResidentDirectory()" style="background:#fff;" />
+        </div>
+        <div id="resident-search-results" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+          <small style="color:#64748b;">Type above to search registered residents...</small>
+        </div>
       </div>
 
       <!-- LIVE SOS ALERTS FEED -->
@@ -537,20 +490,24 @@
       <div class="panel-title">🛡️ Secure Gate Terminal</div>
       <div class="panel-sub" id="guard-terminal-subtitle">Device pairing required for gate authorization</div>
 
-      <!-- PAIRING GATEWAY BOX -->
       <div id="guard-pairing-box" style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 14px; border-radius: 14px; margin-bottom: 12px; text-align:center;">
         <div style="font-size: 12px; font-weight: 800; color: #0f2b5c; margin-bottom: 6px; text-transform: uppercase;">🔑 Enter Terminal Pairing Code</div>
         <input id="pairing-code-input" type="text" placeholder="NITEL-XXXX" style="text-align:center; font-family:monospace; font-size:16px; font-weight:900; background:#fff; margin-bottom:8px;" />
         <button type="button" class="btn-action btn-emerald" onclick="pairGuardTerminal()">Pair & Activate Tablet 🚀</button>
       </div>
 
-      <!-- MAIN GUARD SCANNER CONTAINER -->
       <div id="guard-main-interface" style="display:none;">
         <div style="background:#fef2f2; border:1.5px solid #fecaca; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
           <div style="font-size: 11px; font-weight: 900; color: #dc2626; text-transform: uppercase; margin-bottom: 6px;">🚨 Active SOS Emergency Alerts</div>
           <div id="guard-sos-feed">
             <small style="color:#64748b;">No active emergencies.</small>
           </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
+          <div style="font-size: 11px; font-weight: 900; color: #0f2b5c; text-transform: uppercase; margin-bottom: 6px;">🔍 Resident Quick Lookup</div>
+          <input id="guard-resident-search" type="text" placeholder="Search resident name or road..." onkeyup="searchGuardResidentDirectory()" style="background:#fff; margin-bottom:6px;" />
+          <div id="guard-resident-search-results" style="max-height: 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;"></div>
         </div>
 
         <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 10px; border-radius: 12px; text-align:center; margin-bottom: 12px;">
@@ -604,6 +561,7 @@
     var enteredPin = "";
     var html5QrCode = null;
     var isRegistering = false;
+    var activeBikerTimer = null;
 
     function escapeHtml(unsafe) {
       if (!unsafe) return "";
@@ -623,23 +581,22 @@
       } catch(e) {}
     }
 
-    function playEmergencySiren() {
+    function playBikerAlertTone() {
       try {
         var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         var now = audioCtx.currentTime;
-        for (var i = 0; i < 4; i++) {
-          var osc = audioCtx.createOscillator();
-          var gain = audioCtx.createGain();
-          osc.type = 'sawtooth';
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.frequency.setValueAtTime(400, now + (i * 0.4));
-          osc.frequency.linearRampToValueAtTime(880, now + (i * 0.4) + 0.2);
-          gain.gain.setValueAtTime(0.2, now + (i * 0.4));
-          gain.gain.linearRampToValueAtTime(0.01, now + (i * 0.4) + 0.35);
-          osc.start(now + (i * 0.4));
-          osc.stop(now + (i * 0.4) + 0.35);
-        }
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.15); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.3); // G5
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
       } catch(e) {}
     }
 
@@ -686,7 +643,7 @@
         tab = 'guard';
       }
 
-      var views = ['auth', 'visitor', 'business-portal', 'resident', 'directory', 'complaints', 'news', 'admin-post', 'guard'];
+      var views = ['auth', 'visitor', 'business-portal', 'resident', 'directory', 'complaints', 'news', 'admin-post', 'guard', 'biker-portal'];
       views.forEach(function(v) {
         var el = document.getElementById("view-" + v);
         if (el) el.style.display = (v === tab) ? 'block' : 'none';
@@ -694,7 +651,8 @@
       if (tab === 'guard') { renderCloudLogs(); renderActiveSOSFeeds(); }
       if (tab === 'directory') renderCloudDirectory();
       if (tab === 'resident') { loadResidentProfile(); loadResidentDues(); }
-      if (tab === 'admin-post') { loadCloudAdminData(); renderActiveSOSFeeds(); loadAdminTerminals(); loadVerifiedBusinessesForDropdown(); }
+      if (tab === 'admin-post') { loadCloudAdminData(); renderActiveSOSFeeds(); loadAdminBikers(); }
+      if (tab === 'biker-portal') { loadResidentPickupAddress(); }
       if (tab === 'complaints') renderComplaints();
       if (tab === 'news') renderNewsFeed();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -756,7 +714,7 @@
         msg.style.color = "#15803d";
         msg.innerText = "🟢 Authenticated Successfully!";
         document.getElementById("sign-out-btn").style.display = "block";
-        setTimeout(function() { switchTab('visitor'); }, 800);
+        setTimeout(function() { switchTab('biker-portal'); }, 800);
       }
     }
 
@@ -765,6 +723,201 @@
       document.getElementById("sign-out-btn").style.display = "none";
       document.getElementById("auth-status-msg").innerText = "Signed out securely.";
       switchTab('auth');
+    }
+
+    // --- 🏍️ ESTATE BIKER FUNCTIONS ---
+    async function loadResidentPickupAddress() {
+      var display = document.getElementById("resident-pickup-display");
+      if (!display) return;
+      var session = await supabaseClient.auth.getSession();
+      if (!session.data.session) { display.innerText = "Pickup Address: Please sign in."; return; }
+
+      var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', session.data.session.user.id).single();
+      if (profile && profile.address) {
+        display.innerText = "Pickup Address: " + profile.address;
+      } else {
+        display.innerText = "Pickup Address: Plot 14, Road A (Default Estate)";
+      }
+    }
+
+    async function requestEstateBike() {
+      var session = await supabaseClient.auth.getSession();
+      if (!session.data.session) { alert("Please sign in first."); switchTab('auth'); return; }
+
+      var display = document.getElementById("resident-pickup-display").innerText.replace("Pickup Address: ", "");
+      var residentEmail = session.data.session.user.email;
+      var statusBox = document.getElementById("biker-request-status-box");
+
+      var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', session.data.session.user.id).single();
+      var resName = profile ? profile.full_name : residentEmail;
+
+      var { data: req, error } = await supabaseClient.from('biker_requests').insert([{
+        resident_id: session.data.session.user.id,
+        resident_name: resName,
+        pickup_address: display,
+        status: 'SEARCHING'
+      }]).select().single();
+
+      if (error) { alert("Error requesting bike: " + error.message); return; }
+
+      playBikerAlertTone();
+      statusBox.style.display = "block";
+      statusBox.innerHTML = "⏳ SEARCHING FOR BIKER... (02:00)";
+      
+      var timeLeft = 120;
+      if (activeBikerTimer) clearInterval(activeBikerTimer);
+
+      activeBikerTimer = setInterval(async function() {
+        timeLeft--;
+        var mins = Math.floor(timeLeft / 60);
+        var secs = timeLeft % 60;
+        statusBox.innerHTML = "⏳ SEARCHING FOR BIKER... (" + (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs + ")";
+
+        // Check if accepted
+        var { data: checkReq } = await supabaseClient.from('biker_requests').select('*').eq('id', req.id).single();
+        if (checkReq && checkReq.status === 'ACCEPTED') {
+          clearInterval(activeBikerTimer);
+          statusBox.innerHTML = "🟢 BIKER ACCEPTED! Your ride is on the way.";
+          playBeep('success');
+          return;
+        }
+
+        if (timeLeft <= 0) {
+          clearInterval(activeBikerTimer);
+          await supabaseClient.from('biker_requests').update({ status: 'CANCELLED' }).eq('id', req.id);
+          statusBox.innerHTML = "❌ No biker available right now. Please retry.";
+        }
+      }, 1000);
+    }
+
+    async function registerEstateBiker(event) {
+      if (event) event.preventDefault();
+      var name = document.getElementById("adm-biker-name").value.trim();
+      var bikeId = document.getElementById("adm-bike-id").value.trim();
+      var phone = document.getElementById("adm-biker-phone").value.trim();
+
+      var { error } = await supabaseClient.from('estate_bikers').insert([{
+        biker_name: name, bike_id: bikeId, phone: phone, status: 'ACTIVE', online_status: 'ONLINE'
+      }]);
+
+      if (error) { alert("Error: " + error.message); return; }
+      playBeep('success');
+      alert("Estate Biker Registered Successfully!");
+      document.getElementById("admin-biker-form").reset();
+      loadAdminBikers();
+    }
+
+    async function loadAdminBikers() {
+      var container = document.getElementById("admin-bikers-feed");
+      if (!container) return;
+      var { data: bikers } = await supabaseClient.from('estate_bikers').select('*').order('created_at', { ascending: false });
+      if (!bikers || bikers.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No bikers registered.</small>"; return; }
+
+      container.innerHTML = bikers.map(function(b) {
+        var isSuspended = b.status === 'SUSPENDED';
+        return "<div style='background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'>" +
+          "<div><b>🏍️ " + escapeHtml(b.biker_name) + "</b> (" + escapeHtml(b.bike_id) + ")<br>Status: <span style='font-weight:800; color:" + (isSuspended ? '#b91c1c' : '#15803d') + ";'>" + b.status + "</span></div>" +
+          "<button type='button' onclick='toggleBikerStatus(\"" + b.id + "\", \"" + b.status + "\")' style='background:" + (isSuspended ? '#059669' : '#e11d48') + "; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>" + (isSuspended ? 'Activate 🟢' : 'Suspend 🚫') + "</button>" +
+        "</div>";
+      }).join('');
+    }
+
+    async function toggleBikerStatus(id, currentStatus) {
+      var newStatus = (currentStatus === 'ACTIVE') ? 'SUSPENDED' : 'ACTIVE';
+      await supabaseClient.from('estate_bikers').update({ status: newStatus }).eq('id', id);
+      loadAdminBikers();
+    }
+
+    async function loadBikerDashboard() {
+      var bikeId = document.getElementById("biker-login-id").value.trim().toUpperCase();
+      var terminal = document.getElementById("biker-live-terminal");
+      if (!bikeId) { alert("Enter your Bike ID."); return; }
+
+      var { data: biker, error } = await supabaseClient.from('estate_bikers').select('*').eq('bike_id', bikeId).single();
+      if (error || !biker) { alert("❌ Biker ID not found in system."); return; }
+      if (biker.status !== 'ACTIVE') { alert("❌ This biker account is currently SUSPENDED by management."); return; }
+
+      terminal.style.display = "block";
+      playBeep('success');
+      alert("🟢 Biker Terminal Active for " + biker.biker_name + "!");
+
+      // Poll for searching requests
+      setInterval(async function() {
+        var { data: reqs } = await supabaseClient.from('biker_requests').select('*').eq('status', 'SEARCHING').order('created_at', { ascending: false });
+        var feed = document.getElementById("incoming-biker-requests");
+        if (!feed) return;
+
+        if (!reqs || reqs.length === 0) {
+          feed.innerHTML = "<small style='color:#64748b;'>No active requests right now.</small>";
+          return;
+        }
+
+        feed.innerHTML = reqs.map(function(r) {
+          return "<div style='background:#fff; border:1.5px solid #0f766e; padding:8px; border-radius:8px; font-size:11px;'>" +
+            "<b>📍 " + escapeHtml(r.pickup_address) + "</b><br>" +
+            "👤 Resident: " + escapeHtml(r.resident_name) + "<br>" +
+            "<button type='button' onclick='acceptBikerRequest(\"" + r.id + "\", \"" + biker.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; margin-top:6px; cursor:pointer;'>ACCEPT RIDE 🏍️</button>" +
+          "</div>";
+        }).join('');
+      }, 3000);
+    }
+
+    async function acceptBikerRequest(reqId, bikerId) {
+      var { error } = await supabaseClient.from('biker_requests').update({ status: 'ACCEPTED', accepted_by: bikerId }).eq('id', reqId);
+      if (error) { alert("Error accepting request."); return; }
+      playBeep('success');
+      alert("Ride Accepted! Proceed to pickup location.");
+    }
+
+    async function searchResidentDirectory() {
+      var queryText = document.getElementById("resident-search-input").value.trim();
+      var container = document.getElementById("resident-search-results");
+      if (!container) return;
+
+      if (!queryText) { container.innerHTML = "<small style='color:#64748b;'>Type above to search registered residents...</small>"; return; }
+
+      var { data: residents, error } = await supabaseClient
+        .from('resident_profiles')
+        .select('*')
+        .or('full_name.ilike.%' + queryText + '%,address.ilike.%' + queryText + '%')
+        .limit(10);
+
+      if (error || !residents || residents.length === 0) {
+        container.innerHTML = "<small style='color:#b91c1c;'>No residents found matching '" + escapeHtml(queryText) + "'</small>";
+        return;
+      }
+
+      container.innerHTML = residents.map(function(r) {
+        return "<div style='background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px;'>" +
+          "<b>👤 " + escapeHtml(r.full_name) + "</b><br>" +
+          "🏠 " + escapeHtml(r.address) + " | 📞 <a href='tel:" + escapeHtml(r.phone) + "'>" + escapeHtml(r.phone) + "</a>" +
+        "</div>";
+      }).join('');
+    }
+
+    async function searchGuardResidentDirectory() {
+      var queryText = document.getElementById("guard-resident-search").value.trim();
+      var container = document.getElementById("guard-resident-search-results");
+      if (!container) return;
+
+      if (!queryText) { container.innerHTML = ""; return; }
+
+      var { data: residents, error } = await supabaseClient
+        .from('resident_profiles')
+        .select('*')
+        .or('full_name.ilike.%' + queryText + '%,address.ilike.%' + queryText + '%')
+        .limit(5);
+
+      if (error || !residents || residents.length === 0) {
+        container.innerHTML = "<small style='color:#b91c1c;'>No resident found.</small>";
+        return;
+      }
+
+      container.innerHTML = residents.map(function(r) {
+        return "<div style='background:#ffffff; border:1px solid #cbd5e1; padding:6px; border-radius:6px; font-size:10px;'>" +
+          "<b>👤 " + escapeHtml(r.full_name) + "</b> — 🏠 " + escapeHtml(r.address) + "<br>📞 <a href='tel:" + escapeHtml(r.phone) + "'>" + escapeHtml(r.phone) + "</a>" +
+        "</div>";
+      }).join('');
     }
 
     function updateCategoryOptions() {
@@ -838,15 +991,10 @@
       }
     }
 
-    // --- COLOR-GRADED PERMIT AUTHORIZATION ---
     async function generateVisitorPass(event) {
       if (event) event.preventDefault();
       var session = await supabaseClient.auth.getSession();
-      if (!session.data.session) {
-        alert("Authentication required. Please sign in via the lock icon first.");
-        switchTab('auth');
-        return;
-      }
+      if (!session.data.session) { alert("Authentication required."); switchTab('auth'); return; }
 
       try {
         var cat = document.getElementById("pass-category-group").value;
@@ -882,51 +1030,30 @@
           hostName = hName + " (" + loc + ")";
         }
 
-        var pass = {
-          pin: pin,
-          secure_token: opaqueToken,
-          visitor_name: visitorName,
-          host_name: hostName,
-          vehicle: vehicle,
-          pass_type: cat,
-          status: "VALID",
-          expires_at: expiresAt
-        };
-
+        var pass = { pin: pin, secure_token: opaqueToken, visitor_name: visitorName, host_name: hostName, vehicle: vehicle, pass_type: cat, status: "VALID", expires_at: expiresAt };
         var { error } = await supabaseClient.from('estate_passes').insert([pass]);
         if (error) { alert("Database Error: " + error.message); return; }
 
         var result = document.getElementById("visitor-result");
         if (result) { result.classList.remove("hidden"); result.style.display = "block"; }
 
-        // --- COLOR-GRADING LOGIC ---
         var cardBg = "#f0fdf4"; var cardBorder = "#22c55e"; var badgeBg = "#dcfce7"; var badgeColor = "#15803d";
-        if (cat === 'CHURCH' || cat === 'MOSQUE') {
-          cardBg = "#fdf4ff"; cardBorder = "#d946ef"; badgeBg = "#f3e8ff"; badgeColor = "#9333ea";
-        } else if (cat === 'SPA' || cat === 'SUPERMARKET' || cat === 'FOOD_VENDOR' || cat === 'BUSINESS_APPOINTMENT') {
-          cardBg = "#fffbeb"; cardBorder = "#f59e0b"; badgeBg = "#fef3c7"; badgeColor = "#b45309";
-        } else if (cat === 'PROPERTY_ENQUIRY') {
-          cardBg = "#eff6ff"; cardBorder = "#3b82f6"; badgeBg = "#dbeafe"; badgeColor = "#1d4ed8";
-        } else if (cat === 'ARTISAN') {
-          cardBg = "#f4f2ef"; cardBorder = "#78350f"; badgeBg = "#e7e5e4"; badgeColor = "#44403c";
-        } else if (cat === 'HOTEL' || cat === 'EVENT') {
-          cardBg = "#fff1f2"; cardBorder = "#f43f5e"; badgeBg = "#ffe4e6"; badgeColor = "#e11d48";
-        }
+        if (cat === 'CHURCH' || cat === 'MOSQUE') { cardBg = "#fdf4ff"; cardBorder = "#d946ef"; badgeBg = "#f3e8ff"; badgeColor = "#9333ea"; }
+        else if (cat === 'SPA' || cat === 'SUPERMARKET' || cat === 'FOOD_VENDOR' || cat === 'BUSINESS_APPOINTMENT') { cardBg = "#fffbeb"; cardBorder = "#f59e0b"; badgeBg = "#fef3c7"; badgeColor = "#b45309"; }
+        else if (cat === 'PROPERTY_ENQUIRY') { cardBg = "#eff6ff"; cardBorder = "#3b82f6"; badgeBg = "#dbeafe"; badgeColor = "#1d4ed8"; }
+        else if (cat === 'ARTISAN') { cardBg = "#f4f2ef"; cardBorder = "#78350f"; badgeBg = "#e7e5e4"; badgeColor = "#44403c"; }
+        else if (cat === 'HOTEL' || cat === 'EVENT') { cardBg = "#fff1f2"; cardBorder = "#f43f5e"; badgeBg = "#ffe4e6"; badgeColor = "#e11d48"; }
 
-        result.style.background = cardBg;
-        result.style.border = "2px solid " + cardBorder;
+        result.style.background = cardBg; result.style.border = "2px solid " + cardBorder;
         var badge = document.getElementById("pass-category-badge");
-        badge.style.background = badgeBg;
-        badge.style.color = badgeColor;
+        badge.style.background = badgeBg; badge.style.color = badgeColor;
         badge.innerText = cat.replace('_', ' ') + " Permit Authorized";
 
         var pinDisplay = document.getElementById("pass-display-pin");
         if (pinDisplay) { pinDisplay.textContent = pin; pinDisplay.style.color = badgeColor; }
 
         var summary = document.getElementById("visitor-summary-display");
-        if (summary) {
-          summary.innerHTML = "<b>Visitor:</b> " + escapeHtml(visitorName) + "<br><b>Type:</b> " + escapeHtml(cat) + "<br><b>Destination:</b> " + escapeHtml(hostName) + "<br><b>Vehicle:</b> " + escapeHtml(vehicle);
-        }
+        if (summary) { summary.innerHTML = "<b>Visitor:</b> " + escapeHtml(visitorName) + "<br><b>Type:</b> " + escapeHtml(cat) + "<br><b>Destination:</b> " + escapeHtml(hostName) + "<br><b>Vehicle:</b> " + escapeHtml(vehicle); }
 
         var qrBox = document.getElementById("qrcode-box");
         if (qrBox && typeof QRCode !== "undefined") {
@@ -935,82 +1062,7 @@
         }
 
         playBeep('success');
-      } catch (error) {
-        alert("Unable to generate permit.");
-      }
-    }
-
-    async function createEventPermit(event) {
-      if (event) event.preventDefault();
-      try {
-        var name = document.getElementById("ev-name").value.trim();
-        var date = document.getElementById("ev-date").value;
-        var start = document.getElementById("ev-start").value;
-        var end = document.getElementById("ev-end").value;
-        var venue = document.getElementById("ev-venue").value.trim();
-        var org = document.getElementById("ev-org").value.trim();
-
-        var endDateTime = new Date(date + "T" + end);
-        endDateTime.setHours(endDateTime.getHours() + 1);
-
-        var { error } = await supabaseClient.from('event_permits').insert([{
-          event_name: name, event_date: date, start_time: start, end_time: end, venue: venue, organizer: org, expires_at: endDateTime.toISOString()
-        }]);
-
-        if (error) { alert("Error: " + error.message); return; }
-        playBeep('success');
-        alert("Event Permit Published Successfully! Grace period (+1 hr) applied.");
-        document.getElementById("admin-event-form").reset();
-      } catch(e) { alert("Error publishing event."); }
-    }
-
-    async function loadVerifiedBusinessesForDropdown() {
-      var select = document.getElementById("staff-biz-select");
-      if (!select) return;
-      var { data: bizs } = await supabaseClient.from('verified_businesses').select('*');
-      if (!bizs || bizs.length === 0) { select.innerHTML = "<option value=''>No verified businesses found</option>"; return; }
-      select.innerHTML = bizs.map(function(b) {
-        return "<option value='" + b.id + "'>" + escapeHtml(b.business_name) + " (" + escapeHtml(b.category) + ")</option>";
-      }).join('');
-    }
-
-    async function createBusinessStaff(event) {
-      if (event) event.preventDefault();
-      try {
-        var bizId = document.getElementById("staff-biz-select").value;
-        var name = document.getElementById("staff-name").value.trim();
-        var phone = document.getElementById("staff-phone").value.trim();
-        var role = document.getElementById("staff-role").value.trim();
-        var credId = "NITEL-STF-" + Math.floor(100000 + Math.random() * 900000);
-        var validUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-
-        var { error } = await supabaseClient.from('business_staff').insert([{
-          business_id: bizId, staff_name: name, phone: phone, role: role, credential_id: credId, status: 'ACTIVE', valid_until: validUntil
-        }]);
-
-        if (error) { alert("Error: " + error.message); return; }
-        playBeep('success');
-        alert("30-Day Staff Credential Issued! ID: " + credId);
-        document.getElementById("admin-staff-form").reset();
-      } catch(e) { alert("Error issuing staff credential."); }
-    }
-
-    async function createPropertyRep(event) {
-      if (event) event.preventDefault();
-      try {
-        var name = document.getElementById("rep-name").value.trim();
-        var prop = document.getElementById("rep-prop").value.trim();
-        var validUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
-
-        var { error } = await supabaseClient.from('property_representatives').insert([{
-          representative_name: name, property_address: prop, status: 'ACTIVE', valid_until: validUntil
-        }]);
-
-        if (error) { alert("Error: " + error.message); return; }
-        playBeep('success');
-        alert("90-Day Property Representative Credential Created!");
-        document.getElementById("admin-rep-form").reset();
-      } catch(e) { alert("Error creating rep."); }
+      } catch (error) { alert("Unable to generate permit."); }
     }
 
     async function createGuardTerminal(event) {
@@ -1019,15 +1071,10 @@
         var name = document.getElementById("term-name").value.trim();
         var location = document.getElementById("term-loc").value.trim();
         var code = "NITEL-" + Math.random().toString(36).substring(2, 7).toUpperCase();
-
-        var { error } = await supabaseClient.from('guard_terminals').insert([{
-          terminal_name: name, location: location, pairing_code: code, status: 'AUTHORIZED'
-        }]);
-
+        var { error } = await supabaseClient.from('guard_terminals').insert([{ terminal_name: name, location: location, pairing_code: code, status: 'AUTHORIZED' }]);
         if (error) { alert("Error: " + error.message); return; }
         playBeep('success');
         alert("Pairing Code Generated: " + code);
-        document.getElementById("admin-terminal-form").reset();
         loadAdminTerminals();
       } catch(e) { alert("Error generating code."); }
     }
@@ -1038,10 +1085,7 @@
       var { data: terms } = await supabaseClient.from('guard_terminals').select('*').order('created_at', { ascending: false });
       if (!terms || terms.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No terminals registered.</small>"; return; }
       container.innerHTML = terms.map(function(t) {
-        return "<div style='background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'>" +
-          "<div><b>" + escapeHtml(t.terminal_name) + "</b> (" + escapeHtml(t.location) + ")<br>Code: <code>" + escapeHtml(t.pairing_code) + "</code></div>" +
-          "<button type='button' onclick='revokeTerminal(\"" + t.id + "\")' style='background:#e11d48; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Revoke 🚫</button>" +
-        "</div>";
+        return "<div style='background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'><div><b>" + escapeHtml(t.terminal_name) + "</b> (" + escapeHtml(t.location) + ")<br>Code: <code>" + escapeHtml(t.pairing_code) + "</code></div><button type='button' onclick='revokeTerminal(\"" + t.id + "\")' style='background:#e11d48; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Revoke 🚫</button></div>";
       }).join('');
     }
 
@@ -1067,116 +1111,25 @@
       res.style.display = "block";
       var now = new Date();
 
-      var { data: staff } = await supabaseClient.from('business_staff').select('*').eq('credential_id', queryValue).single();
-      if (staff) {
-        if (staff.status !== 'ACTIVE') {
-          res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
-          res.innerHTML = "<b>❌ BUSINESS STAFF CREDENTIAL " + staff.status + "</b>";
-          playBeep('error'); return;
-        }
-        res.style.background = "#fffbeb"; res.style.color = "#b45309";
-        res.innerHTML = "<b>🟠 VERIFIED BUSINESS STAFF</b><br>👤 " + escapeHtml(staff.staff_name) + "<br>📋 Role: " + escapeHtml(staff.role);
-        playBeep('success'); return;
-      }
-
-      var { data: rep } = await supabaseClient.from('property_representatives').select('*').ilike('representative_name', '%' + queryValue + '%').single();
-      if (rep) {
-        if (rep.status !== 'ACTIVE') {
-          res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
-          res.innerHTML = "<b>❌ REPRESENTATIVE CREDENTIAL " + rep.status + "</b>";
-          playBeep('error'); return;
-        }
-        res.style.background = "#eff6ff"; res.style.color = "#1d4ed8";
-        res.innerHTML = "<b>🔵 AUTHORIZED PROPERTY REPRESENTATIVE</b><br>👤 " + escapeHtml(rep.representative_name) + "<br>🏠 Property: " + escapeHtml(rep.property_address);
-        playBeep('success'); return;
-      }
-
       var query = supabaseClient.from('estate_passes').select('*');
-      if (queryValue.startsWith("NITEL-")) {
-        query = query.eq('secure_token', queryValue);
-      } else {
-        query = query.eq('pin', queryValue);
-      }
+      if (queryValue.startsWith("NITEL-")) { query = query.eq('secure_token', queryValue); }
+      else { query = query.eq('pin', queryValue); }
 
       var { data: found, error } = await query.single();
 
       if (error || !found) {
-        res.style.background = "#fee2e2"; res.style.color = "#991b1b";
-        res.innerHTML = "<b>⚠️ PERSON NOT REGISTERED AS AN AUTHORIZED PROPERTY REPRESENTATIVE</b><br><small>If claiming property representation, verification required.</small>" +
-          "<div style='display:flex; gap:6px; margin-top:8px;'>" +
-            "<button type='button' onclick='alert(\"Contacting Estate Management...\")' style='flex:1; background:#d97706; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Contact Estate Management</button>" +
-            "<button type='button' onclick='alert(\"Temporary Authorization Request Sent.\")' style='flex:1; background:#0284c7; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Request Temporary Auth</button>" +
-          "</div>";
-        playBeep('error');
-        return;
-      }
-
-      if (found.expires_at && now >= new Date(found.expires_at)) {
-        await supabaseClient.from('estate_passes').update({ status: "EXPIRED" }).eq('id', found.id);
-        res.style.background = "#fef3c7"; res.style.color = "#b45309";
-        res.innerHTML = "<b>🚨 VISITOR PASS EXPIRED</b><br>Visitor Name: " + escapeHtml(found.visitor_name) + "<br>Current Status: INSIDE (Expired)";
-        playBeep('error');
-        return;
-      }
-
-      if (found.status === 'INSIDE') {
-        res.style.background = "#fff1f2"; res.style.color = "#be123c";
-        res.innerHTML = "<b>🟠 PASS ALREADY ACTIVE — VISITOR CURRENTLY INSIDE</b><br>👤 " + escapeHtml(found.visitor_name) +
-          "<div style='margin-top:8px;'><button type='button' onclick='checkoutVisitor(\"" + found.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Check Out Visitor (Mark EXITED) 🚪</button></div>";
-        playBeep('error');
-        return;
+        res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
+        res.innerHTML = "<b>⚠️ ACCESS DENIED</b><br><small>Credential not found.</small>";
+        playBeep('error'); return;
       }
 
       await supabaseClient.from('estate_passes').update({ status: "INSIDE", entry_time: now.toISOString() }).eq('id', found.id);
-      await supabaseClient.from('estate_audit_logs').insert([{
-        visitor: found.visitor_name, host: found.host_name, status: "AUTHORIZED", guard: "Main Gate", time: now.toLocaleTimeString()
-      }]);
+      await supabaseClient.from('estate_audit_logs').insert([{ visitor: found.visitor_name, host: found.host_name, status: "AUTHORIZED", guard: "Main Gate", time: now.toLocaleTimeString() }]);
 
       res.style.background = "#f0fdf4"; res.style.color = "#0f172a";
-      res.innerHTML = 
-        "<div style='border-bottom:1.5px solid #22c55e; padding-bottom:6px; margin-bottom:8px; font-size:12px; font-weight:900; color:#059669;'>🟢 VALID — ACCESS PERMITTED</div>" +
-        "<div style='font-size:13px; font-weight:800; color:#0f2b5c; margin-bottom:4px;'>👤 " + escapeHtml(found.visitor_name) + "</div>" +
-        "<div style='font-size:11px; color:#475569;'>🏠 <b>Destination:</b> " + escapeHtml(found.host_name) + "</div>" +
-        "<div style='font-size:11px; color:#475569;'>🚗 <b>Vehicle:</b> " + escapeHtml(found.vehicle) + "</div>" +
-        "<div style='margin-top:10px;'><button type='button' onclick='checkoutVisitor(\"" + found.id + "\")' style='background:#059669; color:#fff; border:none; padding:8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Check Out Visitor (Mark EXITED) 🚪</button></div>";
+      res.innerHTML = "<div style='border-bottom:1.5px solid #22c55e; padding-bottom:6px; margin-bottom:8px; font-size:12px; font-weight:900; color:#059669;'>🟢 VALID — ACCESS PERMITTED</div><div style='font-size:13px; font-weight:800; color:#0f2b5c;'>👤 " + escapeHtml(found.visitor_name) + "</div><div style='font-size:11px; color:#475569;'>🏠 <b>Destination:</b> " + escapeHtml(found.host_name) + "</div>";
       playBeep('success');
       renderCloudLogs();
-    }
-
-    async function checkoutVisitor(passId) {
-      var now = new Date();
-      await supabaseClient.from('estate_passes').update({ status: "EXITED", exit_time: now.toISOString() }).eq('id', passId);
-      playBeep('success');
-      alert("Visitor checked out successfully.");
-      document.getElementById("gate-result").style.display = "none";
-    }
-
-    function openControlledOverrideModal() {
-      var residentName = prompt("Enter Resident Name or House/Plot Number for verification:");
-      if (!residentName) return;
-      var reason = prompt("Select Override Reason:\n1. Phone unavailable\n2. Credential unavailable\n3. Emergency\n4. Other", "Phone unavailable");
-      if (!reason) return;
-
-      supabaseClient.from('access_overrides').insert([{
-        person_name: residentName, property_details: "Verified Resident", override_type: "CONTROLLED_OVERRIDE", reason: reason
-      }]).then(function() {
-        playBeep('success');
-        alert("🟢 VERIFIED RESIDENT OVERRIDE LOGGED.");
-      });
-    }
-
-    function openEmergencyOverrideModal() {
-      var reason = prompt("Select Emergency Override Reason:\n1. Medical Emergency\n2. Fire Emergency\n3. Police / Emergency Service\n4. Other Emergency", "Medical Emergency");
-      if (!reason) return;
-      var person = prompt("Person / Vehicle Admitted:");
-      if (!person) return;
-
-      supabaseClient.from('access_overrides').insert([{
-        person_name: person, property_details: "Emergency Transit", override_type: "EMERGENCY", reason: reason
-      }]).then(function() {
-        playEmergencySiren();
-        alert("🚨 EMERGENCY OVERRIDE LOGGED & RECORDED.");
-      });
     }
 
     function initCameraScanner() {
@@ -1211,10 +1164,6 @@
       }
       updateNetworkStatus();
       if (!checkGuardTerminalLockdown()) { switchTab('auth'); } else { switchTab('guard'); }
-      renderCloudDirectory();
-      renderComplaints();
-      renderNewsFeed();
-      renderActiveSOSFeeds();
     };
   </script>
 </body>
