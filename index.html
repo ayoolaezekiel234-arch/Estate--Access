@@ -88,7 +88,7 @@
     <div class="top-bar">
       <div class="icon-btn" onclick="switchTab('auth')">🔐</div>
       <div id="network-indicator" class="network-badge">🟢 Cloud Secure</div>
-      <div class="header-icons">
+      <div class="header-icons" id="header-nav-icons">
         <div class="icon-btn" onclick="switchTab('news')">📰</div>
         <div class="icon-btn" onclick="switchTab('directory')">🏢</div>
         <div class="icon-btn" onclick="switchTab('resident')">📍</div>
@@ -105,7 +105,7 @@
     </div>
 
     <!-- Navigation Grid -->
-    <div class="quick-grid">
+    <div class="quick-grid" id="main-quick-grid">
       <div class="grid-card card-dark" onclick="switchTab('visitor')">
         <div class="card-icon">🚗</div>
         <div class="card-title">Pass</div>
@@ -140,12 +140,12 @@
       </div>
     </div>
 
-    <button type="button" class="btn-hero" onclick="switchTab('visitor')">
+    <button type="button" class="btn-hero" id="hero-pass-btn" onclick="switchTab('visitor')">
       + Create Visitor Pass
     </button>
 
     <!-- SOS EMERGENCY PANIC BUTTON -->
-    <button type="button" class="btn-sos" onclick="triggerEmergencySOS()">
+    <button type="button" class="btn-sos" id="hero-sos-btn" onclick="triggerEmergencySOS()">
       🚨 EMERGENCY SOS PANIC BUTTON
     </button>
 
@@ -167,9 +167,26 @@
         <input id="auth-password" type="password" placeholder="••••••••" style="background:#fff;" />
       </div>
 
+      <!-- Extended Sign-Up Fields -->
+      <div id="signup-extra-fields" style="display:none; background:#f8fafc; padding:10px; border-radius:10px; border:1px solid #cbd5e1; margin-top:10px;">
+        <div style="font-size:11px; font-weight:800; color:#0f2b5c; margin-bottom:6px;">📝 Additional Details for Registration</div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input id="reg-fullname" type="text" placeholder="e.g. Chief Owueme Mitchelle" style="background:#fff;" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input id="reg-phone" type="tel" placeholder="08108429710" style="background:#fff;" />
+        </div>
+        <div class="form-group">
+          <label>House Address (Plot & Avenue)</label>
+          <input id="reg-address" type="text" placeholder="Plot 14, Avenue 2" style="background:#fff;" />
+        </div>
+      </div>
+
       <div style="display:flex; gap:8px; margin-top:12px;">
         <button type="button" class="btn-action btn-blue" style="flex:1;" onclick="handleLogin()">Secure Sign In</button>
-        <button type="button" class="btn-action btn-outline" style="flex:1;" onclick="handleSignUp()">Register Account</button>
+        <button type="button" class="btn-action btn-outline" style="flex:1;" onclick="toggleSignUpMode()" id="signup-mode-btn">Register Account</button>
       </div>
       <button type="button" class="btn-action btn-rose" style="margin-top:8px; display:none;" id="sign-out-btn" onclick="handleSignOut()">Sign Out</button>
       <div id="auth-status-msg" style="font-size:11px; margin-top:8px; text-align:center; font-weight:700; color:#0369a1;"></div>
@@ -387,17 +404,45 @@
       <div id="news-feed" style="margin-top:10px;"></div>
     </div>
 
-    <!-- ADMIN PORTAL (WITH LEVY PUBLISHER & SOS ALERTS) -->
+    <!-- ADMIN PORTAL (WITH TERMINAL PAIRING, PASS REVOCATION, LEVY PUBLISHER & SOS ALERTS) -->
     <div id="view-admin-post" class="panel-card" style="display: none;">
       <div class="panel-title">👑 Executive Admin Command Center</div>
       <div class="panel-sub">Role-Restricted Cloud Management & Approvals</div>
       <div id="admin-auth-warning" style="color:#b91c1c; font-size:12px; font-weight:700; margin-bottom:10px;"></div>
       
+      <!-- DEVICE PAIRING MANAGER FOR GUARD TABLETS -->
+      <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🛡️ Guard Terminal Pairing & Management</div>
+        <form id="admin-terminal-form" onsubmit="createGuardTerminal(event); return false;">
+          <div class="form-row form-group">
+            <div>
+              <label>Terminal Name</label>
+              <input id="term-name" type="text" placeholder="Gate Terminal 01" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Location</label>
+              <input id="term-loc" type="text" placeholder="Main Gate" required style="background:#fff;" />
+            </div>
+          </div>
+          <button type="submit" class="btn-action btn-blue" style="margin-top:8px;">Generate Pairing Code ⚙️</button>
+        </form>
+        <div id="admin-terminals-feed" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;"></div>
+      </div>
+
       <!-- LIVE EMERGENCY SOS ALERTS FEED -->
       <div style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
         <div style="font-size: 12px; font-weight: 900; color: #dc2626; margin-bottom: 8px; text-transform: uppercase;">🚨 Active Emergency SOS Feed</div>
         <div id="admin-sos-feed" style="display:flex; flex-direction:column; gap:6px;">
           <small style='color:#64748b;'>No active emergencies.</small>
+        </div>
+      </div>
+
+      <!-- PASS REVOCATION MANAGER -->
+      <div style="background: #fdf2f8; border: 1.5px solid #fbcfe8; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #db2777; margin-bottom: 8px; text-transform: uppercase;">🚫 Active Passes & Revocation</div>
+        <div style="font-size: 11px; color: #475569; margin-bottom: 8px;">Tap revoke to instantly invalidate any visitor or business pass:</div>
+        <div id="admin-active-passes-feed" style="max-height: 160px; overflow-y: auto; display:flex; flex-direction:column; gap:6px;">
+          <small style='color:#64748b;'>Loading active passes...</small>
         </div>
       </div>
 
@@ -440,48 +485,58 @@
       <div id="admin-cloud-feed" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;"></div>
     </div>
 
-    <!-- GUARD GATE TERMINAL (WITH SOS ALERTS FEED) -->
+    <!-- GUARD GATE TERMINAL (WITH PAIRING SCREEN & STRICT RESTRICTION) -->
     <div id="view-guard" class="panel-card" style="display: none;">
       <div class="panel-title">🛡️ Secure Gate Terminal</div>
-      <div class="panel-sub">Live QR Scanner & Server-Side Database Verification</div>
+      <div class="panel-sub" id="guard-terminal-subtitle">Device pairing required for gate authorization</div>
 
-      <!-- GUARD EMERGENCY SOS FEED -->
-      <div style="background:#fef2f2; border:1.5px solid #fecaca; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
-        <div style="font-size: 11px; font-weight: 900; color: #dc2626; text-transform: uppercase; margin-bottom: 6px;">🚨 Active SOS Emergency Alerts</div>
-        <div id="guard-sos-feed">
-          <small style="color:#64748b;">No active emergencies.</small>
+      <!-- PAIRING GATEWAY BOX (SHOWN IF TABLET NOT PAIRED YET) -->
+      <div id="guard-pairing-box" style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 14px; border-radius: 14px; margin-bottom: 12px; text-align:center;">
+        <div style="font-size: 12px; font-weight: 800; color: #0f2b5c; margin-bottom: 6px; text-transform: uppercase;">🔑 Enter Terminal Pairing Code</div>
+        <div style="font-size: 11px; color: #64748b; margin-bottom: 10px;">Input the pairing code generated by management (e.g. NITEL-7K42):</div>
+        <input id="pairing-code-input" type="text" placeholder="NITEL-XXXX" style="text-align:center; font-family:monospace; font-size:16px; font-weight:900; background:#fff; margin-bottom:8px;" />
+        <button type="button" class="btn-action btn-emerald" onclick="pairGuardTerminal()">Pair & Activate Tablet 🚀</button>
+      </div>
+
+      <!-- MAIN GUARD SCANNER CONTAINER (HIDDEN UNTIL PAIRED) -->
+      <div id="guard-main-interface" style="display:none;">
+        <div style="background:#fef2f2; border:1.5px solid #fecaca; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
+          <div style="font-size: 11px; font-weight: 900; color: #dc2626; text-transform: uppercase; margin-bottom: 6px;">🚨 Active SOS Emergency Alerts</div>
+          <div id="guard-sos-feed">
+            <small style="color:#64748b;">No active emergencies.</small>
+          </div>
         </div>
-      </div>
 
-      <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 10px; border-radius: 12px; text-align:center; margin-bottom: 12px;">
-        <div id="qr-reader" style="width:100%;"></div>
-        <button type="button" class="btn-outline" style="margin-top:8px;" onclick="initCameraScanner()">📷 Start Camera QR Scanner</button>
-      </div>
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 10px; border-radius: 12px; text-align:center; margin-bottom: 12px;">
+          <div id="qr-reader" style="width:100%;"></div>
+          <button type="button" class="btn-outline" style="margin-top:8px;" onclick="initCameraScanner()">📷 Start Camera QR Scanner</button>
+        </div>
 
-      <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 12px; border-radius: 12px; text-align:center; margin: 12px 0;">
-        <span id="pin-display" style="font-size: 34px; font-family: monospace; letter-spacing: 5px; color: #0f2b5c; font-weight: 900;">------</span>
-      </div>
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 12px; border-radius: 12px; text-align:center; margin: 12px 0;">
+          <span id="pin-display" style="font-size: 34px; font-family: monospace; letter-spacing: 5px; color: #0f2b5c; font-weight: 900;">------</span>
+        </div>
 
-      <div class="keypad-grid">
-        <button type="button" class="keypad-btn" onclick="pressKey('1')">1</button>
-        <button type="button" class="keypad-btn" onclick="pressKey('2')">2</button>
-        <button type="button" class="keypad-btn" onclick="pressKey('3')">3</button>
-        <button type="button" class="keypad-btn" onclick="pressKey('4')">4</button>
-        <button type="button" class="keypad-btn" onclick="pressKey('5')">5</button>
-        <button type="button" class="keypad-btn" onclick="pressKey('6')">6</button>
-        <button type="button" class="keypad-btn" onclick="pressKey('7')">7</button>
-        <button type="button" class="keypad-btn" onclick="pressKey('8')">8</button>
-        <button type="button" class="keypad-btn" onclick="pressKey('9')">9</button>
-        <button type="button" class="keypad-btn" style="background:#fee2e2; color:#b91c1c;" onclick="clearPin()">CLR</button>
-        <button type="button" class="keypad-btn" onclick="pressKey('0')">0</button>
-        <button type="button" class="keypad-btn" style="background:#dcfce7; color:#15803d;" onclick="verifyCloudPass()">ENTER</button>
-      </div>
+        <div class="keypad-grid">
+          <button type="button" class="keypad-btn" onclick="pressKey('1')">1</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('2')">2</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('3')">3</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('4')">4</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('5')">5</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('6')">6</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('7')">7</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('8')">8</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('9')">9</button>
+          <button type="button" class="keypad-btn" style="background:#fee2e2; color:#b91c1c;" onclick="clearPin()">CLR</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('0')">0</button>
+          <button type="button" class="keypad-btn" style="background:#dcfce7; color:#15803d;" onclick="verifyCloudPass()">ENTER</button>
+        </div>
 
-      <div id="gate-result" style="display:none; padding:14px; border-radius:14px; margin-top:14px; text-align:left;"></div>
+        <div id="gate-result" style="display:none; padding:14px; border-radius:14px; margin-top:14px; text-align:left;"></div>
 
-      <div style="margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 14px;">
-        <div style="font-size:12px; font-weight:800; color:#0f2b5c; text-transform:uppercase; margin-bottom:6px;">Live Cloud Audit Trail</div>
-        <div id="audit-log-feed" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
+        <div style="margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 14px;">
+          <div style="font-size:12px; font-weight:800; color:#0f2b5c; text-transform:uppercase; margin-bottom:6px;">Live Cloud Audit Trail</div>
+          <div id="audit-log-feed" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
       </div>
     </div>
 
@@ -494,6 +549,7 @@
 
     var enteredPin = "";
     var html5QrCode = null;
+    var isRegistering = false;
 
     function escapeHtml(unsafe) {
       if (!unsafe) return "";
@@ -513,6 +569,29 @@
       } catch(e) {}
     }
 
+    function playEmergencySiren() {
+      try {
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var now = audioCtx.currentTime;
+        for (var i = 0; i < 4; i++) {
+          var osc = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.frequency.setValueAtTime(400, now + (i * 0.4));
+          osc.frequency.linearRampToValueAtTime(880, now + (i * 0.4) + 0.2);
+          
+          gain.gain.setValueAtTime(0.2, now + (i * 0.4));
+          gain.gain.linearRampToValueAtTime(0.01, now + (i * 0.4) + 0.35);
+          
+          osc.start(now + (i * 0.4));
+          osc.stop(now + (i * 0.4) + 0.35);
+        }
+      } catch(e) {}
+    }
+
     function updateNetworkStatus() {
       var indicator = document.getElementById("network-indicator");
       if (!indicator) return;
@@ -529,7 +608,35 @@
     window.addEventListener("online", updateNetworkStatus);
     window.addEventListener("offline", updateNetworkStatus);
 
+    function checkGuardTerminalLockdown() {
+      var pairedTerminal = localStorage.getItem("nitel_paired_terminal");
+      if (pairedTerminal) {
+        // If this device is a paired guard tablet, lock down navigation to ONLY Guard and News
+        var quickGrid = document.getElementById("main-quick-grid");
+        var heroBtn = document.getElementById("hero-pass-btn");
+        var heroSos = document.getElementById("hero-sos-btn");
+        var headerIcons = document.getElementById("header-nav-icons");
+
+        if (quickGrid) quickGrid.style.display = "none";
+        if (heroBtn) heroBtn.style.display = "none";
+        if (heroSos) heroSos.style.display = "none";
+        if (headerIcons) headerIcons.innerHTML = "<div class='icon-btn' onclick=\"switchTab('guard')\">🛡️</div><div class='icon-btn' onclick=\"switchTab('news')\">📰</div>";
+
+        document.getElementById("guard-pairing-box").style.display = "none";
+        document.getElementById("guard-main-interface").style.display = "block";
+        document.getElementById("guard-terminal-subtitle").innerText = "Authorized Terminal: " + pairedTerminal;
+        
+        return true;
+      }
+      return false;
+    }
+
     function switchTab(tab) {
+      if (checkGuardTerminalLockdown() && tab !== 'guard' && tab !== 'news' && tab !== 'auth') {
+        alert("🔒 Restricted: This gate tablet is locked to the Guard Terminal.");
+        tab = 'guard';
+      }
+
       var views = ['auth', 'visitor', 'business-portal', 'resident', 'directory', 'complaints', 'news', 'admin-post', 'guard'];
       views.forEach(function(v) {
         var el = document.getElementById("view-" + v);
@@ -538,16 +645,76 @@
       if (tab === 'guard') { renderCloudLogs(); renderActiveSOSFeeds(); }
       if (tab === 'directory') renderCloudDirectory();
       if (tab === 'resident') { renderFamilyMembersList(); loadResidentProfile(); loadResidentDues(); }
-      if (tab === 'admin-post') { loadCloudAdminData(); renderActiveSOSFeeds(); }
+      if (tab === 'admin-post') { loadCloudAdminData(); renderActiveSOSFeeds(); loadAdminActivePasses(); loadAdminTerminals(); }
       if (tab === 'complaints') renderComplaints();
       if (tab === 'news') renderNewsFeed();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleSignUpMode() {
+      isRegistering = !isRegistering;
+      var extraFields = document.getElementById("signup-extra-fields");
+      var modeBtn = document.getElementById("signup-mode-btn");
+      var msg = document.getElementById("auth-status-msg");
+      
+      if (isRegistering) {
+        extraFields.style.display = "block";
+        modeBtn.innerText = "Back to Sign In";
+        msg.innerText = "Fill in your details to register a new account.";
+      } else {
+        extraFields.style.display = "none";
+        modeBtn.innerText = "Register Account";
+        msg.innerText = "";
+      }
     }
 
     async function handleLogin() {
       var email = document.getElementById("auth-email").value.trim();
       var password = document.getElementById("auth-password").value.trim();
       var msg = document.getElementById("auth-status-msg");
+
+      if (isRegistering) {
+        var fullName = document.getElementById("reg-fullname").value.trim();
+        var phone = document.getElementById("reg-phone").value.trim();
+        var address = document.getElementById("reg-address").value.trim();
+
+        if (!fullName || !phone || !address) {
+          msg.style.color = "#b91c1c";
+          msg.innerText = "❌ Please fill in all registration fields.";
+          return;
+        }
+
+        var { data, error } = await supabaseClient.auth.signUp({ email: email, password: password });
+        if (error) {
+          msg.style.color = "#b91c1c";
+          msg.innerText = "❌ " + error.message;
+          return;
+        }
+
+        if (data.user) {
+          await supabaseClient.from('profiles').upsert([{
+            id: data.user.id,
+            full_name: fullName,
+            phone: phone,
+            address: address,
+            role: 'resident'
+          }]);
+
+          await supabaseClient.from('resident_profiles').upsert([{
+            user_id: data.user.id,
+            full_name: fullName,
+            phone: phone,
+            address: address
+          }], { onConflict: 'user_id' });
+        }
+
+        msg.style.color = "#15803d";
+        msg.innerText = "🟢 Account Created & Profile Saved! You can now sign in.";
+        isRegistering = false;
+        document.getElementById("signup-extra-fields").style.display = "none";
+        document.getElementById("signup-mode-btn").innerText = "Register Account";
+        return;
+      }
 
       var { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
       if (error) {
@@ -561,21 +728,6 @@
       }
     }
 
-    async function handleSignUp() {
-      var email = document.getElementById("auth-email").value.trim();
-      var password = document.getElementById("auth-password").value.trim();
-      var msg = document.getElementById("auth-status-msg");
-
-      var { data, error } = await supabaseClient.auth.signUp({ email: email, password: password });
-      if (error) {
-        msg.style.color = "#b91c1c";
-        msg.innerText = "❌ " + error.message;
-      } else {
-        msg.style.color = "#15803d";
-        msg.innerText = "🟢 Account Created! You can now sign in.";
-      }
-    }
-
     async function handleSignOut() {
       await supabaseClient.auth.signOut();
       document.getElementById("sign-out-btn").style.display = "none";
@@ -583,16 +735,89 @@
       switchTab('auth');
     }
 
-    // --- NEW: EMERGENCY SOS TRIGGER ---
+    // --- NEW: ADMIN TERMINAL PAIRING GENERATOR ---
+    async function createGuardTerminal(event) {
+      if (event) event.preventDefault();
+      try {
+        var name = document.getElementById("term-name").value.trim();
+        var location = document.getElementById("term-loc").value.trim();
+        if (!name || !location) return;
+
+        var code = "NITEL-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+
+        var { error } = await supabaseClient.from('guard_terminals').insert([{
+          terminal_name: name,
+          location: location,
+          pairing_code: code,
+          status: 'AUTHORIZED'
+        }]);
+
+        if (error) { alert("Error: " + error.message); return; }
+
+        playBeep('success');
+        alert("Terminal Pairing Code Generated Successfully!\n\nPAIRING CODE: " + code);
+        document.getElementById("admin-terminal-form").reset();
+        loadAdminTerminals();
+      } catch(e) {
+        alert("Unable to generate terminal code.");
+      }
+    }
+
+    async function loadAdminTerminals() {
+      var container = document.getElementById("admin-terminals-feed");
+      if (!container) return;
+
+      try {
+        var { data: terms } = await supabaseClient.from('guard_terminals').select('*').order('created_at', { ascending: false });
+        if (!terms || terms.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No guard terminals registered.</small>"; return; }
+
+        container.innerHTML = terms.map(function(t) {
+          return "<div style='background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'>" +
+            "<div><b>" + escapeHtml(t.terminal_name) + "</b> (" + escapeHtml(t.location) + ")<br>Code: <code style='font-weight:900; color:#0284c7;'>" + escapeHtml(t.pairing_code) + "</code></div>" +
+            "<button type='button' onclick='revokeTerminal(\"" + t.id + "\")' style='background:#e11d48; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Revoke 🚫</button>" +
+          "</div>";
+        }).join('');
+      } catch(e) {}
+    }
+
+    async function revokeTerminal(termId) {
+      if (!confirm("Revoke this terminal pairing?")) return;
+      await supabaseClient.from('guard_terminals').delete().eq('id', termId);
+      loadAdminTerminals();
+    }
+
+    // --- NEW: GUARD TABLET PAIRING GATEWAY ---
+    async function pairGuardTerminal() {
+      var code = document.getElementById("pairing-code-input").value.trim().toUpperCase();
+      if (!code) { alert("Enter pairing code."); return; }
+
+      try {
+        var { data: term, error } = await supabaseClient.from('guard_terminals').select('*').eq('pairing_code', code).single();
+        if (error || !term) {
+          alert("❌ Invalid or expired pairing code.");
+          return;
+        }
+
+        localStorage.setItem("nitel_paired_terminal", term.terminal_name + " (" + term.location + ")");
+        playBeep('success');
+        alert("🟢 Tablet Successfully Paired as " + term.terminal_name + "!");
+        location.reload();
+      } catch(e) {
+        alert("Pairing failed.");
+      }
+    }
+
     async function triggerEmergencySOS() {
+      playEmergencySiren();
+
       var session = await supabaseClient.auth.getSession();
       if (!session.data.session) {
-        alert("Please sign in first so guards know who triggered the emergency!");
+        alert("🚨 EMERGENCY ACTIVATED! Please sign in so guards know who you are.");
         switchTab('auth');
         return;
       }
 
-      var confirmSOS = confirm("🚨 EMERGENCY CONFIRMATION:\n\nThis will instantly broadcast a high-priority red alert to all active Security Guards and Admins with your profile details. Are you in danger?");
+      var confirmSOS = confirm("🚨 EMERGENCY CONFIRMATION:\n\nThis will instantly broadcast a high-priority red alert with your profile details to all active Security Guards and Admins. Proceed?");
       if (!confirmSOS) return;
 
       try {
@@ -613,15 +838,14 @@
 
         if (error) { alert("SOS Error: " + error.message); return; }
 
-        playBeep('error');
-        alert("🚨 EMERGENCY SOS BROADCASTED!\n\nGuards and Administrators have been instantly alerted with your details.");
+        playEmergencySiren();
+        alert("🚨 EMERGENCY SOS BROADCASTED!\n\nGuards and Administrators have been instantly alerted with your name, address (" + address + "), and phone number (" + phone + ").");
         switchTab('guard');
       } catch(e) {
         alert("Unable to trigger SOS.");
       }
     }
 
-    // --- NEW: RENDER ACTIVE SOS FEEDS FOR GUARDS & ADMINS ---
     async function renderActiveSOSFeeds() {
       var feeds = ['guard-sos-feed', 'admin-sos-feed'];
       
@@ -662,6 +886,49 @@
       playBeep('success');
       alert("Emergency alert cleared.");
       renderActiveSOSFeeds();
+    }
+
+    async function loadAdminActivePasses() {
+      var container = document.getElementById("admin-active-passes-feed");
+      if (!container) return;
+
+      try {
+        var { data: passes, error } = await supabaseClient
+          .from('estate_passes')
+          .select('*')
+          .in('status', ['ACTIVE', 'USED'])
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (error || !passes || passes.length === 0) {
+          container.innerHTML = "<small style='color:#64748b;'>No active passes in Cloud DB.</small>";
+          return;
+        }
+
+        container.innerHTML = passes.map(function(p) {
+          return "<div style='background:#ffffff; border:1px solid #fbcfe8; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'>" +
+            "<div>" +
+              "<b>👤 " + escapeHtml(p.visitor_name) + "</b><br>" +
+              "<small style='color:#64748b;'>PIN: <b>" + escapeHtml(p.pin) + "</b> | Type: " + escapeHtml(p.pass_type) + "</small>" +
+            "</div>" +
+            "<button type='button' onclick='revokePass(\"" + p.id + "\")' style='background:#e11d48; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Revoke 🚫</button>" +
+          "</div>";
+        }).join('');
+      } catch(e) {
+        container.innerHTML = "<small style='color:#b91c1c;'>Error loading passes.</small>";
+      }
+    }
+
+    async function revokePass(passId) {
+      var confirmRevoke = confirm("Are you sure you want to revoke this pass? It will instantly fail verification at the gate.");
+      if (!confirmRevoke) return;
+
+      var { error } = await supabaseClient.from('estate_passes').update({ status: 'REVOKED' }).eq('id', passId);
+      if (error) { alert("Error revoking pass: " + error.message); return; }
+
+      playBeep('success');
+      alert("Pass successfully revoked!");
+      loadAdminActivePasses();
     }
 
     async function generateVisitorPass(event) {
@@ -1052,6 +1319,7 @@
       playBeep('success');
       alert("Business Approved in Cloud DB! Owner PIN: " + ownerPin);
       loadCloudAdminData();
+      loadAdminActivePasses();
     }
 
     async function renderCloudDirectory() {
@@ -1122,7 +1390,7 @@
         playBeep('error');
       } else if (found.status === "REVOKED") {
         res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
-        res.innerHTML = "<b>❌ ACCESS DENIED — PASS REVOKED</b>";
+        res.innerHTML = "<b>❌ ACCESS DENIED — PASS REVOKED BY ADMIN/GUARD</b>";
         playBeep('error');
       } else if (found.status === "USED" && found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "FAMILY_MEMBER") {
         res.style.background = "#fff1f2"; res.style.color = "#be123c";
@@ -1172,11 +1440,16 @@
 
     window.onload = function() {
       updateNetworkStatus();
-      switchTab('auth');
+      if (!checkGuardTerminalLockdown()) {
+        switchTab('auth');
+      } else {
+        switchTab('guard');
+      }
       renderCloudDirectory();
       renderComplaints();
       renderNewsFeed();
       renderActiveSOSFeeds();
+      loadAdminActivePasses();
     };
   </script>
 </body>
