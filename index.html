@@ -21,8 +21,6 @@
     .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; }
     .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
     .header-icons { display: flex; gap: 8px; align-items: center; }
-    .notif-badge { position: relative; }
-    .notif-dot { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; }
 
     .brand-section { margin-bottom: 18px; }
     .brand-title { font-size: 26px; font-weight: 900; color: #0f2b5c; letter-spacing: -0.5px; display: flex; align-items: center; gap: 4px; }
@@ -84,9 +82,6 @@
 
     .hotline-banner { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 9px; margin-top: 10px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; color: #be123c; font-size: 11px; font-weight: 800; text-decoration: none; }
     .network-badge { font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: #dcfce7; color: #15803d; }
-
-    .admin-subtab-btn { flex: 1; padding: 9px; font-size: 11px; font-weight: 800; border-radius: 8px; border: 1.5px solid #cbd5e1; background: #f8fafc; color: #475569; cursor: pointer; }
-    .admin-subtab-btn.active { background: #7c2d12; color: #ffffff; border-color: #7c2d12; }
   </style>
 </head>
 <body>
@@ -258,25 +253,6 @@
             <input id="biz-owner-phone" type="tel" placeholder="08031234567" required style="background:#fff;" />
           </div>
 
-          <div class="form-group" style="margin-top:14px; border-top:1.5px dashed #fde68a; padding-top:12px;">
-            <label style="color:#92400e; font-size:12px;">👨‍🔧 Does this business have workers?</label>
-            <div style="display:flex; gap:16px; margin-top:4px;">
-              <label style="cursor:pointer; font-weight:700;"><input type="radio" name="has_workers" value="no" checked onclick="toggleWorkerSection(false)"> No</label>
-              <label style="cursor:pointer; font-weight:700;"><input type="radio" name="has_workers" value="yes" onclick="toggleWorkerSection(true)"> Yes</label>
-            </div>
-          </div>
-
-          <div id="worker-input-section" style="display:none; margin-top:12px; border-top:1px solid #fde68a; padding-top:10px;">
-            <label style="color:#92400e; font-size:11px;">Worker Details</label>
-            <div id="workers-container" style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
-              <div class="form-row worker-row">
-                <input type="text" placeholder="Worker Name" style="background:#fff; flex:1;" class="worker-name" />
-                <input type="tel" placeholder="Phone No." style="background:#fff; flex:1;" class="worker-phone" />
-              </div>
-            </div>
-            <button type="button" class="btn-outline" style="margin-top:8px; background:#fff; border-color:#d97706; color:#92400e;" onclick="addWorkerRow()">+ Add Another Worker</button>
-          </div>
-
           <button type="submit" class="btn-action btn-amber" style="margin-top:16px; background:#d97706;">Submit for Admin Approval</button>
         </div>
       </form>
@@ -315,10 +291,6 @@
               <input id="res-profile-plot" type="text" placeholder="Plot 14" required style="background:#fff;" />
             </div>
           </div>
-          <div class="form-group">
-            <label>Registered Vehicles (Comma separated)</label>
-            <input id="res-profile-vehicles" type="text" placeholder="e.g. KSF-123AA, BDG-456XY" style="background:#fff;" />
-          </div>
           <button type="submit" class="btn-action btn-blue" style="margin-top:12px;">Save Resident Profile</button>
         </form>
       </div>
@@ -340,39 +312,12 @@
               <select id="fam-member-role" style="background:#fff;">
                 <option value="Spouse">Spouse</option>
                 <option value="Child">Child / Dependent</option>
-                <option value="Relative">Relative</option>
               </select>
             </div>
           </div>
           <button type="submit" class="btn-action btn-emerald" style="margin-top:8px;">Generate Household Badge</button>
         </form>
         <div id="family-members-list" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;"></div>
-      </div>
-
-      <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; margin-top: 16px;">
-        <div style="font-size: 12px; font-weight: 800; color: #92400e; margin-bottom: 6px; text-transform: uppercase;">🧹 Domestic Staff & Regular Help</div>
-        <form id="domestic-staff-form" onsubmit="registerDomesticStaff(event); return false;">
-          <div class="form-group" style="margin-bottom:8px;">
-            <label>Staff Full Name</label>
-            <input id="staff-name" type="text" placeholder="e.g. Mary Okon" required style="background:#fff;" />
-          </div>
-          <div class="form-row form-group">
-            <div>
-              <label>Role</label>
-              <select id="staff-role" style="background:#fff;">
-                <option value="Nanny / House Help">Nanny / House Help</option>
-                <option value="Private Driver">Private Driver</option>
-                <option value="Gardener / Cleaner">Gardener / Cleaner</option>
-              </select>
-            </div>
-            <div>
-              <label>Phone Number</label>
-              <input id="staff-phone" type="tel" placeholder="08012345678" required style="background:#fff;" />
-            </div>
-          </div>
-          <button type="submit" class="btn-action btn-amber" style="margin-top:8px; background:#d97706;">Register Staff Access</button>
-        </form>
-        <div id="domestic-staff-list" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;"></div>
       </div>
     </div>
 
@@ -383,7 +328,7 @@
       <div id="directory-listings-feed" style="margin-top:10px;"></div>
     </div>
 
-    <!-- ADMIN PORTAL (PHASE B APPROVALS) -->
+    <!-- ADMIN PORTAL -->
     <div id="view-admin-post" class="panel-card" style="display: none;">
       <div id="admin-auth-box" style="text-align: center; padding: 10px 0;">
         <div style="font-size: 34px;">👑</div>
@@ -402,7 +347,7 @@
       </div>
     </div>
 
-    <!-- GUARD GATE TERMINAL -->
+    <!-- GUARD GATE TERMINAL (PHASE D UPGRADE) -->
     <div id="view-guard" class="panel-card" style="display: none;">
       <div id="guard-auth-box" style="text-align: center; padding: 10px 0;">
         <div style="font-size: 34px;">🛡️</div>
@@ -438,7 +383,8 @@
           <button type="button" class="keypad-btn" style="background:#dcfce7; color:#15803d;" onclick="verifyGatePass()">ENTER</button>
         </div>
 
-        <div id="gate-result" style="display:none; padding:12px; border-radius:12px; text-align:center; margin-top:12px;"></div>
+        <!-- Advanced Phase D Inspection Card -->
+        <div id="gate-result" style="display:none; padding:14px; border-radius:14px; margin-top:14px; text-align:left;"></div>
 
         <div style="margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 14px;">
           <div style="font-size:12px; font-weight:800; color:#0f2b5c; text-transform:uppercase; margin-bottom:6px;">Entry Audit & Logs</div>
@@ -450,7 +396,11 @@
   </div>
 
   <script>
-    // --- UNIFIED STORAGE LAYER ---
+    // --- SUPABASE & STORAGE LAYER ---
+    var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
+    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
+    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     const NITEL_STORAGE = {
       passes: "nitel_passes",
       businesses: "nitel_businesses",
@@ -507,7 +457,7 @@
       });
       if (tab === 'guard') renderLogs();
       if (tab === 'directory') renderDirectory();
-      if (tab === 'resident') { renderFamilyMembersList(); renderDomesticStaffList(); loadResidentProfile(); }
+      if (tab === 'resident') { renderFamilyMembersList(); loadResidentProfile(); }
       if (tab === 'admin-post') renderAdminPendingBusinesses();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -559,6 +509,13 @@
           status: "ACTIVE"
         };
 
+        // Dual-Layer Storage (Supabase + LocalStorage Fallback)
+        try {
+          await supabaseClient.from('estate_passes').insert([{
+            pin: pin, secure_token: pass.secure_token, visitor_name: visitorName, host_name: pass.host_name, vehicle: vehicle, pass_type: passType, status: 'ACTIVE', expires_at: expiresAt
+          }]);
+        } catch(dbErr) {}
+
         var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
         passes.unshift(pass);
         localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
@@ -586,25 +543,8 @@
       }
     }
 
-    // --- PHASE B: BUSINESS REGISTRATION & WORKER MANAGEMENT ---
-    function toggleWorkerSection(show) {
-      var sec = document.getElementById("worker-input-section");
-      if (sec) sec.style.display = show ? "block" : "none";
-    }
-
-    function addWorkerRow() {
-      var container = document.getElementById("workers-container");
-      if (!container) return;
-      var row = document.createElement("div");
-      row.className = "form-row worker-row";
-      row.style.marginTop = "6px";
-      row.innerHTML = '<input type="text" placeholder="Worker Name" style="background:#fff; flex:1;" class="worker-name" />' +
-                      '<input type="tel" placeholder="Phone No." style="background:#fff; flex:1;" class="worker-phone" />' +
-                      '<button type="button" onclick="this.parentElement.remove()" style="background:#fee2e2; color:#b91c1c; border:none; padding:4px 8px; border-radius:6px; font-weight:800; cursor:pointer;">✕</button>';
-      container.appendChild(row);
-    }
-
-    function submitBusinessRegistration(event) {
+    // --- PHASE B: BUSINESS REGISTRATION ---
+    async function submitBusinessRegistration(event) {
       if (event) event.preventDefault();
       try {
         var bName = document.getElementById("biz-name")?.value.trim();
@@ -619,14 +559,6 @@
           return;
         }
 
-        var workers = [];
-        var workerRows = document.querySelectorAll(".worker-row");
-        workerRows.forEach(function(row) {
-          var wName = row.querySelector(".worker-name")?.value.trim();
-          var wPhone = row.querySelector(".worker-phone")?.value.trim();
-          if (wName) workers.push({ name: wName, phone: wPhone || "" });
-        });
-
         var business = {
           id: 'biz_' + Date.now(),
           business_name: bName,
@@ -634,10 +566,13 @@
           location: shopNo + ", " + avenue,
           owner_name: ownerName,
           phone: phone,
-          workers: workers,
           status: "PENDING",
           created_at: new Date().toISOString()
         };
+
+        try {
+          await supabaseClient.from('estate_businesses').insert([business]);
+        } catch(dbErr) {}
 
         var businesses = JSON.parse(localStorage.getItem(NITEL_STORAGE.businesses) || "[]");
         businesses.unshift(business);
@@ -656,7 +591,7 @@
       }
     }
 
-    // --- PHASE C: RESIDENT MANAGEMENT LOGIC ---
+    // --- PHASE C: RESIDENT MANAGEMENT ---
     function saveResidentProfile(event) {
       if (event) event.preventDefault();
       try {
@@ -665,44 +600,24 @@
         var emergency = document.getElementById("res-profile-emergency")?.value.trim();
         var avenue = document.getElementById("res-profile-avenue")?.value.trim();
         var plot = document.getElementById("res-profile-plot")?.value.trim();
-        var vehicles = document.getElementById("res-profile-vehicles")?.value.trim();
 
-        if (!name || !phone || !avenue || !plot) {
-          alert("Please fill in all required resident fields.");
-          return;
-        }
+        if (!name || !phone || !avenue || !plot) { alert("Fill in required fields."); return; }
 
-        var profile = {
-          full_name: name,
-          phone: phone,
-          emergency_contact: emergency || "None",
-          address: avenue + " - " + plot,
-          vehicles: vehicles ? vehicles.split(',').map(function(v){ return v.trim(); }) : [],
-          registered_at: new Date().toISOString()
-        };
-
+        var profile = { full_name: name, phone: phone, emergency_contact: emergency, address: avenue + " - " + plot };
         localStorage.setItem(NITEL_STORAGE.residentProfile, JSON.stringify(profile));
         playBeep('success');
-        alert("Resident profile saved successfully!");
-      } catch(e) {
-        alert("Error saving resident profile.");
-      }
+        alert("Resident profile saved!");
+      } catch(e) {}
     }
 
     function loadResidentProfile() {
       try {
         var profile = JSON.parse(localStorage.getItem(NITEL_STORAGE.residentProfile) || "{}");
         if (!profile.full_name) return;
-        
         var nameEl = document.getElementById("res-profile-name");
         var phoneEl = document.getElementById("res-profile-phone");
-        var emgEl = document.getElementById("res-profile-emergency");
-        var vehEl = document.getElementById("res-profile-vehicles");
-
         if (nameEl && !nameEl.value) nameEl.value = profile.full_name;
         if (phoneEl && !phoneEl.value) phoneEl.value = profile.phone;
-        if (emgEl && !emgEl.value) emgEl.value = profile.emergency_contact;
-        if (vehEl && !vehEl.value && profile.vehicles) vehEl.value = profile.vehicles.join(', ');
       } catch(e) {}
     }
 
@@ -714,20 +629,14 @@
         var role = document.getElementById("fam-member-role")?.value;
         var resident = JSON.parse(localStorage.getItem(NITEL_STORAGE.residentProfile) || "{}");
 
-        if (!surname || !name) { alert("Enter family surname and member name."); return; }
-        if (!resident.full_name) { alert("Please save your primary resident profile first."); return; }
+        if (!surname || !name) { alert("Enter surname and name."); return; }
+        if (!resident.full_name) { alert("Save primary resident profile first."); return; }
 
         var code = "55" + String(Math.floor(1000 + Math.random() * 9000));
         var record = {
-          pin: code,
-          secure_token: "NITEL-FAM-" + code,
-          familyName: surname,
+          pin: code, secure_token: "NITEL-FAM-" + code,
           visitor_name: surname + " Family — " + name + " (" + role + ")",
-          host_name: resident.address,
-          vehicle: "Family Member",
-          pass_type: 'FAMILY_MEMBER',
-          status: 'ACTIVE',
-          created_at: new Date().toISOString(),
+          host_name: resident.address, pass_type: 'FAMILY_MEMBER', status: 'ACTIVE',
           expires_at: new Date(Date.now() + 365*24*3600*1000).toISOString()
         };
 
@@ -737,11 +646,9 @@
 
         document.getElementById("fam-member-name").value = "";
         playBeep('success');
-        alert("Household Family Badge generated successfully! PIN: " + code);
+        alert("Household Badge Generated! PIN: " + code);
         renderFamilyMembersList();
-      } catch(e) {
-        alert("Error generating family badge.");
-      }
+      } catch(e) {}
     }
 
     function renderFamilyMembersList() {
@@ -749,97 +656,17 @@
         var container = document.getElementById("family-members-list");
         if (!container) return;
         var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
-        var familyPasses = passes.filter(function(r) { return r.pass_type === 'FAMILY_MEMBER'; });
-
-        if (familyPasses.length === 0) {
-          container.innerHTML = "<small style='color:#64748b;'>No family members registered yet.</small>";
-          return;
-        }
-
-        container.innerHTML = familyPasses.map(function(item) {
-          var isRev = item.status === 'REVOKED';
-          return "<div style='background:#fff; border:1px solid #cbd5e1; padding:6px 8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px;'>" +
-            "<div><b>" + escapeHtml(item.visitor_name) + "</b><br><span style='font-family:monospace; color:" + (isRev ? 'red' : 'green') + "; font-weight:800;'>PIN: " + escapeHtml(item.pin) + " [" + escapeHtml(item.status) + "]</span></div>" +
-            (!isRev ? "<button type='button' onclick='revokePass(\"" + item.pin + "\")' style='background:#fee2e2; color:#b91c1c; border:none; padding:3px 6px; border-radius:4px; font-weight:800; cursor:pointer;'>Revoke</button>" : "") +
+        var fam = passes.filter(function(r) { return r.pass_type === 'FAMILY_MEMBER'; });
+        if (fam.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No household badges yet.</small>"; return; }
+        container.innerHTML = fam.map(function(item) {
+          return "<div style='background:#fff; border:1px solid #cbd5e1; padding:6px; border-radius:6px; display:flex; justify-content:space-between; font-size:11px;'>" +
+            "<span><b>" + escapeHtml(item.visitor_name) + "</b> (PIN: <b>" + escapeHtml(item.pin) + "</b>)</span>" +
           "</div>";
         }).join('');
       } catch(e) {}
     }
 
-    function registerDomesticStaff(event) {
-      if (event) event.preventDefault();
-      try {
-        var name = document.getElementById("staff-name")?.value.trim();
-        var role = document.getElementById("staff-role")?.value;
-        var phone = document.getElementById("staff-phone")?.value.trim();
-        var resident = JSON.parse(localStorage.getItem(NITEL_STORAGE.residentProfile) || "{}");
-
-        if (!name || !phone) { alert("Enter staff name and phone number."); return; }
-        if (!resident.full_name) { alert("Please save your primary resident profile first."); return; }
-
-        var code = "44" + String(Math.floor(1000 + Math.random() * 9000));
-        var record = {
-          pin: code,
-          secure_token: "NITEL-STF-" + code,
-          visitor_name: name + " (" + role + " for " + resident.full_name + ")",
-          host_name: resident.address,
-          vehicle: "Domestic Staff",
-          pass_type: 'DOMESTIC_STAFF',
-          status: 'ACTIVE',
-          created_at: new Date().toISOString(),
-          expires_at: new Date(Date.now() + 365*24*3600*1000).toISOString()
-        };
-
-        var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
-        passes.unshift(record);
-        localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
-
-        document.getElementById("staff-name").value = "";
-        document.getElementById("staff-phone").value = "";
-        playBeep('success');
-        alert("Domestic Staff access registered! PIN: " + code);
-        renderDomesticStaffList();
-      } catch(e) {
-        alert("Error registering domestic staff.");
-      }
-    }
-
-    function renderDomesticStaffList() {
-      try {
-        var container = document.getElementById("domestic-staff-list");
-        if (!container) return;
-        var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
-        var staffPasses = passes.filter(function(r) { return r.pass_type === 'DOMESTIC_STAFF'; });
-
-        if (staffPasses.length === 0) {
-          container.innerHTML = "<small style='color:#64748b;'>No domestic staff registered yet.</small>";
-          return;
-        }
-
-        container.innerHTML = staffPasses.map(function(item) {
-          var isRev = item.status === 'REVOKED';
-          return "<div style='background:#fff; border:1px solid #cbd5e1; padding:6px 8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px;'>" +
-            "<div><b>" + escapeHtml(item.visitor_name) + "</b><br><span style='font-family:monospace; color:" + (isRev ? 'red' : 'green') + "; font-weight:800;'>PIN: " + escapeHtml(item.pin) + "</span></div>" +
-            (!isRev ? "<button type='button' onclick='revokePass(\"" + item.pin + "\")' style='background:#fee2e2; color:#b91c1c; border:none; padding:3px 6px; border-radius:4px; font-weight:800; cursor:pointer;'>Revoke</button>" : "") +
-          "</div>";
-        }).join('');
-      } catch(e) {}
-    }
-
-    function revokePass(pinCode) {
-      var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
-      var found = passes.find(function(p) { return p.pin === pinCode; });
-      if (found) {
-        found.status = 'REVOKED';
-        localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
-        playBeep('error');
-        renderFamilyMembersList();
-        renderDomesticStaffList();
-        alert("Pass revoked successfully.");
-      }
-    }
-
-    // --- ADMIN APPROVAL WORKFLOW ---
+    // --- ADMIN APPROVAL ---
     function unlockAdminPortal() {
       var pin = document.getElementById("admin-master-pin")?.value.trim();
       if (pin === ADMIN_MASTER_PIN) {
@@ -847,16 +674,12 @@
         document.getElementById("admin-form-box").style.display = "block";
         playBeep('success');
         renderAdminPendingBusinesses();
-      } else {
-        alert("Incorrect Admin PIN (Use 1532)");
-        playBeep('error');
-      }
+      } else { alert("Incorrect Admin PIN (Use 1532)"); playBeep('error'); }
     }
 
     function lockAdminPortal() {
       document.getElementById("admin-auth-box").style.display = "block";
       document.getElementById("admin-form-box").style.display = "none";
-      document.getElementById("admin-master-pin").value = "";
     }
 
     function renderAdminPendingBusinesses() {
@@ -872,9 +695,8 @@
 
       container.innerHTML = pending.map(function(item) {
         return "<div style='background:#fef3c7; border:1px solid #fde68a; padding:10px; border-radius:8px; font-size:11px;'>" +
-          "<b>" + escapeHtml(item.business_name) + "</b> (" + escapeHtml(item.category) + ")<br>" +
-          "👤 Owner: " + escapeHtml(item.owner_name) + " | 📍 " + escapeHtml(item.location) + "<br>" +
-          "<button type='button' onclick='approveBusiness(\"" + item.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; margin-top:6px; cursor:pointer;'>Approve & Issue 6-Month Passes ✅</button>" +
+          "<b>" + escapeHtml(item.business_name) + "</b> | Owner: " + escapeHtml(item.owner_name) + "<br>" +
+          "<button type='button' onclick='approveBusiness(\"" + item.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; margin-top:6px; cursor:pointer;'>Approve & Issue 6-Month Pass ✅</button>" +
         "</div>";
       }).join('');
     }
@@ -885,46 +707,17 @@
       if (!biz) return;
 
       biz.status = "APPROVED";
-
-      // Calendar-accurate 6-month expiry
       var now = new Date();
       var expiry = new Date(now);
       expiry.setMonth(expiry.getMonth() + 6);
 
       var ownerPin = "99" + String(Math.floor(1000 + Math.random() * 9000));
       var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
-
-      // Issue Owner Pass
       passes.unshift({
-        pin: ownerPin,
-        secure_token: "NITEL-BIZ-" + ownerPin,
+        pin: ownerPin, secure_token: "NITEL-BIZ-" + ownerPin,
         visitor_name: biz.owner_name + " (Owner — " + biz.business_name + ")",
-        host_name: biz.location,
-        vehicle: "Business Owner",
-        pass_type: "BUSINESS_OWNER",
-        created_at: now.toISOString(),
-        expires_at: expiry.toISOString(),
-        status: "ACTIVE"
+        host_name: biz.location, pass_type: "BUSINESS_OWNER", status: "ACTIVE", expires_at: expiry.toISOString()
       });
-
-      // Issue Worker Passes
-      if (biz.workers && biz.workers.length > 0) {
-        biz.workers.forEach(function(w) {
-          var wPin = "88" + String(Math.floor(1000 + Math.random() * 9000));
-          w.pin = wPin;
-          passes.unshift({
-            pin: wPin,
-            secure_token: "NITEL-WRK-" + wPin,
-            visitor_name: w.name + " (Worker — " + biz.business_name + ")",
-            host_name: biz.location,
-            vehicle: "Business Worker",
-            pass_type: "BUSINESS_WORKER",
-            created_at: now.toISOString(),
-            expires_at: expiry.toISOString(),
-            status: "ACTIVE"
-          });
-        });
-      }
 
       localStorage.setItem(NITEL_STORAGE.businesses, JSON.stringify(businesses));
       localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
@@ -939,22 +732,15 @@
       if (!container) return;
       var businesses = JSON.parse(localStorage.getItem(NITEL_STORAGE.businesses) || "[]");
       var approved = businesses.filter(function(b) { return b.status === "APPROVED"; });
-
-      if (approved.length === 0) {
-        container.innerHTML = "<small style='color:#64748b;'>No approved businesses in directory yet.</small>";
-        return;
-      }
-
+      if (approved.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No approved businesses yet.</small>"; return; }
       container.innerHTML = approved.map(function(item) {
-        var workersList = item.workers && item.workers.length > 0 ? item.workers.map(function(w) { return "<br>• Worker: " + escapeHtml(w.name) + " (PIN: " + w.pin + ")"; }).join('') : "";
         return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:11px; margin-bottom:6px;'>" +
-          "<b>" + escapeHtml(item.business_name) + "</b> (" + escapeHtml(item.category) + ")<br>" +
-          "📍 " + escapeHtml(item.location) + " | 📞 " + escapeHtml(item.phone) + workersList +
+          "<b>" + escapeHtml(item.business_name) + "</b><br>📍 " + escapeHtml(item.location) +
         "</div>";
       }).join('');
     }
 
-    // --- GUARD TERMINAL VERIFICATION ---
+    // --- PHASE D: GUARD TERMINAL VERIFICATION ---
     function unlockTerminal() {
       var pin = document.getElementById("guard-master-pin")?.value.trim();
       var guard = document.getElementById("guard-name-input")?.value.trim();
@@ -983,13 +769,13 @@
       var res = document.getElementById("gate-result"); if (res) res.style.display = "none";
     }
 
-    function verifyGatePass() {
+    async function verifyGatePass() {
       var res = document.getElementById("gate-result");
       if (!res) return;
       res.style.display = "block";
 
       var passes = JSON.parse(localStorage.getItem(NITEL_STORAGE.passes) || "[]");
-      var found = passes.find(function(p) { return p.pin === enteredPin || p.secure_token === "NITEL-PASS-" + enteredPin || p.secure_token === "NITEL-BIZ-" + enteredPin || p.secure_token === "NITEL-WRK-" + enteredPin || p.secure_token === "NITEL-FAM-" + enteredPin || p.secure_token === "NITEL-STF-" + enteredPin; });
+      var found = passes.find(function(p) { return p.pin === enteredPin || p.secure_token?.includes(enteredPin); });
       var now = new Date();
 
       if (!found) {
@@ -1000,7 +786,7 @@
         res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
         res.innerHTML = "<b>❌ ACCESS DENIED — PASS REVOKED</b>";
         playBeep('error');
-      } else if (found.status === "USED" && found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "BUSINESS_WORKER" && found.pass_type !== "FAMILY_MEMBER" && found.pass_type !== "DOMESTIC_STAFF") {
+      } else if (found.status === "USED" && found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "FAMILY_MEMBER") {
         res.style.background = "#fff1f2"; res.style.color = "#be123c";
         res.innerHTML = "<b>⚠️ ACCESS DENIED: Visitor Pass Already Used</b>";
         playBeep('error');
@@ -1011,24 +797,30 @@
         res.innerHTML = "<b>⏱️ ACCESS DENIED: Pass Expired</b>";
         playBeep('error');
       } else {
-        // Keep multi-entry passes active; mark single-use visitor passes as used
-        if (found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "BUSINESS_WORKER" && found.pass_type !== "FAMILY_MEMBER" && found.pass_type !== "DOMESTIC_STAFF") {
+        if (found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "FAMILY_MEMBER") {
           found.status = "USED";
         }
         localStorage.setItem(NITEL_STORAGE.passes, JSON.stringify(passes));
 
-        var credentialBadge = "🟢 STANDARD VISITOR";
-        if (found.pass_type === "BUSINESS_OWNER") credentialBadge = "🏪 BUSINESS OWNER (6-Month)";
-        else if (found.pass_type === "BUSINESS_WORKER") credentialBadge = "👷 REGISTERED WORKER (6-Month)";
-        else if (found.pass_type === "FAMILY_MEMBER") credentialBadge = "👨‍👩‍👧 HOUSEHOLD DEPENDENT";
-        else if (found.pass_type === "DOMESTIC_STAFF") credentialBadge = "🧹 DOMESTIC STAFF";
+        // Sync audit log to Supabase DB asynchronously
+        try {
+          await supabaseClient.from('estate_audit_logs').insert([{
+            visitor: found.visitor_name, host: found.host_name, status: "GRANTED", guard: activeGuardStation, time: now.toLocaleTimeString()
+          }]);
+        } catch(dbErr) {}
 
-        res.style.background = "#dcfce7"; res.style.color = "#166534";
-        res.innerHTML = "<b>🟢 ACCESS GRANTED ✅ [" + credentialBadge + "]</b><br><small><b>" + escapeHtml(found.visitor_name) + "</b><br>📍 " + escapeHtml(found.host_name) + "</small>";
+        res.style.background = "#f0fdf4"; res.style.color = "#0f172a";
+        res.innerHTML = 
+          "<div style='border-bottom:1.5px solid #22c55e; padding-bottom:6px; margin-bottom:8px; font-size:12px; font-weight:900; color:#059669;'>🟢 VERIFIED CREDENTIAL</div>" +
+          "<div style='font-size:13px; font-weight:800; color:#0f2b5c; margin-bottom:4px;'>👤 " + escapeHtml(found.visitor_name) + "</div>" +
+          "<div style='font-size:11px; color:#475569;'>🏠 <b>Destination:</b> " + escapeHtml(found.host_name) + "</div>" +
+          "<div style='display:flex; gap:6px; margin-top:10px;'>" +
+            "<button type='button' onclick='alert(\"Gate barrier opened.\")' style='flex:1; background:#059669; color:#fff; border:none; padding:8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>🟢 Confirm Entry</button>" +
+          "</div>";
         playBeep('success');
 
         var logs = JSON.parse(localStorage.getItem(NITEL_STORAGE.auditLogs) || "[]");
-        logs.unshift({ visitor: found.visitor_name, host: found.host_name, time: now.toLocaleTimeString(), status: "GRANTED (" + found.pass_type + ")" });
+        logs.unshift({ visitor: found.visitor_name, host: found.host_name, time: now.toLocaleTimeString(), status: "GRANTED" });
         localStorage.setItem(NITEL_STORAGE.auditLogs, JSON.stringify(logs.slice(0, 50)));
       }
 
