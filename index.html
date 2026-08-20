@@ -256,8 +256,8 @@
               </select>
             </div>
             <div>
-              <label>Vehicle Plate Number</label>
-              <input id="visitor-vehicle" type="text" placeholder="KSF-123AA" required />
+              <label>Vehicle Plate Number (Optional)</label>
+              <input id="visitor-vehicle" type="text" placeholder="e.g. KSF-123AA (Leave blank if none)" />
             </div>
           </div>
         </div>
@@ -786,8 +786,8 @@
               <input id="host-phone" type="tel" placeholder="08030000000" required />
             </div>
             <div>
-              <label>Vehicle Plate Number</label>
-              <input id="visitor-vehicle" type="text" placeholder="KSF-123AA" required />
+              <label>Vehicle Plate Number (Optional)</label>
+              <input id="visitor-vehicle" type="text" placeholder="Leave blank if none" />
             </div>
           </div>
           <div class="form-row form-group">
@@ -830,8 +830,8 @@
               </select>
             </div>
             <div>
-              <label>Vehicle Plate Number</label>
-              <input id="visitor-vehicle" type="text" placeholder="KSF-123AA" required />
+              <label>Vehicle Plate Number (Optional)</label>
+              <input id="visitor-vehicle" type="text" placeholder="Leave blank if none" />
             </div>
           </div>
         `;
@@ -851,7 +851,9 @@
       try {
         var cat = document.getElementById("pass-category-group").value;
         var visitorName = document.getElementById('visitor-name')?.value.trim();
-        var vehicle = document.getElementById('visitor-vehicle')?.value.trim() || 'N/A';
+        var vehicleInput = document.getElementById('visitor-vehicle')?.value.trim();
+        var vehicle = vehicleInput ? vehicleInput : "Walk-In / No Vehicle";
+        
         var now = new Date();
         var durationHours = 24;
         var hostName = "";
@@ -900,15 +902,15 @@
         // --- COLOR-GRADING LOGIC ---
         var cardBg = "#f0fdf4"; var cardBorder = "#22c55e"; var badgeBg = "#dcfce7"; var badgeColor = "#15803d";
         if (cat === 'CHURCH' || cat === 'MOSQUE') {
-          cardBg = "#fdf4ff"; cardBorder = "#d946ef"; badgeBg = "#f3e8ff"; badgeColor = "#9333ea"; // Purple
+          cardBg = "#fdf4ff"; cardBorder = "#d946ef"; badgeBg = "#f3e8ff"; badgeColor = "#9333ea";
         } else if (cat === 'SPA' || cat === 'SUPERMARKET' || cat === 'FOOD_VENDOR' || cat === 'BUSINESS_APPOINTMENT') {
-          cardBg = "#fffbeb"; cardBorder = "#f59e0b"; badgeBg = "#fef3c7"; badgeColor = "#b45309"; // Amber
+          cardBg = "#fffbeb"; cardBorder = "#f59e0b"; badgeBg = "#fef3c7"; badgeColor = "#b45309";
         } else if (cat === 'PROPERTY_ENQUIRY') {
-          cardBg = "#eff6ff"; cardBorder = "#3b82f6"; badgeBg = "#dbeafe"; badgeColor = "#1d4ed8"; // Blue
+          cardBg = "#eff6ff"; cardBorder = "#3b82f6"; badgeBg = "#dbeafe"; badgeColor = "#1d4ed8";
         } else if (cat === 'ARTISAN') {
-          cardBg = "#f4f2ef"; cardBorder = "#78350f"; badgeBg = "#e7e5e4"; badgeColor = "#44403c"; // Brown
+          cardBg = "#f4f2ef"; cardBorder = "#78350f"; badgeBg = "#e7e5e4"; badgeColor = "#44403c";
         } else if (cat === 'HOTEL' || cat === 'EVENT') {
-          cardBg = "#fff1f2"; cardBorder = "#f43f5e"; badgeBg = "#ffe4e6"; badgeColor = "#e11d48"; // Crimson Red
+          cardBg = "#fff1f2"; cardBorder = "#f43f5e"; badgeBg = "#ffe4e6"; badgeColor = "#e11d48";
         }
 
         result.style.background = cardBg;
@@ -923,7 +925,7 @@
 
         var summary = document.getElementById("visitor-summary-display");
         if (summary) {
-          summary.innerHTML = "<b>Visitor:</b> " + escapeHtml(visitorName) + "<br><b>Type:</b> " + escapeHtml(cat) + "<br><b>Destination:</b> " + escapeHtml(hostName);
+          summary.innerHTML = "<b>Visitor:</b> " + escapeHtml(visitorName) + "<br><b>Type:</b> " + escapeHtml(cat) + "<br><b>Destination:</b> " + escapeHtml(hostName) + "<br><b>Vehicle:</b> " + escapeHtml(vehicle);
         }
 
         var qrBox = document.getElementById("qrcode-box");
