@@ -369,7 +369,7 @@
       <div id="news-feed" style="margin-top:10px;"></div>
     </div>
 
-    <!-- ADMIN PORTAL (RBAC ENFORCED) -->
+    <!-- ADMIN PORTAL (LIVE DB RBAC ENFORCED) -->
     <div id="view-admin-post" class="panel-card" style="display: none;">
       <div class="panel-title">👑 Executive Admin Command Center</div>
       <div class="panel-sub">Role-Restricted Cloud Management & Approvals</div>
@@ -378,12 +378,11 @@
       <div id="admin-cloud-feed" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;"></div>
     </div>
 
-    <!-- GUARD GATE TERMINAL (CAMERA QR SCANNER & SERVER VERIFICATION) -->
+    <!-- GUARD GATE TERMINAL -->
     <div id="view-guard" class="panel-card" style="display: none;">
       <div class="panel-title">🛡️ Secure Gate Terminal</div>
       <div class="panel-sub">Live QR Scanner & Server-Side Database Verification</div>
 
-      <!-- Camera QR Scanner Section -->
       <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 10px; border-radius: 12px; text-align:center; margin-bottom: 12px;">
         <div id="qr-reader" style="width:100%;"></div>
         <button type="button" class="btn-outline" style="margin-top:8px;" onclick="initCameraScanner()">📷 Start Camera QR Scanner</button>
@@ -419,14 +418,11 @@
   </div>
 
   <script>
-    // --- SUPABASE CLOUD CONFIGURATION ---
     var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
     var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
     var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     var enteredPin = "";
-    var currentUserRole = null;
-    var currentUserId = null;
     var html5QrCode = null;
 
     function escapeHtml(unsafe) {
@@ -478,7 +474,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // --- SECURE SUPABASE AUTHENTICATION & RBAC ---
     async function handleLogin() {
       var email = document.getElementById("auth-email").value.trim();
       var password = document.getElementById("auth-password").value.trim();
@@ -492,12 +487,6 @@
         msg.style.color = "#15803d";
         msg.innerText = "🟢 Authenticated Successfully!";
         document.getElementById("sign-out-btn").style.display = "block";
-        
-        var user = data.user;
-        currentUserId = user.id;
-        var { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', user.id).single();
-        currentUserRole = profile ? profile.role : 'resident';
-        
         setTimeout(function() { switchTab('visitor'); }, 800);
       }
     }
@@ -519,17 +508,13 @@
 
     async function handleSignOut() {
       await supabaseClient.auth.signOut();
-      currentUserRole = null;
-      currentUserId = null;
       document.getElementById("sign-out-btn").style.display = "none";
       document.getElementById("auth-status-msg").innerText = "Signed out securely.";
       switchTab('auth');
     }
 
-    // --- SECURE SERVER-SIDE TOKEN GENERATION VIA DATABASE FUNCTION ---
     async function generateVisitorPass(event) {
       if (event) event.preventDefault();
-      
       var session = await supabaseClient.auth.getSession();
       if (!session.data.session) {
         alert("Authentication required. Please sign in via the lock icon first.");
@@ -549,7 +534,6 @@
           return;
         }
 
-        // Call secure database function (RPC) or fallback to server token generation
         var opaqueToken = "NITEL-VST-" + crypto.randomUUID();
         var pin = String(Math.floor(100000 + Math.random() * 900000));
         var now = new Date();
@@ -593,7 +577,6 @@
       }
     }
 
-    // --- PHASE B: BUSINESS REGISTRATION (SUPABASE BACKED) ---
     async function submitBusinessRegistration(event) {
       if (event) event.preventDefault();
       try {
@@ -635,7 +618,6 @@
       }
     }
 
-    // --- PHASE C: CLOUD-SYNCHRONIZED RESIDENT PROFILES ---
     async function saveResidentProfile(event) {
       if (event) event.preventDefault();
       try {
@@ -729,7 +711,6 @@
       } catch(e) {}
     }
 
-    // --- COMMUNITY FEED (CLOUD-SYNCHRONIZED) ---
     async function submitComplaint() {
       var msg = document.getElementById("complaint-msg")?.value.trim();
       var session = await supabaseClient.auth.getSession();
@@ -772,17 +753,34 @@
       "</div>";
     }
 
-    // --- ADMIN APPROVAL (RBAC ENFORCED) ---
+    // --- LIVE DATABASE ROLE-CHECKED ADMIN LOADER ---
     async function loadCloudAdminData() {
       var container = document.getElementById("admin-cloud-feed");
       var warningBox = document.getElementById("admin-auth-warning");
       if (!container) return;
 
-      if (currentUserRole !== 'admin') {
-        if (warningBox) warningBox.innerText = "⛔ Access Denied: Admin privileges required to approve businesses.";
+      var session = await supabaseClient.auth.getSession();
+      if (!session.data.session) {
+        if (warningBox) warningBox.innerText = "⛔ Please sign in via the lock icon first.";
+        container.innerHTML = "<p style='color:#b91c1c; font-size:11px; text-align:center;'>Not authenticated.</p>";
+        return;
+      }
+
+      var userId = session.data.session.user.id;
+      var { data: userProfile } = await supabaseClient
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+
+      var liveRole = userProfile ? userProfile.role : 'resident';
+
+      if (liveRole !== 'admin') {
+        if (warningBox) warningBox.innerText = "⛔ Access Denied: DB Role is currently '" + liveRole + "'. Admin privileges required.";
         container.innerHTML = "<p style='color:#b91c1c; font-size:11px; text-align:center;'>Unauthorized role.</p>";
         return;
       }
+
       if (warningBox) warningBox.innerText = "";
 
       var { data: dbBusinesses, error } = await supabaseClient.from('estate_businesses').select('*').eq('status', 'PENDING');
@@ -800,7 +798,11 @@
     }
 
     async function approveCloudBusiness(bizId) {
-      if (currentUserRole !== 'admin') { alert("Unauthorized: Admin role required."); return; }
+      var session = await supabaseClient.auth.getSession();
+      if (!session.data.session) return;
+
+      var { data: userProfile } = await supabaseClient.from('profiles').select('role').eq('id', session.data.session.user.id).single();
+      if (!userProfile || userProfile.role !== 'admin') { alert("Unauthorized."); return; }
 
       var { data: biz } = await supabaseClient.from('estate_businesses').select('*').eq('id', bizId).single();
       if (!biz) return;
@@ -837,7 +839,6 @@
       }).join('');
     }
 
-    // --- PHASE D: GUARD CAMERA SCANNER & SERVER VERIFICATION ---
     function initCameraScanner() {
       if (typeof Html5Qrcode === "undefined") { alert("QR library loading..."); return; }
       if (!html5QrCode) {
@@ -876,7 +877,6 @@
       if (!res) return;
       res.style.display = "block";
 
-      // Query database matching either PIN or Opaque Secure Token
       var query = supabaseClient.from('estate_passes').select('*');
       if (queryValue.startsWith("NITEL-")) {
         query = query.eq('secure_token', queryValue);
@@ -912,10 +912,6 @@
         await supabaseClient.from('estate_audit_logs').insert([{
           visitor: found.visitor_name, host: found.host_name, status: "GRANTED", guard: "Main Gate", time: now.toLocaleTimeString()
         }]);
-
-        var credentialBadge = "🟢 STANDARD VISITOR";
-        if (found.pass_type === "BUSINESS_OWNER") credentialBadge = "🏪 BUSINESS OWNER (6-Month)";
-        else if (found.pass_type === "FAMILY_MEMBER") credentialBadge = "👨‍👩‍👧 HOUSEHOLD DEPENDENT";
 
         res.style.background = "#f0fdf4"; res.style.color = "#0f172a";
         res.innerHTML = 
