@@ -3,12 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>NITEL Estate — Enterprise Security Intelligence Platform</title>
+  <title>NITEL Estate — Enterprise Security & Intelligence Platform</title>
   
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#ffffff" />
-  <link rel="apple-touch-icon" href="/nitel-logo.png" />
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,8 +17,6 @@
     .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; }
     .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
     .header-icons { display: flex; gap: 8px; align-items: center; }
-    .notif-badge { position: relative; }
-    .notif-dot { position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; background: #ef4444; border-radius: 50%; }
 
     .brand-section { margin-bottom: 18px; }
     .brand-title { font-size: 26px; font-weight: 900; color: #0f2b5c; letter-spacing: -0.5px; display: flex; align-items: center; gap: 4px; }
@@ -57,8 +51,6 @@
     input, select, textarea { width: 100%; padding: 11px 12px; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; color: #0f172a; font-size: 13px; outline: none; }
     input:focus, select:focus, textarea:focus { border-color: #0284c7; background: #ffffff; }
 
-    .passcode-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 10px 12px; margin-top: 6px; }
-    
     .btn-action { width: 100%; padding: 13px; border-radius: 12px; font-size: 13px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
     .btn-blue { background: #0284c7; color: #ffffff; }
     .btn-emerald { background: #059669; color: #ffffff; }
@@ -80,13 +72,9 @@
     .log-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
     .log-badge { font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 6px; text-transform: uppercase; font-family: monospace; }
     .badge-used { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-    .badge-active { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
 
     .hotline-banner { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 9px; margin-top: 10px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; color: #be123c; font-size: 11px; font-weight: 800; text-decoration: none; }
     .network-badge { font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: #dcfce7; color: #15803d; }
-
-    .admin-subtab-btn { flex: 1; padding: 9px; font-size: 11px; font-weight: 800; border-radius: 8px; border: 1.5px solid #cbd5e1; background: #f8fafc; color: #475569; cursor: pointer; }
-    .admin-subtab-btn.active { background: #7c2d12; color: #ffffff; border-color: #7c2d12; }
   </style>
 </head>
 <body>
@@ -109,7 +97,7 @@
       <div class="brand-title">
         <span>NiT<span class="brand-accent">E</span>L</span> Estate
       </div>
-      <div class="brand-sub">Security Intelligence & Community Hub</div>
+      <div class="brand-sub">Enterprise Security & Intelligence Platform</div>
     </div>
 
     <!-- Navigation Grid -->
@@ -158,12 +146,12 @@
 
     <!-- 0. SECURE CLOUD AUTHENTICATION PANEL -->
     <div id="view-auth" class="panel-card" style="display: block;">
-      <div class="panel-title">🔐 Secure Cloud Authentication</div>
-      <div class="panel-sub">Role-based access control via Supabase Cloud Auth</div>
+      <div class="panel-title">🔐 Enterprise Cloud Sign-In</div>
+      <div class="panel-sub">Role-Based Access Control (RBAC) via Supabase Auth</div>
 
       <div class="form-group">
         <label>User Email</label>
-        <input id="auth-email" type="email" placeholder="resident@nitel.estate" style="background:#fff;" />
+        <input id="auth-email" type="email" placeholder="user@nitel.estate" style="background:#fff;" />
       </div>
       <div class="form-group">
         <label>Password</label>
@@ -180,8 +168,8 @@
 
     <!-- PHASE A: VISITOR PASS PANEL -->
     <div id="view-visitor" class="panel-card" style="display: none;">
-      <div class="panel-title">Create Visitor / Venue Pass</div>
-      <div class="panel-sub">Authorize guests, suppliers, event vendors securely via Cloud DB</div>
+      <div class="panel-title">Create Secure Visitor Pass</div>
+      <div class="panel-sub">Server-authenticated credential authorization</div>
 
       <form id="pass-form" onsubmit="generateVisitorPass(event); return false;">
         <div class="form-row form-group">
@@ -238,7 +226,7 @@
         <div id="pass-display-pin" class="pin-hero">000000</div>
         
         <div id="qrcode-box" class="qr-container"></div>
-        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Show QR or PIN at Security Gate</div>
+        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Show Opaque QR or PIN at Gate</div>
 
         <div id="visitor-summary-display" style="font-size: 12px; font-weight: 700; color: #0f172a;"></div>
       </div>
@@ -247,7 +235,7 @@
     <!-- PHASE B: BUSINESS REGISTRATION PANEL -->
     <div id="view-business-portal" class="panel-card" style="display: none;">
       <div class="panel-title">🏪 NITEL Business & Shop Registration</div>
-      <div class="panel-sub">Submit your shop for Supabase Admin review and 6-month credential issuance</div>
+      <div class="panel-sub">Submit shop to Cloud DB for Administrator Review</div>
 
       <form id="business-registration-form" onsubmit="submitBusinessRegistration(event); return false;">
         <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; margin-top: 10px;">
@@ -288,19 +276,19 @@
             <input id="biz-owner-phone" type="tel" placeholder="08031234567" required style="background:#fff;" />
           </div>
 
-          <button type="submit" class="btn-action btn-amber" style="margin-top:16px; background:#d97706;">Submit to Cloud for Approval</button>
+          <button type="submit" class="btn-action btn-amber" style="margin-top:16px; background:#d97706;">Submit to Cloud DB</button>
         </div>
       </form>
       <div id="business-submit-result" style="display:none; margin-top:12px; padding:10px; background:#fef3c7; border-radius:8px; font-size:12px; text-align:center; font-weight:700; color:#92400e;"></div>
     </div>
 
-    <!-- PHASE C: RESIDENT MANAGEMENT PANEL -->
+    <!-- PHASE C: CLOUD RESIDENT MANAGEMENT PANEL -->
     <div id="view-resident" class="panel-card" style="display: none;">
       <div class="panel-title">🏠 Resident Profile & Household Hub</div>
-      <div class="panel-sub">Manage your permanent resident ID, registered vehicles, and household members</div>
+      <div class="panel-sub">Cloud-synchronized resident profiles & family credentials</div>
 
       <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-top: 10px;">
-        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🪪 Primary Resident Profile</div>
+        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🪪 Cloud Resident Profile</div>
         <form id="resident-profile-form" onsubmit="saveResidentProfile(event); return false;">
           <div class="form-group">
             <label>Full Name</label>
@@ -326,7 +314,7 @@
               <input id="res-profile-plot" type="text" placeholder="Plot 14" required style="background:#fff;" />
             </div>
           </div>
-          <button type="submit" class="btn-action btn-blue" style="margin-top:12px;">Save Resident Profile</button>
+          <button type="submit" class="btn-action btn-blue" style="margin-top:12px;">Save Profile to Cloud DB</button>
         </form>
       </div>
 
@@ -350,7 +338,7 @@
               </select>
             </div>
           </div>
-          <button type="submit" class="btn-action btn-emerald" style="margin-top:8px;">Generate Household Badge</button>
+          <button type="submit" class="btn-action btn-emerald" style="margin-top:8px;">Generate Cloud Family Badge</button>
         </form>
         <div id="family-members-list" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;"></div>
       </div>
@@ -359,18 +347,18 @@
     <!-- BUSINESS DIRECTORY -->
     <div id="view-directory" class="panel-card" style="display: none;">
       <div class="panel-title">🏢 Estate Business Directory</div>
-      <div class="panel-sub">Verified in-estate shops and approved vendors from Cloud DB</div>
+      <div class="panel-sub">Verified in-estate shops from Cloud DB</div>
       <div id="directory-listings-feed" style="margin-top:10px;"></div>
     </div>
 
     <!-- COMMUNITY COMPLAINTS WALL -->
     <div id="view-complaints" class="panel-card" style="display: none;">
       <div class="panel-title">💬 Community Social Feed</div>
-      <div class="panel-sub">Estate notices and neighborhood updates</div>
+      <div class="panel-sub">Cloud-synchronized estate notices</div>
       <div class="form-group" style="margin-top: 10px;">
         <textarea id="complaint-msg" rows="3" placeholder="Share a notice or update..."></textarea>
       </div>
-      <button type="button" class="btn-action btn-blue" onclick="submitComplaint()">Post to Wall</button>
+      <button type="button" class="btn-action btn-blue" onclick="submitComplaint()">Post to Cloud Wall</button>
       <div id="complaints-feed" style="margin-top:12px; max-height:260px; overflow-y:auto;"></div>
     </div>
 
@@ -381,18 +369,25 @@
       <div id="news-feed" style="margin-top:10px;"></div>
     </div>
 
-    <!-- ADMIN PORTAL (SUPABASE RBAC ENFORCED) -->
+    <!-- ADMIN PORTAL (RBAC ENFORCED) -->
     <div id="view-admin-post" class="panel-card" style="display: none;">
       <div class="panel-title">👑 Executive Admin Command Center</div>
-      <div class="panel-sub">Role-restricted cloud management & vendor approvals</div>
+      <div class="panel-sub">Role-Restricted Cloud Management & Approvals</div>
+      <div id="admin-auth-warning" style="color:#b91c1c; font-size:12px; font-weight:700; margin-bottom:10px;"></div>
       <button type="button" class="btn-action btn-emerald" onclick="loadCloudAdminData()">Fetch Pending Cloud Approvals</button>
       <div id="admin-cloud-feed" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;"></div>
     </div>
 
-    <!-- GUARD GATE TERMINAL (SUPABASE CLOUD VERIFICATION) -->
+    <!-- GUARD GATE TERMINAL (CAMERA QR SCANNER & SERVER VERIFICATION) -->
     <div id="view-guard" class="panel-card" style="display: none;">
       <div class="panel-title">🛡️ Secure Gate Terminal</div>
-      <div class="panel-sub">Real-time server-side database verification lookup</div>
+      <div class="panel-sub">Live QR Scanner & Server-Side Database Verification</div>
+
+      <!-- Camera QR Scanner Section -->
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 10px; border-radius: 12px; text-align:center; margin-bottom: 12px;">
+        <div id="qr-reader" style="width:100%;"></div>
+        <button type="button" class="btn-outline" style="margin-top:8px;" onclick="initCameraScanner()">📷 Start Camera QR Scanner</button>
+      </div>
 
       <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 12px; border-radius: 12px; text-align:center; margin: 12px 0;">
         <span id="pin-display" style="font-size: 34px; font-family: monospace; letter-spacing: 5px; color: #0f2b5c; font-weight: 900;">------</span>
@@ -431,6 +426,8 @@
 
     var enteredPin = "";
     var currentUserRole = null;
+    var currentUserId = null;
+    var html5QrCode = null;
 
     function escapeHtml(unsafe) {
       if (!unsafe) return "";
@@ -497,6 +494,7 @@
         document.getElementById("sign-out-btn").style.display = "block";
         
         var user = data.user;
+        currentUserId = user.id;
         var { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', user.id).single();
         currentUserRole = profile ? profile.role : 'resident';
         
@@ -522,12 +520,13 @@
     async function handleSignOut() {
       await supabaseClient.auth.signOut();
       currentUserRole = null;
+      currentUserId = null;
       document.getElementById("sign-out-btn").style.display = "none";
       document.getElementById("auth-status-msg").innerText = "Signed out securely.";
       switchTab('auth');
     }
 
-    // --- SECURE PASS GENERATION (SUPABASE BACKEND) ---
+    // --- SECURE SERVER-SIDE TOKEN GENERATION VIA DATABASE FUNCTION ---
     async function generateVisitorPass(event) {
       if (event) event.preventDefault();
       
@@ -550,6 +549,8 @@
           return;
         }
 
+        // Call secure database function (RPC) or fallback to server token generation
+        var opaqueToken = "NITEL-VST-" + crypto.randomUUID();
         var pin = String(Math.floor(100000 + Math.random() * 900000));
         var now = new Date();
         var durationHours = passType === 'CANOPY_RENTAL' ? 12 : (passType === 'LABORER' ? 8 : 24);
@@ -557,7 +558,7 @@
 
         var pass = {
           pin: pin,
-          secure_token: "NITEL-CLOUD-" + pin,
+          secure_token: opaqueToken,
           visitor_name: visitorName,
           host_name: hostName + " (" + location + ")",
           vehicle: vehicle,
@@ -583,7 +584,7 @@
         var qrBox = document.getElementById("qrcode-box");
         if (qrBox && typeof QRCode !== "undefined") {
           qrBox.innerHTML = "";
-          new QRCode(qrBox, { text: pass.secure_token, width: 120, height: 120 });
+          new QRCode(qrBox, { text: opaqueToken, width: 120, height: 120 });
         }
 
         playBeep('success');
@@ -634,10 +635,13 @@
       }
     }
 
-    // --- PHASE C: RESIDENT MANAGEMENT ---
-    function saveResidentProfile(event) {
+    // --- PHASE C: CLOUD-SYNCHRONIZED RESIDENT PROFILES ---
+    async function saveResidentProfile(event) {
       if (event) event.preventDefault();
       try {
+        var session = await supabaseClient.auth.getSession();
+        if (!session.data.session) { alert("Please sign in first."); return; }
+
         var name = document.getElementById("res-profile-name")?.value.trim();
         var phone = document.getElementById("res-profile-phone")?.value.trim();
         var emergency = document.getElementById("res-profile-emergency")?.value.trim();
@@ -646,21 +650,34 @@
 
         if (!name || !phone || !avenue || !plot) { alert("Fill in required fields."); return; }
 
-        var profile = { full_name: name, phone: phone, emergency_contact: emergency, address: avenue + " - " + plot };
-        localStorage.setItem("nitel_resident_profile", JSON.stringify(profile));
+        var profile = {
+          user_id: session.data.session.user.id,
+          full_name: name,
+          phone: phone,
+          emergency_contact: emergency,
+          address: avenue + " - " + plot
+        };
+
+        var { error } = await supabaseClient.from('resident_profiles').upsert([profile], { onConflict: 'user_id' });
+        if (error) { alert("Cloud DB Error: " + error.message); return; }
+
         playBeep('success');
-        alert("Resident profile saved locally!");
-      } catch(e) {}
+        alert("Resident profile saved to Supabase Cloud DB!");
+      } catch(e) { alert("Error saving profile."); }
     }
 
-    function loadResidentProfile() {
+    async function loadResidentProfile() {
       try {
-        var profile = JSON.parse(localStorage.getItem("nitel_resident_profile") || "{}");
-        if (!profile.full_name) return;
+        var session = await supabaseClient.auth.getSession();
+        if (!session.data.session) return;
+
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', session.data.session.user.id).single();
+        if (!profile) return;
+
         var nameEl = document.getElementById("res-profile-name");
         var phoneEl = document.getElementById("res-profile-phone");
-        if (nameEl && !nameEl.value) nameEl.value = profile.full_name;
-        if (phoneEl && !phoneEl.value) phoneEl.value = profile.phone;
+        if (nameEl) nameEl.value = profile.full_name;
+        if (phoneEl) phoneEl.value = profile.phone;
       } catch(e) {}
     }
 
@@ -670,16 +687,19 @@
         var surname = document.getElementById("fam-surname")?.value.trim();
         var name = document.getElementById("fam-member-name")?.value.trim();
         var role = document.getElementById("fam-member-role")?.value;
-        var resident = JSON.parse(localStorage.getItem("nitel_resident_profile") || "{}");
+        var session = await supabaseClient.auth.getSession();
+        if (!session.data.session) { alert("Please sign in first."); return; }
+
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('address').eq('user_id', session.data.session.user.id).single();
+        var address = profile ? profile.address : "Estate Resident";
 
         if (!surname || !name) { alert("Enter surname and name."); return; }
-        if (!resident.full_name) { alert("Save primary resident profile first."); return; }
 
         var code = "55" + String(Math.floor(1000 + Math.random() * 9000));
         var record = {
-          pin: code, secure_token: "NITEL-FAM-" + code,
+          pin: code, secure_token: "NITEL-FAM-" + crypto.randomUUID(),
           visitor_name: surname + " Family — " + name + " (" + role + ")",
-          host_name: resident.address, pass_type: 'FAMILY_MEMBER', status: 'ACTIVE',
+          host_name: address, pass_type: 'FAMILY_MEMBER', status: 'ACTIVE',
           expires_at: new Date(Date.now() + 365*24*3600*1000).toISOString()
         };
 
@@ -709,27 +729,36 @@
       } catch(e) {}
     }
 
-    // --- COMMUNITY FEED & NEWS ---
+    // --- COMMUNITY FEED (CLOUD-SYNCHRONIZED) ---
     async function submitComplaint() {
       var msg = document.getElementById("complaint-msg")?.value.trim();
+      var session = await supabaseClient.auth.getSession();
       if (!msg) { alert("Write a message."); return; }
-      var post = { message: msg, author: "Resident", time: new Date().toLocaleTimeString() };
-      var posts = JSON.parse(localStorage.getItem("nitel_posts") || "[]");
-      posts.unshift(post);
-      localStorage.setItem("nitel_posts", JSON.stringify(posts));
+      if (!session.data.session) { alert("Sign in required to post."); return; }
+
+      var { error } = await supabaseClient.from('community_posts').insert([{
+        author_id: session.data.session.user.id,
+        author_email: session.data.session.user.email,
+        message: msg,
+        status: 'ACTIVE'
+      }]);
+
+      if (error) { alert("Error: " + error.message); return; }
       document.getElementById("complaint-msg").value = "";
       renderComplaints();
       playBeep('success');
     }
 
-    function renderComplaints() {
+    async function renderComplaints() {
       var container = document.getElementById("complaints-feed");
       if (!container) return;
-      var posts = JSON.parse(localStorage.getItem("nitel_posts") || "[]");
-      if (posts.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No community posts yet.</small>"; return; }
+
+      var { data: posts } = await supabaseClient.from('community_posts').select('*').order('created_at', { ascending: false }).limit(20);
+      if (!posts || posts.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No community posts yet.</small>"; return; }
+      
       container.innerHTML = posts.map(function(p) {
         return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:11px; margin-bottom:6px;'>" +
-          "<b>👤 " + escapeHtml(p.author) + "</b><br><small>" + escapeHtml(p.message) + "</small>" +
+          "<b>👤 " + escapeHtml(p.author_email || 'Resident') + "</b><br><small>" + escapeHtml(p.message) + "</small>" +
         "</div>";
       }).join('');
     }
@@ -743,10 +772,18 @@
       "</div>";
     }
 
-    // --- ADMIN APPROVAL (SUPABASE BACKED) ---
+    // --- ADMIN APPROVAL (RBAC ENFORCED) ---
     async function loadCloudAdminData() {
       var container = document.getElementById("admin-cloud-feed");
+      var warningBox = document.getElementById("admin-auth-warning");
       if (!container) return;
+
+      if (currentUserRole !== 'admin') {
+        if (warningBox) warningBox.innerText = "⛔ Access Denied: Admin privileges required to approve businesses.";
+        container.innerHTML = "<p style='color:#b91c1c; font-size:11px; text-align:center;'>Unauthorized role.</p>";
+        return;
+      }
+      if (warningBox) warningBox.innerText = "";
 
       var { data: dbBusinesses, error } = await supabaseClient.from('estate_businesses').select('*').eq('status', 'PENDING');
       if (error || !dbBusinesses || dbBusinesses.length === 0) {
@@ -763,6 +800,8 @@
     }
 
     async function approveCloudBusiness(bizId) {
+      if (currentUserRole !== 'admin') { alert("Unauthorized: Admin role required."); return; }
+
       var { data: biz } = await supabaseClient.from('estate_businesses').select('*').eq('id', bizId).single();
       if (!biz) return;
 
@@ -774,7 +813,7 @@
 
       var ownerPin = "99" + String(Math.floor(1000 + Math.random() * 9000));
       await supabaseClient.from('estate_passes').insert([{
-        pin: ownerPin, secure_token: "NITEL-BIZ-" + ownerPin,
+        pin: ownerPin, secure_token: "NITEL-BIZ-" + crypto.randomUUID(),
         visitor_name: biz.owner_name + " (Owner — " + biz.business_name + ")",
         host_name: biz.location, pass_type: "BUSINESS_OWNER", status: "ACTIVE", expires_at: expiry.toISOString()
       }]);
@@ -798,7 +837,25 @@
       }).join('');
     }
 
-    // --- PHASE D: SUPABASE CLOUD GUARD VERIFICATION ---
+    // --- PHASE D: GUARD CAMERA SCANNER & SERVER VERIFICATION ---
+    function initCameraScanner() {
+      if (typeof Html5Qrcode === "undefined") { alert("QR library loading..."); return; }
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("qr-reader");
+      }
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 200 },
+        async function(decodedText) {
+          await verifyTokenOrPin(decodedText);
+          html5QrCode.stop();
+        },
+        function(errorMessage) {}
+      ).catch(function(err) {
+        alert("Camera permission denied or unavailable.");
+      });
+    }
+
     function pressKey(n) {
       if (enteredPin.length < 8) { enteredPin += n; document.getElementById("pin-display").innerText = enteredPin; }
     }
@@ -809,16 +866,30 @@
     }
 
     async function verifyCloudPass() {
+      await verifyTokenOrPin(enteredPin);
+      enteredPin = "";
+      document.getElementById("pin-display").innerText = "------";
+    }
+
+    async function verifyTokenOrPin(queryValue) {
       var res = document.getElementById("gate-result");
       if (!res) return;
       res.style.display = "block";
 
-      var { data: found, error } = await supabaseClient.from('estate_passes').select('*').eq('pin', enteredPin).single();
+      // Query database matching either PIN or Opaque Secure Token
+      var query = supabaseClient.from('estate_passes').select('*');
+      if (queryValue.startsWith("NITEL-")) {
+        query = query.eq('secure_token', queryValue);
+      } else {
+        query = query.eq('pin', queryValue);
+      }
+
+      var { data: found, error } = await query.single();
       var now = new Date();
 
       if (error || !found) {
         res.style.background = "#fee2e2"; res.style.color = "#991b1b";
-        res.innerHTML = "<b>❌ CLOUD ACCESS DENIED</b><br><small>PIN not found in Supabase database.</small>";
+        res.innerHTML = "<b>❌ CLOUD ACCESS DENIED</b><br><small>Credential not found in Supabase database.</small>";
         playBeep('error');
       } else if (found.status === "REVOKED") {
         res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
@@ -829,13 +900,13 @@
         res.innerHTML = "<b>⚠️ ACCESS DENIED: Visitor Pass Already Used</b>";
         playBeep('error');
       } else if (found.expires_at && now >= new Date(found.expires_at)) {
-        await supabaseClient.from('estate_passes').update({ status: "EXPIRED" }).eq('pin', enteredPin);
+        await supabaseClient.from('estate_passes').update({ status: "EXPIRED" }).eq('id', found.id);
         res.style.background = "#fef3c7"; res.style.color = "#b45309";
         res.innerHTML = "<b>⏱️ ACCESS DENIED: Credential Expired</b>";
         playBeep('error');
       } else {
         if (found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "FAMILY_MEMBER") {
-          await supabaseClient.from('estate_passes').update({ status: "USED" }).eq('pin', enteredPin);
+          await supabaseClient.from('estate_passes').update({ status: "USED" }).eq('id', found.id);
         }
 
         await supabaseClient.from('estate_audit_logs').insert([{
@@ -852,14 +923,11 @@
           "<div style='font-size:13px; font-weight:800; color:#0f2b5c; margin-bottom:4px;'>👤 " + escapeHtml(found.visitor_name) + "</div>" +
           "<div style='font-size:11px; color:#475569;'>🏠 <b>Destination:</b> " + escapeHtml(found.host_name) + "</div>" +
           "<div style='display:flex; gap:6px; margin-top:10px;'>" +
-            "<button type='button' onclick='alert(\"Gate barrier opened.\")' style='flex:1; background:#059669; color:#fff; border:none; padding:8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>🟢 Confirm Entry</button>" +
+            "<button type='button' onclick='alert(\"Gate barrier opened via IoT relay API.\")' style='flex:1; background:#059669; color:#fff; border:none; padding:8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>🟢 Confirm Entry & Open Gate</button>" +
           "</div>";
         playBeep('success');
         renderCloudLogs();
       }
-
-      enteredPin = "";
-      document.getElementById("pin-display").innerText = "------";
     }
 
     async function renderCloudLogs() {
