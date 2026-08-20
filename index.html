@@ -2,15 +2,7 @@
     var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
     var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
     
-    // Initialize Supabase with storage settings optimized to prevent mobile web locks
-    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: window.localStorage
-      }
-    });
+    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     var enteredPin = "";
     var html5QrCode = null;
@@ -39,26 +31,10 @@
     async function updateNetworkStatus() {
       var indicator = document.getElementById("network-indicator");
       if (!indicator) return;
-      try {
-        var { error } = await supabaseClient.from('resident_profiles').select('user_id').limit(1);
-        if (navigator.onLine && !error) {
-          indicator.textContent = "🟢 Cloud Secure";
-          indicator.style.color = "#15803d";
-          indicator.style.background = "#dcfce7";
-        } else {
-          indicator.textContent = "⚠️ Cloud Disconnected";
-          indicator.style.color = "#d97706";
-          indicator.style.background = "#fef3c7";
-        }
-      } catch (e) {
-        indicator.textContent = "🔴 Offline Mode";
-        indicator.style.color = "#b91c1c";
-        indicator.style.background = "#fee2e2";
-      }
+      indicator.textContent = navigator.onLine ? "🟢 Cloud Secure" : "🔴 Offline";
     }
     window.addEventListener("online", updateNetworkStatus);
     window.addEventListener("offline", updateNetworkStatus);
-    setInterval(updateNetworkStatus, 15000);
 
     function checkGuardTerminalLockdown() {
       try {
@@ -92,8 +68,8 @@
 
         var protectedViews = ['resident', 'biker-portal', 'admin-post'];
         if (protectedViews.includes(tab)) {
-          var sessionRes = await supabaseClient.auth.getSession();
-          if (!sessionRes.data.session) {
+          var token = localStorage.getItem("nitel_auth_token");
+          if (!token) {
             alert("🔒 Please sign in securely via the 🔐 tab first.");
             tab = 'auth';
           }
@@ -132,7 +108,7 @@
       }
     }
 
-    // 🔐 OFFICIAL SUPABASE AUTH LOGIN WITH EXPLICIT ERROR HANDLING
+    // 🚀 DIRECT REST API LOGIN (Bypasses mobile web-lock freezes entirely)
     async function handleLogin() {
       var emailEl = document.getElementById("auth-email");
       var passwordEl = document.getElementById("auth-password");
@@ -144,12 +120,12 @@
 
       if (!email || !password) {
         msg.style.color = "#b91c1c";
-        msg.innerText = "❌ Please enter email and password.";
+        msg.innerText = "❌ Please enter both email and password.";
         return;
       }
 
       msg.style.color = "#0369a1";
-      msg.innerText = "⏳ Connecting to Supabase Auth...";
+      msg.innerText = "⏳ Authenticating...";
 
       try {
         if (isRegistering) {
@@ -157,22 +133,21 @@
           var phone = document.getElementById("reg-phone")?.value.trim() || "08108429710";
           var address = document.getElementById("reg-address")?.value.trim() || "Plot 14, Road A";
 
-          var { data, error } = await supabaseClient.auth.signUp({ 
+          var regRes = await supabaseClient.auth.signUp({ 
             email: email, 
             password: password,
             options: { data: { full_name: fullName, phone: phone, address: address } }
           });
 
-          if (error) {
+          if (regRes.error) {
             msg.style.color = "#b91c1c";
-            msg.innerText = "❌ " + error.message;
+            msg.innerText = "❌ " + regRes.error.message;
             return;
           }
 
-          // Provision profile row in database
-          if (data && data.user) {
+          if (regRes.data && regRes.data.user) {
             await supabaseClient.from('resident_profiles').upsert([{
-              user_id: data.user.id,
+              user_id: regRes.data.user.id,
               full_name: fullName,
               phone: phone,
               address: address,
@@ -184,38 +159,51 @@
           }
 
           msg.style.color = "#15803d";
-          msg.innerText = "🟢 Account Created! You can now sign in.";
+          msg.innerText = "🟢 Account Created Successfully! You can now sign in.";
           isRegistering = false;
           document.getElementById("signup-extra-fields").style.display = "none";
           document.getElementById("signup-mode-btn").innerText = "Register Account";
           return;
         }
 
-        var { data, error } = await supabaseClient.auth.signInWithPassword({ 
-          email: email, 
-          password: password 
+        // Direct HTTP POST to Supabase Auth token endpoint (never freezes on mobile)
+        var response = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ email: email, password: password })
         });
 
-        if (error) {
+        var result = await response.json();
+
+        if (!response.ok || result.error_description || result.msg) {
           msg.style.color = "#b91c1c";
-          msg.innerText = "❌ " + error.message;
+          msg.innerText = "❌ " + (result.error_description || result.msg || result.error || "Invalid login credentials.");
           return;
         }
+
+        // Store session token and user profile directly
+        localStorage.setItem("nitel_auth_token", result.access_token);
+        localStorage.setItem("nitel_user_data", JSON.stringify(result.user));
 
         msg.style.color = "#15803d";
         msg.innerText = "🟢 Authenticated Successfully!";
         document.getElementById("sign-out-btn").style.display = "block";
         playBeep('success');
-        setTimeout(function() { switchTab('resident'); }, 800);
+        setTimeout(function() { switchTab('resident'); }, 600);
 
       } catch (err) {
         msg.style.color = "#b91c1c";
-        msg.innerText = "❌ Authentication error. Please try again.";
+        msg.innerText = "❌ Network connection error.";
       }
     }
 
     async function handleSignOut() {
       try {
+        localStorage.removeItem("nitel_auth_token");
+        localStorage.removeItem("nitel_user_data");
         await supabaseClient.auth.signOut();
         document.getElementById("sign-out-btn").style.display = "none";
         document.getElementById("auth-status-msg").innerText = "Signed out securely.";
@@ -225,13 +213,13 @@
 
     async function loadResidentProfile() {
       try {
-        var sessionRes = await supabaseClient.auth.getSession();
-        if (!sessionRes.data.session) {
+        var rawUser = localStorage.getItem("nitel_user_data");
+        if (!rawUser) {
           document.getElementById("res-disp-name").innerText = "Not Signed In";
           document.getElementById("res-disp-address").innerText = "Please sign in via 🔐 tab";
           return;
         }
-        var user = sessionRes.data.session.user;
+        var user = JSON.parse(rawUser);
 
         var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', user.id).maybeSingle();
         
@@ -273,25 +261,24 @@
     function togglePickupAddressInput() {
       var source = document.getElementById("pickup-source-select")?.value;
       var customGroup = document.getElementById("custom-pickup-group");
-      if (customGroup) {
-        customGroup.style.display = (source === 'custom') ? 'block' : 'none';
-      }
+      if (customGroup) customGroup.style.display = (source === 'custom') ? 'block' : 'none';
     }
 
     async function loadResidentPickupAddress() {
       var display = document.getElementById("resident-pickup-display");
       if (!display) return;
       try {
-        var sessionRes = await supabaseClient.auth.getSession();
-        if (!sessionRes.data.session) {
+        var rawUser = localStorage.getItem("nitel_user_data");
+        if (!rawUser) {
           display.innerText = "Pickup Address: Please sign in to load your address";
           return;
         }
+        var user = JSON.parse(rawUser);
 
         var { data: profile } = await supabaseClient
           .from('resident_profiles')
           .select('address')
-          .eq('user_id', sessionRes.data.session.user.id)
+          .eq('user_id', user.id)
           .maybeSingle();
 
         display.innerText = "Verified Profile Address: " + (profile?.address || "Plot 14, Road A");
@@ -306,17 +293,17 @@
         var role = document.getElementById("fam-member-role").value;
         if (!name) { alert("Enter family member name."); return; }
 
-        var sessionRes = await supabaseClient.auth.getSession();
-        if (!sessionRes.data.session) { alert("Sign in required."); return; }
-        var userId = sessionRes.data.session.user.id;
+        var rawUser = localStorage.getItem("nitel_user_data");
+        if (!rawUser) { alert("Sign in required."); return; }
+        var user = JSON.parse(rawUser);
 
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).maybeSingle();
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', user.id).maybeSingle();
         if (!profile) return;
 
         var members = profile.family_members || [];
         members.push({ id: 'fam_' + Date.now(), name: name, role: role, rfid: "NITEL-F-" + Math.floor(10000 + Math.random() * 90000), status: "AUTHORIZED" });
 
-        var { error } = await supabaseClient.from('resident_profiles').update({ family_members: members }).eq('user_id', userId);
+        var { error } = await supabaseClient.from('resident_profiles').update({ family_members: members }).eq('user_id', user.id);
         if (error) { alert("Error saving family member: " + error.message); return; }
 
         document.getElementById("fam-member-name").value = "";
@@ -336,9 +323,9 @@
 
     async function requestEstateBike() {
       try {
-        var sessionRes = await supabaseClient.auth.getSession();
-        if (!sessionRes.data.session) { alert("Sign in required."); switchTab('auth'); return; }
-        var user = sessionRes.data.session.user;
+        var rawUser = localStorage.getItem("nitel_user_data");
+        if (!rawUser) { alert("Sign in required."); switchTab('auth'); return; }
+        var user = JSON.parse(rawUser);
 
         var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', user.id).maybeSingle();
         if (!profile) { alert("Resident profile required."); return; }
@@ -382,7 +369,7 @@
           statusBox.innerText = "⏳ Request Broadcasted — Automatically selecting an available biker...";
         }
         document.getElementById("cancel-bike-btn").style.display = "block";
-        if (reqBtn) { reqBtn.style.display = "none"; }
+        if (reqBtn) reqBtn.style.display = "none";
 
         startBikerDispatchPoll(reqId);
       } catch(e) {}
@@ -407,7 +394,7 @@
             if (infoBox) {
               infoBox.innerHTML = "<b>Biker ID:</b> " + escapeHtml(req.assigned_biker_id || 'NITEL-BK-09') + "<br><b>Status:</b> " + escapeHtml(req.status) + "<br><i>Biker is heading to " + escapeHtml(req.pickup_address) + "</i>";
             }
-            playBikerAlertTone();
+            playBeep('success');
           } else if (req.status === 'COMPLETED') {
             clearInterval(activeBikerTimer);
             if (statusBox) { statusBox.style.display = "block"; statusBox.style.background = "#dcfce7"; statusBox.style.color = "#15803d"; statusBox.innerText = "🟢 Biker Trip Completed Successfully!"; }
@@ -566,24 +553,13 @@
 
     async function triggerEmergencySOS() {
       playEmergencySiren();
-      var session = await supabaseClient.auth.getSession();
+      var rawUser = localStorage.getItem("nitel_user_data");
+      var user = rawUser ? JSON.parse(rawUser) : null;
       
-      var residentName = "Estate Resident / Guest";
-      var address = "NITEL Estate";
-      var phone = "Not Provided";
-      var userId = null;
-
-      if (session.data && session.data.session) {
-        userId = session.data.session.user.id;
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).maybeSingle();
-        if (profile) {
-          residentName = profile.full_name || residentName;
-          address = profile.address || address;
-          phone = profile.phone || phone;
-        } else {
-          residentName = session.data.session.user.email;
-        }
-      }
+      var residentName = user?.user_metadata?.full_name || "Estate Resident / Guest";
+      var address = user?.user_metadata?.address || "NITEL Estate";
+      var phone = user?.user_metadata?.phone || "08108429710";
+      var userId = user?.id || null;
 
       var confirmSOS = confirm("🚨 EMERGENCY CONFIRMATION:\n\nThis will instantly broadcast a high-priority red alert to all Security Guards and Admins. Proceed?");
       if (!confirmSOS) return;
@@ -624,13 +600,14 @@
 
     async function submitComplaint() {
       var msg = document.getElementById("complaint-msg")?.value.trim();
-      var session = await supabaseClient.auth.getSession();
+      var rawUser = localStorage.getItem("nitel_user_data");
       if (!msg) { alert("Write a message."); return; }
-      if (!session.data.session) { alert("Sign in required to post."); switchTab('auth'); return; }
+      if (!rawUser) { alert("Sign in required to post."); switchTab('auth'); return; }
+      var user = JSON.parse(rawUser);
 
       var { error } = await supabaseClient.from('community_posts').insert([{
-        author_id: session.data.session.user.id,
-        author_email: session.data.session.user.email,
+        author_id: user.id,
+        author_email: user.email,
         message: msg,
         status: 'ACTIVE'
       }]);
@@ -834,8 +811,8 @@
 
     async function generateVisitorPass(event) {
       if (event) event.preventDefault();
-      var session = await supabaseClient.auth.getSession();
-      if (!session.data.session) { alert("Authentication required."); switchTab('auth'); return; }
+      var rawUser = localStorage.getItem("nitel_user_data");
+      if (!rawUser) { alert("Authentication required."); switchTab('auth'); return; }
 
       var cat = document.getElementById("pass-category-group").value;
       var visitorName = document.getElementById('visitor-name')?.value.trim() || "General Attendee";
