@@ -1,0 +1,973 @@
+  <script>
+    var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
+    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
+    
+    // Initialize Supabase with storage settings optimized to prevent mobile web locks
+    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage
+      }
+    });
+
+    var enteredPin = "";
+    var html5QrCode = null;
+    var isRegistering = false;
+    var activeBikerTimer = null;
+    var currentActiveRequestId = null;
+
+    function escapeHtml(unsafe) {
+      if (!unsafe) return "";
+      return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function playBeep(type) {
+      try {
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(type === 'success' ? 600 : 200, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+      } catch(e) {}
+    }
+
+    async function updateNetworkStatus() {
+      var indicator = document.getElementById("network-indicator");
+      if (!indicator) return;
+      try {
+        var { error } = await supabaseClient.from('resident_profiles').select('user_id').limit(1);
+        if (navigator.onLine && !error) {
+          indicator.textContent = "🟢 Cloud Secure";
+          indicator.style.color = "#15803d";
+          indicator.style.background = "#dcfce7";
+        } else {
+          indicator.textContent = "⚠️ Cloud Disconnected";
+          indicator.style.color = "#d97706";
+          indicator.style.background = "#fef3c7";
+        }
+      } catch (e) {
+        indicator.textContent = "🔴 Offline Mode";
+        indicator.style.color = "#b91c1c";
+        indicator.style.background = "#fee2e2";
+      }
+    }
+    window.addEventListener("online", updateNetworkStatus);
+    window.addEventListener("offline", updateNetworkStatus);
+    setInterval(updateNetworkStatus, 15000);
+
+    function checkGuardTerminalLockdown() {
+      try {
+        var pairedTerminal = localStorage.getItem("nitel_paired_terminal");
+        if (pairedTerminal) {
+          var quickGrid = document.getElementById("main-quick-grid");
+          var heroBtn = document.getElementById("hero-pass-btn");
+          var heroSos = document.getElementById("hero-sos-btn");
+          var headerIcons = document.getElementById("header-nav-icons");
+
+          if (quickGrid) quickGrid.style.display = "none";
+          if (heroBtn) heroBtn.style.display = "none";
+          if (heroSos) heroSos.style.display = "none";
+          if (headerIcons) headerIcons.innerHTML = "<div class='icon-btn' onclick=\"switchTab('guard')\">🛡️</div><div class='icon-btn' onclick=\"switchTab('news')\">📰</div>";
+
+          document.getElementById("guard-pairing-box").style.display = "none";
+          document.getElementById("guard-main-interface").style.display = "block";
+          document.getElementById("guard-terminal-subtitle").innerText = "Authorized Terminal: " + pairedTerminal;
+          return true;
+        }
+      } catch(e) {}
+      return false;
+    }
+
+    async function switchTab(tab) {
+      try {
+        if (checkGuardTerminalLockdown() && tab !== 'guard' && tab !== 'news' && tab !== 'auth') {
+          alert("🔒 Restricted: This gate tablet is locked to the Guard Terminal.");
+          tab = 'guard';
+        }
+
+        var protectedViews = ['resident', 'biker-portal', 'admin-post'];
+        if (protectedViews.includes(tab)) {
+          var sessionRes = await supabaseClient.auth.getSession();
+          if (!sessionRes.data.session) {
+            alert("🔒 Please sign in securely via the 🔐 tab first.");
+            tab = 'auth';
+          }
+        }
+
+        var views = ['auth', 'visitor', 'business-portal', 'resident', 'directory', 'complaints', 'news', 'admin-post', 'guard', 'biker-portal'];
+        views.forEach(function(v) {
+          var el = document.getElementById("view-" + v);
+          if (el) el.style.display = (v === tab) ? 'block' : 'none';
+        });
+
+        if (tab === 'guard') { renderActiveSOSFeeds(); }
+        if (tab === 'directory') renderCloudDirectory();
+        if (tab === 'resident') { loadResidentProfile(); }
+        if (tab === 'admin-post') { loadCloudAdminData(); renderActiveSOSFeeds(); loadAdminBikers(); }
+        if (tab === 'biker-portal') { loadResidentPickupAddress(); }
+        if (tab === 'complaints') renderComplaints();
+        if (tab === 'news') renderNewsFeed();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {}
+    }
+
+    function toggleSignUpMode() {
+      isRegistering = !isRegistering;
+      var extraFields = document.getElementById("signup-extra-fields");
+      var modeBtn = document.getElementById("signup-mode-btn");
+      var msg = document.getElementById("auth-status-msg");
+      if (isRegistering) {
+        extraFields.style.display = "block";
+        modeBtn.innerText = "Back to Sign In";
+        msg.innerText = "Fill in your details to register a new account.";
+      } else {
+        extraFields.style.display = "none";
+        modeBtn.innerText = "Register Account";
+        msg.innerText = "";
+      }
+    }
+
+    // 🔐 OFFICIAL SUPABASE AUTH LOGIN WITH EXPLICIT ERROR HANDLING
+    async function handleLogin() {
+      var emailEl = document.getElementById("auth-email");
+      var passwordEl = document.getElementById("auth-password");
+      var msg = document.getElementById("auth-status-msg");
+
+      if (!emailEl || !passwordEl) return;
+      var email = emailEl.value.trim();
+      var password = passwordEl.value.trim();
+
+      if (!email || !password) {
+        msg.style.color = "#b91c1c";
+        msg.innerText = "❌ Please enter email and password.";
+        return;
+      }
+
+      msg.style.color = "#0369a1";
+      msg.innerText = "⏳ Connecting to Supabase Auth...";
+
+      try {
+        if (isRegistering) {
+          var fullName = document.getElementById("reg-fullname")?.value.trim() || "Chief Owueme Mitchelle";
+          var phone = document.getElementById("reg-phone")?.value.trim() || "08108429710";
+          var address = document.getElementById("reg-address")?.value.trim() || "Plot 14, Road A";
+
+          var { data, error } = await supabaseClient.auth.signUp({ 
+            email: email, 
+            password: password,
+            options: { data: { full_name: fullName, phone: phone, address: address } }
+          });
+
+          if (error) {
+            msg.style.color = "#b91c1c";
+            msg.innerText = "❌ " + error.message;
+            return;
+          }
+
+          // Provision profile row in database
+          if (data && data.user) {
+            await supabaseClient.from('resident_profiles').upsert([{
+              user_id: data.user.id,
+              full_name: fullName,
+              phone: phone,
+              address: address,
+              rfid_tag: "NITEL-R-" + Math.floor(10000 + Math.random() * 90000),
+              access_status: "AUTHORIZED",
+              levy_status: "PENDING",
+              family_members: []
+            }], { onConflict: 'user_id' });
+          }
+
+          msg.style.color = "#15803d";
+          msg.innerText = "🟢 Account Created! You can now sign in.";
+          isRegistering = false;
+          document.getElementById("signup-extra-fields").style.display = "none";
+          document.getElementById("signup-mode-btn").innerText = "Register Account";
+          return;
+        }
+
+        var { data, error } = await supabaseClient.auth.signInWithPassword({ 
+          email: email, 
+          password: password 
+        });
+
+        if (error) {
+          msg.style.color = "#b91c1c";
+          msg.innerText = "❌ " + error.message;
+          return;
+        }
+
+        msg.style.color = "#15803d";
+        msg.innerText = "🟢 Authenticated Successfully!";
+        document.getElementById("sign-out-btn").style.display = "block";
+        playBeep('success');
+        setTimeout(function() { switchTab('resident'); }, 800);
+
+      } catch (err) {
+        msg.style.color = "#b91c1c";
+        msg.innerText = "❌ Authentication error. Please try again.";
+      }
+    }
+
+    async function handleSignOut() {
+      try {
+        await supabaseClient.auth.signOut();
+        document.getElementById("sign-out-btn").style.display = "none";
+        document.getElementById("auth-status-msg").innerText = "Signed out securely.";
+        switchTab('auth');
+      } catch(e) {}
+    }
+
+    async function loadResidentProfile() {
+      try {
+        var sessionRes = await supabaseClient.auth.getSession();
+        if (!sessionRes.data.session) {
+          document.getElementById("res-disp-name").innerText = "Not Signed In";
+          document.getElementById("res-disp-address").innerText = "Please sign in via 🔐 tab";
+          return;
+        }
+        var user = sessionRes.data.session.user;
+
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', user.id).maybeSingle();
+        
+        if (!profile) {
+          profile = {
+            user_id: user.id,
+            full_name: user.user_metadata?.full_name || "Chief Owueme Mitchelle",
+            phone: user.user_metadata?.phone || "08108429710",
+            address: user.user_metadata?.address || "Plot 14, Road A",
+            rfid_tag: "NITEL-R-" + Math.floor(10000 + Math.random() * 90000),
+            access_status: "AUTHORIZED",
+            levy_status: "PENDING",
+            family_members: []
+          };
+          await supabaseClient.from('resident_profiles').upsert([profile], { onConflict: 'user_id' });
+        }
+
+        document.getElementById("res-disp-name").innerText = profile.full_name || "Chief Owueme Mitchelle";
+        document.getElementById("res-disp-address").innerText = profile.address || "Plot 14, Road A";
+        document.getElementById("res-disp-rfid").innerText = profile.rfid_tag || "NITEL-R-88412";
+        document.getElementById("res-disp-levy").innerText = profile.levy_status || "PENDING";
+        
+        var accessBadge = document.getElementById("res-disp-access");
+        if (accessBadge) {
+          accessBadge.innerText = profile.access_status || "AUTHORIZED";
+          accessBadge.style.color = profile.access_status === 'AUTHORIZED' ? '#15803d' : '#b91c1c';
+        }
+        
+        var residentQrBox = document.getElementById("resident-qr-box");
+        if (residentQrBox && typeof QRCode !== "undefined") {
+          residentQrBox.innerHTML = "";
+          new QRCode(residentQrBox, { text: profile.rfid_tag || "NITEL-R-88412", width: 110, height: 110 });
+        }
+
+        renderHouseholdMembers(profile.family_members || []);
+      } catch (e) {}
+    }
+
+    function togglePickupAddressInput() {
+      var source = document.getElementById("pickup-source-select")?.value;
+      var customGroup = document.getElementById("custom-pickup-group");
+      if (customGroup) {
+        customGroup.style.display = (source === 'custom') ? 'block' : 'none';
+      }
+    }
+
+    async function loadResidentPickupAddress() {
+      var display = document.getElementById("resident-pickup-display");
+      if (!display) return;
+      try {
+        var sessionRes = await supabaseClient.auth.getSession();
+        if (!sessionRes.data.session) {
+          display.innerText = "Pickup Address: Please sign in to load your address";
+          return;
+        }
+
+        var { data: profile } = await supabaseClient
+          .from('resident_profiles')
+          .select('address')
+          .eq('user_id', sessionRes.data.session.user.id)
+          .maybeSingle();
+
+        display.innerText = "Verified Profile Address: " + (profile?.address || "Plot 14, Road A");
+      } catch(e) {
+        display.innerText = "Verified Profile Address: Plot 14, Road A";
+      }
+    }
+
+    async function addHouseholdMember() {
+      try {
+        var name = document.getElementById("fam-member-name").value.trim();
+        var role = document.getElementById("fam-member-role").value;
+        if (!name) { alert("Enter family member name."); return; }
+
+        var sessionRes = await supabaseClient.auth.getSession();
+        if (!sessionRes.data.session) { alert("Sign in required."); return; }
+        var userId = sessionRes.data.session.user.id;
+
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).maybeSingle();
+        if (!profile) return;
+
+        var members = profile.family_members || [];
+        members.push({ id: 'fam_' + Date.now(), name: name, role: role, rfid: "NITEL-F-" + Math.floor(10000 + Math.random() * 90000), status: "AUTHORIZED" });
+
+        var { error } = await supabaseClient.from('resident_profiles').update({ family_members: members }).eq('user_id', userId);
+        if (error) { alert("Error saving family member: " + error.message); return; }
+
+        document.getElementById("fam-member-name").value = "";
+        playBeep('success');
+        loadResidentProfile();
+      } catch(e) {}
+    }
+
+    function renderHouseholdMembers(members) {
+      var feed = document.getElementById("household-members-feed");
+      if (!feed) return;
+      if (!members || members.length === 0) { feed.innerHTML = "<small style='color:#64748b;'>No family members registered yet.</small>"; return; }
+      feed.innerHTML = members.map(function(m) {
+        return "<div style='background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'><div><b>👤 " + escapeHtml(m.name) + "</b> (" + escapeHtml(m.role) + ")<br><span style='font-family:monospace; color:#1e40af;'>" + escapeHtml(m.rfid) + "</span></div><span style='color:#15803d; font-weight:800;'>" + escapeHtml(m.status) + "</span></div>";
+      }).join('');
+    }
+
+    async function requestEstateBike() {
+      try {
+        var sessionRes = await supabaseClient.auth.getSession();
+        if (!sessionRes.data.session) { alert("Sign in required."); switchTab('auth'); return; }
+        var user = sessionRes.data.session.user;
+
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', user.id).maybeSingle();
+        if (!profile) { alert("Resident profile required."); return; }
+
+        var source = document.getElementById("pickup-source-select")?.value;
+        var pickupAddr = source === 'custom' ? document.getElementById("custom-pickup-input")?.value.trim() : profile.address;
+        if (!pickupAddr) { alert("Please provide a valid pickup address."); return; }
+
+        var dest = document.getElementById("biker-dest-input")?.value.trim() || "Estate Gate";
+        var passengers = document.getElementById("biker-passengers")?.value || "1";
+        var notes = document.getElementById("biker-note-input")?.value.trim() || "";
+
+        var reqBtn = document.getElementById("request-bike-btn");
+        if (reqBtn) { reqBtn.disabled = true; reqBtn.innerText = "Dispatching Biker..."; }
+
+        var reqId = 'req_' + Date.now();
+        var { error } = await supabaseClient.from('estate_biker_requests').insert([{
+          id: reqId,
+          resident_id: user.id,
+          resident_name: profile.full_name,
+          resident_phone: profile.phone,
+          pickup_address: pickupAddr,
+          destination: dest,
+          passengers: passengers,
+          special_instructions: notes,
+          status: 'REQUESTED'
+        }]);
+
+        if (error) {
+          alert("Dispatch Error: " + error.message);
+          if (reqBtn) { reqBtn.disabled = false; reqBtn.innerText = "Request Estate Bike 🏍️"; }
+          return;
+        }
+
+        currentActiveRequestId = reqId;
+        var statusBox = document.getElementById("biker-request-status-box");
+        if (statusBox) {
+          statusBox.style.display = "block";
+          statusBox.style.background = "#eff6ff";
+          statusBox.style.color = "#1e40af";
+          statusBox.innerText = "⏳ Request Broadcasted — Automatically selecting an available biker...";
+        }
+        document.getElementById("cancel-bike-btn").style.display = "block";
+        if (reqBtn) { reqBtn.style.display = "none"; }
+
+        startBikerDispatchPoll(reqId);
+      } catch(e) {}
+    }
+
+    function startBikerDispatchPoll(reqId) {
+      if (activeBikerTimer) clearInterval(activeBikerTimer);
+      activeBikerTimer = setInterval(async function() {
+        try {
+          var { data: req } = await supabaseClient.from('estate_biker_requests').select('*').eq('id', reqId).maybeSingle();
+          if (!req) return;
+
+          var statusBox = document.getElementById("biker-request-status-box");
+          var assignedCard = document.getElementById("assigned-biker-card");
+          var infoBox = document.getElementById("assigned-biker-info");
+
+          if (req.status === 'REQUESTED') {
+            await assignAvailableBiker(reqId);
+          } else if (req.status === 'ASSIGNED' || req.status === 'BIKER_ACCEPTED') {
+            if (statusBox) statusBox.style.display = "none";
+            if (assignedCard) assignedCard.style.display = "block";
+            if (infoBox) {
+              infoBox.innerHTML = "<b>Biker ID:</b> " + escapeHtml(req.assigned_biker_id || 'NITEL-BK-09') + "<br><b>Status:</b> " + escapeHtml(req.status) + "<br><i>Biker is heading to " + escapeHtml(req.pickup_address) + "</i>";
+            }
+            playBikerAlertTone();
+          } else if (req.status === 'COMPLETED') {
+            clearInterval(activeBikerTimer);
+            if (statusBox) { statusBox.style.display = "block"; statusBox.style.background = "#dcfce7"; statusBox.style.color = "#15803d"; statusBox.innerText = "🟢 Biker Trip Completed Successfully!"; }
+            resetBikerUI();
+          }
+        } catch(e) {}
+      }, 4000);
+    }
+
+    async function assignAvailableBiker(reqId) {
+      try {
+        var { data: bikers } = await supabaseClient.from('estate_bikers').select('*').eq('status', 'ONLINE');
+        if (!bikers || bikers.length === 0) return;
+
+        var eligible = bikers.filter(function(b) { return b.availability === 'AVAILABLE'; });
+        if (eligible.length === 0) return;
+
+        var selectedBiker = eligible[Math.floor(Math.random() * eligible.length)];
+
+        await supabaseClient.from('estate_biker_requests').update({
+          assigned_biker_id: selectedBiker.bike_id,
+          status: 'ASSIGNED'
+        }).eq('id', reqId).eq('status', 'REQUESTED');
+      } catch(e) {}
+    }
+
+    async function cancelEstateBikeRequest() {
+      if (!currentActiveRequestId) return;
+      try {
+        await supabaseClient.from('estate_biker_requests').update({ status: 'CANCELLED' }).eq('id', currentActiveRequestId);
+        if (activeBikerTimer) clearInterval(activeBikerTimer);
+        alert("❌ Biker request cancelled.");
+        resetBikerUI();
+      } catch(e) {}
+    }
+
+    function resetBikerUI() {
+      currentActiveRequestId = null;
+      document.getElementById("biker-request-status-box").style.display = "none";
+      document.getElementById("cancel-bike-btn").style.display = "none";
+      document.getElementById("assigned-biker-card").style.display = "none";
+      var reqBtn = document.getElementById("request-bike-btn");
+      if (reqBtn) { reqBtn.style.display = "block"; reqBtn.disabled = false; reqBtn.innerText = "Request Estate Bike 🏍️"; }
+    }
+
+    async function loadBikerDashboard() {
+      var bikeId = document.getElementById("biker-login-id").value.trim().toUpperCase();
+      if (!bikeId) { alert("Enter your Bike ID."); return; }
+
+      var { data: biker } = await supabaseClient.from('estate_bikers').select('*').eq('bike_id', bikeId).maybeSingle();
+      if (!biker) { alert("❌ Invalid Bike ID or not registered by admin."); return; }
+
+      document.getElementById("biker-live-terminal").style.display = "block";
+      playBeep('success');
+      pollBikerTerminal(bikeId);
+    }
+
+    function pollBikerTerminal(bikeId) {
+      setInterval(async function() {
+        try {
+          var { data: requests } = await supabaseClient
+            .from('estate_biker_requests')
+            .select('*')
+            .eq('assigned_biker_id', bikeId)
+            .in('status', ['ASSIGNED', 'BIKER_ACCEPTED'])
+            .order('created_at', { ascending: false });
+
+          var feed = document.getElementById("incoming-biker-requests");
+          if (!feed) return;
+
+          if (!requests || requests.length === 0) {
+            feed.innerHTML = "<small style='color:#64748b;'>No active ride assignments...</small>";
+            return;
+          }
+
+          feed.innerHTML = requests.map(function(r) {
+            return "<div style='background:#fff; border:1.5px solid #0f766e; padding:10px; border-radius:8px; font-size:11px; margin-bottom:6px;'>" +
+              "<b>🏍️ RIDE DISPATCH: " + escapeHtml(r.resident_name) + "</b><br>" +
+              "📍 <b>Pickup:</b> " + escapeHtml(r.pickup_address) + "<br>" +
+              "🏁 <b>Destination:</b> " + escapeHtml(r.destination) + "<br>" +
+              "📞 <b>Contact:</b> <a href='tel:" + escapeHtml(r.resident_phone) + "'>" + escapeHtml(r.resident_phone) + "</a><br>" +
+              "<div style='display:flex; gap:6px; margin-top:8px;'>" +
+                "<button type='button' onclick='acceptBikerRide(\"" + r.id + "\")' style='flex:1; background:#059669; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:800; cursor:pointer;'>Accept Ride ✅</button>" +
+                "<button type='button' onclick='completeBikerRide(\"" + r.id + "\")' style='flex:1; background:#0284c7; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:800; cursor:pointer;'>Complete Trip 🏁</button>" +
+              "</div>" +
+            "</div>";
+          }).join('');
+        } catch(e) {}
+      }, 4000);
+    }
+
+    async function acceptBikerRide(reqId) {
+      await supabaseClient.from('estate_biker_requests').update({ status: 'BIKER_ACCEPTED' }).eq('id', reqId);
+      playBeep('success');
+      alert("🟢 Ride Accepted! Navigate to pickup address.");
+    }
+
+    async function completeBikerRide(reqId) {
+      await supabaseClient.from('estate_biker_requests').update({ status: 'COMPLETED' }).eq('id', reqId);
+      playBeep('success');
+      alert("🏁 Trip marked completed.");
+    }
+
+    async function registerEstateBiker(event) {
+      if (event) event.preventDefault();
+      var name = document.getElementById("adm-biker-name").value.trim();
+      var bikeId = document.getElementById("adm-bike-id").value.trim().toUpperCase();
+      var phone = document.getElementById("adm-biker-phone").value.trim();
+
+      var { error } = await supabaseClient.from('estate_bikers').insert([{
+        biker_name: name, bike_id: bikeId, phone: phone, status: 'ONLINE', availability: 'AVAILABLE'
+      }]);
+
+      if (error) { alert("Error registering biker: " + error.message); return; }
+      playBeep('success');
+      alert("🟢 Biker registered successfully!");
+      document.getElementById("admin-biker-form").reset();
+      loadAdminBikers();
+    }
+
+    async function loadAdminBikers() {
+      var container = document.getElementById("admin-bikers-feed");
+      if (!container) return;
+      var { data: bikers } = await supabaseClient.from('estate_bikers').select('*');
+      if (!bikers || bikers.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No registered bikers.</small>"; return; }
+      container.innerHTML = bikers.map(function(b) {
+        return "<div style='background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; margin-bottom:4px;'><b>🏍️ " + escapeHtml(b.biker_name) + "</b> (" + escapeHtml(b.bike_id) + ") | 📞 " + escapeHtml(b.phone) + " | Status: <span style='color:#15803d; font-weight:800;'>" + escapeHtml(b.status) + "</span></div>";
+      }).join('');
+    }
+
+    async function pairGuardTerminal() {
+      var code = document.getElementById("pairing-code-input").value.trim().toUpperCase();
+      if (!code) { alert("⚠️ Please enter a valid pairing code."); return; }
+
+      try {
+        var { data: term, error } = await supabaseClient
+          .from('guard_terminals')
+          .select('*')
+          .eq('pairing_code', code)
+          .single();
+
+        if (error || !term) {
+          playBeep('error');
+          alert("❌ Incorrect or invalid terminal pairing code.");
+          return;
+        }
+
+        localStorage.setItem("nitel_paired_terminal", term.terminal_name + " (" + term.location + ")");
+        playBeep('success');
+        alert("🟢 Tablet Successfully Paired as " + term.terminal_name + "!");
+        location.reload();
+      } catch(e) {
+        alert("❌ Error verifying pairing code.");
+      }
+    }
+
+    async function triggerEmergencySOS() {
+      playEmergencySiren();
+      var session = await supabaseClient.auth.getSession();
+      
+      var residentName = "Estate Resident / Guest";
+      var address = "NITEL Estate";
+      var phone = "Not Provided";
+      var userId = null;
+
+      if (session.data && session.data.session) {
+        userId = session.data.session.user.id;
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).maybeSingle();
+        if (profile) {
+          residentName = profile.full_name || residentName;
+          address = profile.address || address;
+          phone = profile.phone || phone;
+        } else {
+          residentName = session.data.session.user.email;
+        }
+      }
+
+      var confirmSOS = confirm("🚨 EMERGENCY CONFIRMATION:\n\nThis will instantly broadcast a high-priority red alert to all Security Guards and Admins. Proceed?");
+      if (!confirmSOS) return;
+
+      try {
+        var { error } = await supabaseClient.from('estate_sos_alerts').insert([{
+          user_id: userId, resident_name: residentName, address: address, phone: phone, status: 'ACTIVE'
+        }]);
+
+        if (error) { alert("SOS Error: " + error.message); return; }
+        playEmergencySiren();
+        alert("🚨 EMERGENCY SOS BROADCASTED SUCCESSFULLY!");
+        switchTab('guard');
+      } catch(e) { alert("Unable to trigger SOS."); }
+    }
+
+    async function renderActiveSOSFeeds() {
+      var feeds = ['guard-sos-feed', 'admin-sos-feed'];
+      try {
+        var { data: activeSOS } = await supabaseClient.from('estate_sos_alerts').select('*').eq('status', 'ACTIVE').order('created_at', { ascending: false });
+        feeds.forEach(function(feedId) {
+          var container = document.getElementById(feedId);
+          if (!container) return;
+          if (!activeSOS || activeSOS.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No active emergencies.</small>"; return; }
+          container.innerHTML = activeSOS.map(function(sos) {
+            return "<div style='background:#ffffff; border:1px solid #fecaca; padding:8px; border-radius:8px; font-size:11px; margin-bottom:6px;'><b>🚨 " + escapeHtml(sos.resident_name) + "</b><br>🏠 " + escapeHtml(sos.address) + " | 📞 <a href='tel:" + escapeHtml(sos.phone) + "'>" + escapeHtml(sos.phone) + "</a><br><button type='button' onclick='resolveSOS(\"" + sos.id + "\")' style='background:#059669; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-weight:800; margin-top:4px; cursor:pointer;'>Resolve / Clear ✅</button></div>";
+          }).join('');
+        });
+      } catch(e) {}
+    }
+
+    async function resolveSOS(sosId) {
+      if (!confirm("Clear this emergency alert?")) return;
+      await supabaseClient.from('estate_sos_alerts').update({ status: 'RESOLVED' }).eq('id', sosId);
+      playBeep('success');
+      renderActiveSOSFeeds();
+    }
+
+    async function submitComplaint() {
+      var msg = document.getElementById("complaint-msg")?.value.trim();
+      var session = await supabaseClient.auth.getSession();
+      if (!msg) { alert("Write a message."); return; }
+      if (!session.data.session) { alert("Sign in required to post."); switchTab('auth'); return; }
+
+      var { error } = await supabaseClient.from('community_posts').insert([{
+        author_id: session.data.session.user.id,
+        author_email: session.data.session.user.email,
+        message: msg,
+        status: 'ACTIVE'
+      }]);
+
+      if (error) { alert("Error posting: " + error.message); return; }
+      document.getElementById("complaint-msg").value = "";
+      renderComplaints();
+      playBeep('success');
+      alert("Notice posted successfully to Community Wall!");
+    }
+
+    async function renderComplaints() {
+      var container = document.getElementById("complaints-feed");
+      if (!container) return;
+      var { data: posts } = await supabaseClient.from('community_posts').select('*').order('created_at', { ascending: false }).limit(20);
+      if (!posts || posts.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No community posts yet.</small>"; return; }
+      container.innerHTML = posts.map(function(p) {
+        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:11px; margin-bottom:6px;'><b>👤 " + escapeHtml(p.author_email || 'Resident') + "</b><br><small>" + escapeHtml(p.message) + "</small></div>";
+      }).join('');
+    }
+
+    async function submitBusinessRegistration(event) {
+      if (event) event.preventDefault();
+      var submitBtn = document.getElementById("biz-submit-btn");
+      var photoInput = document.getElementById("biz-photos-input");
+
+      try {
+        var bName = document.getElementById("biz-name")?.value.trim();
+        var categoryText = document.getElementById("biz-category-text")?.value.trim();
+        var shopNo = document.getElementById("biz-shop-no")?.value.trim();
+        var avenue = document.getElementById("biz-avenue")?.value.trim();
+        var ownerName = document.getElementById("biz-owner-name")?.value.trim();
+        var phone = document.getElementById("biz-owner-phone")?.value.trim();
+
+        if (!bName || !ownerName || !phone || !shopNo || !avenue || !categoryText) {
+          alert("Please complete all required fields.");
+          return;
+        }
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.style.opacity = "0.6";
+          submitBtn.innerText = "Uploading Photos & Submitting...";
+        }
+
+        var { data: existing } = await supabaseClient
+          .from('estate_businesses')
+          .select('business_name')
+          .ilike('business_name', bName);
+
+        if (existing && existing.length > 0) {
+          alert("❌ A business with the name '" + bName + "' is already registered or pending review!");
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = "1"; submitBtn.innerText = "Submit Business to Cloud DB"; }
+          return;
+        }
+
+        var photoPublicUrls = [];
+        if (photoInput && photoInput.files && photoInput.files.length > 0) {
+          var filesToProcess = Array.from(photoInput.files).slice(0, 3);
+          for (var file of filesToProcess) {
+            var fileExt = file.name.split('.').pop();
+            var fileName = 'biz_' + Date.now() + '_' + Math.random().toString(36.substring(2)) + '.' + fileExt;
+            var filePath = 'public/' + fileName;
+
+            var { error: uploadError } = await supabaseClient.storage
+              .from('business-photos')
+              .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+            if (!uploadError) {
+              var { data: publicUrlData } = supabaseClient.storage
+                .from('business-photos')
+                .getPublicUrl(filePath);
+              if (publicUrlData) {
+                photoPublicUrls.push(publicUrlData.publicUrl);
+              }
+            }
+          }
+        }
+
+        var business = {
+          id: 'biz_' + Date.now(),
+          business_name: bName,
+          category: categoryText,
+          location: shopNo + ", " + avenue,
+          owner_name: ownerName,
+          phone: phone,
+          photos: photoPublicUrls,
+          status: "PENDING"
+        };
+
+        var { error } = await supabaseClient.from('estate_businesses').insert([business]);
+        if (error) { 
+          alert("Cloud DB Error: " + error.message); 
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = "1"; submitBtn.innerText = "Submit Business to Cloud DB"; } 
+          return; 
+        }
+
+        var resBox = document.getElementById("business-submit-result");
+        if (resBox) {
+          resBox.style.display = "block";
+          resBox.innerText = "⏳ Business & photos submitted securely to Supabase Storage! Awaiting Admin Approval.";
+        }
+        document.getElementById("business-registration-form").reset();
+        playBeep('success');
+      } catch (error) {
+        alert("Unable to submit business registration.");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = "1";
+          submitBtn.innerText = "Submit Business to Cloud DB";
+        }
+      }
+    }
+
+    async function renderCloudDirectory() {
+      var container = document.getElementById("directory-listings-feed");
+      if (!container) return;
+      var { data: dbApproved } = await supabaseClient.from('estate_businesses').select('*').eq('status', 'ACTIVE');
+      if (!dbApproved || dbApproved.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No active business permits in Cloud DB yet.</small>"; return; }
+      container.innerHTML = dbApproved.map(function(item) {
+        var rawPhone = (item.phone || '').trim().replace(/[^0-9+]/g, '');
+        if (rawPhone.startsWith('0')) {
+          rawPhone = '234' + rawPhone.substring(1);
+        }
+        var cleanPhone = escapeHtml(rawPhone);
+        
+        var photosHtml = "";
+        if (item.photos && item.photos.length > 0) {
+          photosHtml = "<div style='display:flex; gap:4px; margin-top:6px;'>" + item.photos.map(function(p) {
+            return "<img src='" + p + "' style='width:50px; height:50px; object-fit:cover; border-radius:6px; border:1px solid #cbd5e1;' />";
+          }).join('') + "</div>";
+        }
+        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px; font-size:11px; margin-bottom:8px;'>" +
+          "<b>🏪 " + escapeHtml(item.business_name || item.name) + "</b> (" + escapeHtml(item.category) + ")<br>" +
+          "📍 " + escapeHtml(item.location) + " | 👤 " + escapeHtml(item.owner_name) + "<br>" +
+          "Permit ID: <span style='font-family:monospace; font-weight:700; color:#0f2b5c;'>" + escapeHtml(item.permit_code || 'BUS-PENDING') + "</span>" +
+          photosHtml +
+          "<div style='display:flex; gap:6px; margin-top:8px;'>" +
+            "<a href='tel:+" + cleanPhone + "' style='flex:1; text-align:center; background:#0284c7; color:#fff; text-decoration:none; padding:6px; border-radius:6px; font-weight:800;'>📞 Call Owner</a>" +
+            "<a href='https://wa.me/" + cleanPhone + "?text=Hello%20" + encodeURIComponent(item.business_name) + ",%20I%20found%20you%20on%20NITEL%20Estate%20Directory.' target='_blank' style='flex:1; text-align:center; background:#059669; color:#fff; text-decoration:none; padding:6px; border-radius:6px; font-weight:800;'>💬 WhatsApp</a>" +
+          "</div>" +
+        "</div>";
+      }).join('');
+    }
+
+    async function loadCloudAdminData() {
+      var container = document.getElementById("admin-cloud-feed");
+      if (!container) return;
+      
+      var { data: bizList, error } = await supabaseClient
+        .from('estate_businesses')
+        .select('*')
+        .in('status', ['PENDING', 'SUSPENDED']);
+
+      if (error) { alert("❌ Error: " + error.message); return; }
+
+      if (!bizList || bizList.length === 0) {
+        container.innerHTML = "<small style='color:#64748b;'>No pending business approvals.</small>";
+        return;
+      }
+
+      container.innerHTML = bizList.map(function(b) {
+        var statusColor = b.status === 'ACTIVE' ? '#15803d' : (b.status === 'REVOKED' || b.status === 'REJECTED' ? '#b91c1c' : '#d97706');
+        return "<div style='background:#fff; border:1.5px solid #cbd5e1; padding:12px; border-radius:10px; font-size:11px; margin-bottom:8px;'>" +
+          "<b>🏪 " + escapeHtml(b.business_name || b.name) + "</b> (" + escapeHtml(b.category) + ")<br>" +
+          "📍 " + escapeHtml(b.location) + " | 👤 " + escapeHtml(b.owner_name) + " | 📞 " + escapeHtml(b.phone) + "<br>" +
+          "Status: <span style='font-weight:800; color:" + statusColor + ";'>" + escapeHtml(b.status || 'PENDING') + "</span><br>" +
+          "Permit: <span style='font-family:monospace; font-weight:700;'>" + escapeHtml(b.permit_code || 'None Assigned') + "</span><br>" +
+          "<div style='display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;'>" +
+            "<button type='button' onclick='approveBusinessPermit(\"" + b.id + "\")' style='background:#059669; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-weight:800; cursor:pointer;'>Approve / Renew 6M ✅</button>" +
+            "<button type='button' onclick='suspendBusiness(\"" + b.id + "\")' style='background:#d97706; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-weight:800; cursor:pointer;'>Suspend ⚠️</button>" +
+            "<button type='button' onclick='revokeBusiness(\"" + b.id + "\")' style='background:#dc2626; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-weight:800; cursor:pointer;'>Revoke ❌</button>" +
+          "</div>" +
+        "</div>";
+      }).join('');
+    }
+
+    async function approveBusinessPermit(bizId) {
+      var permitCode = "BUS-" + Math.floor(1000 + Math.random() * 9000) + "-XP";
+      var expiryDate = new Date(Date.now() + 180 * 24 * 3600 * 1000).toISOString();
+      var { error } = await supabaseClient.from('estate_businesses').update({ status: 'ACTIVE', permit_code: permitCode, expires_at: expiryDate }).eq('id', bizId);
+      if (error) { alert("Error: " + error.message); return; }
+      playBeep('success');
+      alert("🟢 6-Month Business Access Permit Generated (" + permitCode + ")!");
+      loadCloudAdminData();
+    }
+
+    async function suspendBusiness(bizId) {
+      await supabaseClient.from('estate_businesses').update({ status: 'SUSPENDED' }).eq('id', bizId);
+      alert("⚠️ Business suspended temporarily.");
+      loadCloudAdminData();
+    }
+
+    async function revokeBusiness(bizId) {
+      if (!confirm("Are you sure you want to permanently revoke this business permit?")) return;
+      await supabaseClient.from('estate_businesses').update({ status: 'REVOKED' }).eq('id', bizId);
+      alert("🔴 Business permit revoked.");
+      loadCloudAdminData();
+    }
+
+    async function generateVisitorPass(event) {
+      if (event) event.preventDefault();
+      var session = await supabaseClient.auth.getSession();
+      if (!session.data.session) { alert("Authentication required."); switchTab('auth'); return; }
+
+      var cat = document.getElementById("pass-category-group").value;
+      var visitorName = document.getElementById('visitor-name')?.value.trim() || "General Attendee";
+      var vehicle = document.getElementById('visitor-vehicle')?.value.trim() || "Walk-In";
+      var pin = String(Math.floor(100000 + Math.random() * 900000));
+      var opaqueToken = "NITEL-PRM-" + crypto.randomUUID();
+      
+      var durationHours = 24;
+      if (cat === 'ARTISAN') durationHours = 2;
+      else if (cat === 'CONTRACTOR') durationHours = 10;
+      else if (cat === 'PROPERTY_ENQUIRY') durationHours = 1;
+      else if (cat === 'CHURCH' || cat === 'MOSQUE') durationHours = 4;
+      else if (cat === 'SPA' || cat === 'SUPERMARKET' || cat === 'FOOD_VENDOR' || cat === 'BUSINESS_APPOINTMENT') durationHours = 3;
+
+      var expiresAt = new Date(Date.now() + durationHours * 3600 * 1000).toISOString();
+      
+      var hostField = document.getElementById('host-name');
+      var locField = document.getElementById('visitor-location');
+      var hostNameVal = hostField ? hostField.value.trim() : (cat + " Visitor");
+      var locVal = locField ? locField.value : "Road A";
+
+      var hostName = cat === 'PROPERTY_ENQUIRY' ? "Property Enquiry" : (hostNameVal + " (" + locVal + ")");
+
+      var pass = { pin: pin, secure_token: opaqueToken, visitor_name: visitorName, host_name: hostName, vehicle: vehicle, pass_type: cat, status: "VALID", expires_at: expiresAt };
+      var { error } = await supabaseClient.from('estate_passes').insert([pass]);
+      if (error) { alert("Database Error: " + error.message); return; }
+      
+      var result = document.getElementById("visitor-result");
+      result.classList.remove("hidden"); result.style.display = "block";
+      document.getElementById("pass-display-pin").textContent = pin;
+      document.getElementById("visitor-summary-display").innerHTML = "<b>Visitor:</b> " + escapeHtml(visitorName) + "<br><b>Details:</b> " + escapeHtml(hostName) + "<br><b>Duration:</b> " + durationHours + " Hours";
+      
+      var qrBox = document.getElementById("qrcode-box");
+      if (qrBox && typeof QRCode !== "undefined") {
+        qrBox.innerHTML = "";
+        new QRCode(qrBox, { text: opaqueToken, width: 120, height: 120 });
+      }
+      playBeep('success');
+    }
+
+    async function verifyTokenOrPin(queryValue) {
+      var res = document.getElementById("gate-result");
+      res.style.display = "block";
+      
+      if (queryValue.startsWith("BUS-")) {
+        var { data: biz, error } = await supabaseClient.from('estate_businesses').select('*').eq('permit_code', queryValue).maybeSingle();
+        if (error || !biz || biz.status !== 'ACTIVE') {
+          res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
+          res.innerHTML = "<b>⚠️ BUSINESS ACCESS DENIED</b><br>Status: " + escapeHtml(biz ? biz.status : "NOT FOUND");
+          playBeep('error'); return;
+        }
+        res.style.background = "#f0fdf4"; res.style.color = "#0f172a";
+        res.innerHTML = "<b>🟢 ACTIVE BUSINESS PERMIT</b><br>🏪 " + escapeHtml(biz.business_name) + "<br>👤 Owner: " + escapeHtml(biz.owner_name) + "<br>📍 " + escapeHtml(biz.location);
+        playBeep('success');
+        return;
+      }
+
+      if (queryValue.startsWith("NITEL-R-") || queryValue.startsWith("NITEL-F-")) {
+        var { data: residents } = await supabaseClient.from('resident_profiles').select('*');
+        var matchedResident = null;
+        var matchedMember = null;
+
+        if (residents) {
+          residents.forEach(function(r) {
+            if (r.rfid_tag === queryValue) { matchedResident = r; }
+            if (r.family_members) {
+              r.family_members.forEach(function(m) {
+                if (m.rfid === queryValue) { matchedResident = r; matchedMember = m; }
+              });
+            }
+          });
+        }
+
+        if (matchedResident) {
+          if (matchedResident.access_status === 'REVOKED' || matchedResident.access_status === 'SUSPENDED') {
+            res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
+            res.innerHTML = "<b>⚠️ ACCESS DENIED — CREDENTIAL " + escapeHtml(matchedResident.access_status) + "</b>";
+            playBeep('error');
+            return;
+          }
+
+          res.style.background = "#f0fdf4"; res.style.color = "#0f172a";
+          if (matchedMember) {
+            res.innerHTML = "<b>🟢 AUTHORIZED FAMILY MEMBER</b><br>👤 " + escapeHtml(matchedMember.name) + " (" + escapeHtml(matchedMember.role) + ")<br>🏠 Household: " + escapeHtml(matchedResident.full_name) + " (" + escapeHtml(matchedResident.address) + ")";
+          } else {
+            res.innerHTML = "<b>🟢 AUTHORIZED PERMANENT RESIDENT</b><br>👤 " + escapeHtml(matchedResident.full_name) + "<br>🏠 Address: " + escapeHtml(matchedResident.address) + "<br>💰 Levy Status: " + escapeHtml(matchedResident.levy_status || 'PENDING');
+          }
+          playBeep('success');
+          return;
+        }
+      }
+
+      var query = supabaseClient.from('estate_passes').select('*');
+      if (queryValue.startsWith("NITEL-")) { query = query.eq('secure_token', queryValue); } else { query = query.eq('pin', queryValue); }
+      var { data: found, error } = await query.maybeSingle();
+
+      if (error || !found || found.status !== 'VALID' || new Date(found.expires_at) < new Date()) {
+        res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
+        res.innerHTML = "<b>⚠️ ACCESS DENIED / EXPIRED PASS</b>";
+        playBeep('error'); return;
+      }
+      res.style.background = "#f0fdf4"; res.style.color = "#0f172a";
+      res.innerHTML = "<b>🟢 VALID — ACCESS PERMITTED</b><br>👤 " + escapeHtml(found.visitor_name) + "<br>📋 " + escapeHtml(found.host_name);
+      playBeep('success');
+    }
+
+    function initCameraScanner() {
+      if (!html5QrCode) html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 200 }, async function(text) { await verifyTokenOrPin(text); html5QrCode.stop(); }, function() {});
+    }
+
+    function pressKey(n) { if (enteredPin.length < 8) { enteredPin += n; document.getElementById("pin-display").innerText = enteredPin; } }
+    function clearPin() { enteredPin = ""; document.getElementById("pin-display").innerText = "------"; document.getElementById("gate-result").style.display = "none"; }
+    async function verifyCloudPass() { await verifyTokenOrPin(enteredPin); enteredPin = ""; document.getElementById("pin-display").innerText = "------"; }
+
+    function renderNewsFeed() {
+      var container = document.getElementById("news-feed");
+      if (!container) return;
+      container.innerHTML = "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px; font-size:12px;'><b>🏗️ Perimeter Solar Lighting Project Commences</b><br><small style='color:#64748b;'>August 2026 • NITEL CDA Executive</small><p style='margin-top:6px; color:#334155;'>Installation of solar security floodlights along Road A through Road H has officially begun.</p></div>";
+    }
+
+    window.onload = function() {
+      if (window.location.search.includes('reset=true')) {
+        localStorage.removeItem("nitel_paired_terminal");
+        alert("Terminal pairing cleared!");
+        window.location.href = window.location.pathname;
+        return;
+      }
+      updateNetworkStatus();
+      if (!checkGuardTerminalLockdown()) { switchTab('auth'); } else { switchTab('guard'); }
+      renderNewsFeed();
+      renderComplaints();
+      renderActiveSOSFeeds();
+    };
+  </script>
