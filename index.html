@@ -65,8 +65,8 @@
     .error-banner { display: none; padding: 10px; background: #fee2e2; border: 1px solid #ef4444; border-radius: 10px; color: #b91c1c; font-size: 12px; font-weight: 700; margin-top: 10px; }
     .hidden { display: none !important; }
 
-    .result-card { background: #f0fdf4; border: 2px solid #22c55e; border-radius: 16px; padding: 18px; text-align: center; margin-top: 14px; }
-    .pin-hero { font-size: 40px; font-weight: 900; font-family: monospace; letter-spacing: 5px; color: #15803d; margin: 4px 0; }
+    .result-card { border-radius: 16px; padding: 18px; text-align: center; margin-top: 14px; }
+    .pin-hero { font-size: 40px; font-weight: 900; font-family: monospace; letter-spacing: 5px; margin: 4px 0; }
     .qr-container { display: flex; justify-content: center; margin: 12px 0; padding: 8px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; width: 146px; height: 146px; margin-left: auto; margin-right: auto; }
 
     .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
@@ -172,15 +172,15 @@
         <div style="font-size:11px; font-weight:800; color:#0f2b5c; margin-bottom:6px;">📝 Additional Details for Registration</div>
         <div class="form-group">
           <label>Full Name</label>
-          <input id="reg-fullname" type="text" placeholder="e.g. Chief Owueme Mitchelle" style="background:#fff;" />
+          <input id="reg-fullname" type="text" placeholder="Chief Owueme Mitchelle" style="background:#fff;" />
         </div>
         <div class="form-group">
           <label>Phone Number</label>
           <input id="reg-phone" type="tel" placeholder="08108429710" style="background:#fff;" />
         </div>
         <div class="form-group">
-          <label>House Address (Plot & Avenue)</label>
-          <input id="reg-address" type="text" placeholder="Plot 14, Avenue 2" style="background:#fff;" />
+          <label>House Address (Plot & Road)</label>
+          <input id="reg-address" type="text" placeholder="Plot 14, Road A" style="background:#fff;" />
         </div>
       </div>
 
@@ -192,63 +192,94 @@
       <div id="auth-status-msg" style="font-size:11px; margin-top:8px; text-align:center; font-weight:700; color:#0369a1;"></div>
     </div>
 
-    <!-- PHASE A: VISITOR PASS PANEL -->
+    <!-- PHASE A: EXPANDED VISITOR PASS & PERMIT PANEL -->
     <div id="view-visitor" class="panel-card" style="display: none;">
-      <div class="panel-title">Create Secure Visitor Pass</div>
-      <div class="panel-sub">Server-authenticated credential authorization</div>
+      <div class="panel-title">Create Secure Visitor Permit</div>
+      <div class="panel-sub">Select categorized permit type & duration</div>
+
+      <!-- Category Selector -->
+      <div class="form-group">
+        <label>Select Category</label>
+        <select id="pass-category-group" onchange="updateCategoryOptions()">
+          <optgroup label="RESIDENTIAL">
+            <option value="RESIDENTIAL">Residential Guest (24 Hours)</option>
+          </optgroup>
+          <optgroup label="RELIGIOUS / COMMUNITY">
+            <option value="CHURCH">Church Permit (4 Hours)</option>
+            <option value="MOSQUE">Mosque Permit (4 Hours)</option>
+          </optgroup>
+          <optgroup label="BUSINESS">
+            <option value="SPA">Spa Customer (3 Hours)</option>
+            <option value="SUPERMARKET">Supermarket Customer (2 Hours)</option>
+            <option value="FOOD_VENDOR">Food Vendor Customer (3 Hours)</option>
+            <option value="BUSINESS_APPOINTMENT">Business Appointment (3 Hours)</option>
+          </optgroup>
+          <optgroup label="PROPERTY">
+            <option value="PROPERTY_ENQUIRY">Property Enquiry (1 Hour)</option>
+          </optgroup>
+          <optgroup label="WORK">
+            <option value="ARTISAN">Artisan / Worker (2 Hours)</option>
+          </optgroup>
+          <optgroup label="HOSPITALITY">
+            <option value="HOTEL">Hotel / Shortlet (Select Days)</option>
+          </optgroup>
+          <optgroup label="EVENTS">
+            <option value="EVENT">Event Center (Dynamic)</option>
+          </optgroup>
+        </select>
+      </div>
 
       <form id="pass-form" onsubmit="generateVisitorPass(event); return false;">
-        <div class="form-row form-group">
-          <div>
-            <label>Host Name</label>
-            <input id="host-name" type="text" placeholder="e.g. Mr. Adeleke" required />
+        <!-- Dynamic Fields Container -->
+        <div id="dynamic-permit-fields">
+          <div class="form-row form-group">
+            <div>
+              <label>Host Name / Sponsor</label>
+              <input id="host-name" type="text" placeholder="Mr. Adeleke" required />
+            </div>
+            <div>
+              <label>Host Phone</label>
+              <input id="host-phone" type="tel" placeholder="08031234567" />
+            </div>
           </div>
-          <div>
-            <label>Host Phone</label>
-            <input id="host-phone" type="tel" placeholder="e.g. 08031234567" />
+
+          <div class="form-group">
+            <label>Visitor / Guest Full Name</label>
+            <input id="visitor-name" type="text" placeholder="Emmanuel Chukwu" required />
+          </div>
+
+          <div class="form-row form-group">
+            <div>
+              <label>Estate Road (Road A - U)</label>
+              <select id="visitor-location">
+                <option value="Road A">Road A</option><option value="Road B">Road B</option><option value="Road C">Road C</option><option value="Road D">Road D</option><option value="Road E">Road E</option><option value="Road F">Road F</option><option value="Road G">Road G</option><option value="Road H">Road H</option><option value="Road I">Road I</option><option value="Road J">Road J</option><option value="Road K">Road K</option><option value="Road L">Road L</option><option value="Road M">Road M</option><option value="Road N">Road N</option><option value="Road O">Road O</option><option value="Road P">Road P</option><option value="Road Q">Road Q</option><option value="Road R">Road R</option><option value="Road S">Road S</option><option value="Road T">Road T</option><option value="Road U">Road U</option>
+              </select>
+            </div>
+            <div>
+              <label>Vehicle Plate Number</label>
+              <input id="visitor-vehicle" type="text" placeholder="KSF-123AA" required />
+            </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Visitor / Guest Name</label>
-          <input id="visitor-name" type="text" placeholder="e.g. Emmanuel Chukwu" required />
-        </div>
-
-        <div class="form-row form-group">
-          <div>
-            <label>Avenue / Location</label>
-            <select id="visitor-location">
-              <option value="Avenue 1">Avenue 1</option>
-              <option value="Avenue 2">Avenue 2</option>
-              <option value="Avenue 3">Avenue 3</option>
-              <option value="Avenue 4">Avenue 4</option>
-              <option value="Avenue 5">Avenue 5</option>
-            </select>
-          </div>
-          <div>
-            <label>Vehicle Plate (Required)</label>
-            <input id="visitor-vehicle" type="text" placeholder="e.g. KSF-123AA" required />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Pass Category</label>
-          <select id="visitor-pass-type">
-            <option value="RESIDENTIAL">Residential Guest (24 Hours)</option>
-            <option value="CANOPY_RENTAL">Canopy & Chair Rentals (12 Hours)</option>
-            <option value="LABORER">Site Laborer / Worker (8 Hours)</option>
+        <!-- Extra Duration Selector for Hotel/Shortlet -->
+        <div id="hotel-duration-box" class="form-group" style="display:none;">
+          <label>Shortlet Duration</label>
+          <select id="hotel-days">
+            <option value="1">1 Day</option><option value="2">2 Days</option><option value="3">3 Days</option><option value="4">4 Days</option><option value="5">5 Days</option><option value="6">6 Days</option><option value="7">7 Days</option>
           </select>
         </div>
 
         <div id="gen-error-banner" class="error-banner"></div>
 
-        <button type="submit" class="btn-action btn-blue">
-          Authorize Cloud Pass
+        <button type="submit" class="btn-action btn-blue" style="margin-top:14px;">
+          Authorize Cloud Permit 🚀
         </button>
       </form>
 
+      <!-- COLOR-GRADED RESULT CARD -->
       <div id="visitor-result" class="result-card hidden">
-        <div style="font-size: 11px; font-weight: 800; color: #166534; text-transform: uppercase;">Pass Authorized</div>
+        <div id="pass-category-badge" style="font-size: 11px; font-weight: 900; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px;">Permit Authorized</div>
         <div id="pass-display-pin" class="pin-hero">000000</div>
         
         <div id="qrcode-box" class="qr-container"></div>
@@ -267,7 +298,7 @@
         <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; margin-top: 10px;">
           <div class="form-group">
             <label>Business / Shop Name</label>
-            <input id="biz-name" type="text" placeholder="e.g. Alaba Chairs & Canopy" required style="background:#fff;" />
+            <input id="biz-name" type="text" placeholder="Alaba Chairs & Canopy" required style="background:#fff;" />
           </div>
 
           <div class="form-row form-group">
@@ -275,25 +306,28 @@
               <label>Category</label>
               <select id="biz-category" style="background:#fff;">
                 <option value="CANOPY_RENTAL">⛺ Canopy & Chair Rentals</option>
+                <option value="SPA">💆 Spa / Wellness</option>
+                <option value="SUPERMARKET">🛒 Supermarket</option>
                 <option value="RETAIL">🛒 Retail / Provision</option>
                 <option value="POS">🪙 POS Services</option>
                 <option value="WATER">🥤 Water Vendor</option>
+                <option value="RESTAURANT">🍽️ Restaurant / Food Vendor</option>
               </select>
             </div>
             <div>
               <label>Shop Number</label>
-              <input id="biz-shop-no" type="text" placeholder="e.g. Shop 4" required style="background:#fff;" />
+              <input id="biz-shop-no" type="text" placeholder="Shop 4" required style="background:#fff;" />
             </div>
           </div>
 
           <div class="form-row form-group">
             <div>
-              <label>Avenue / Road</label>
-              <input id="biz-avenue" type="text" placeholder="e.g. Road C" required style="background:#fff;" />
+              <label>Estate Road</label>
+              <input id="biz-avenue" type="text" placeholder="Road C" required style="background:#fff;" />
             </div>
             <div>
               <label>Owner's Full Name</label>
-              <input id="biz-owner-name" type="text" placeholder="e.g. Mr. Alaba" required style="background:#fff;" />
+              <input id="biz-owner-name" type="text" placeholder="Mr. Alaba" required style="background:#fff;" />
             </div>
           </div>
 
@@ -318,7 +352,7 @@
         <form id="resident-profile-form" onsubmit="saveResidentProfile(event); return false;">
           <div class="form-group">
             <label>Full Name</label>
-            <input id="res-profile-name" type="text" placeholder="e.g. Chief Owueme Mitchelle" required style="background:#fff;" />
+            <input id="res-profile-name" type="text" placeholder="Chief Owueme Mitchelle" required style="background:#fff;" />
           </div>
           <div class="form-row form-group">
             <div>
@@ -332,8 +366,8 @@
           </div>
           <div class="form-row form-group">
             <div>
-              <label>Avenue / Road</label>
-              <input id="res-profile-avenue" type="text" placeholder="Avenue 2" required style="background:#fff;" />
+              <label>Estate Road</label>
+              <input id="res-profile-avenue" type="text" placeholder="Road A" required style="background:#fff;" />
             </div>
             <div>
               <label>Plot / House No.</label>
@@ -344,38 +378,11 @@
         </form>
       </div>
 
-      <!-- RESIDENT DUES & LEVY LEDGER VIEWER -->
       <div style="background: #fdf2f8; border: 1.5px solid #fbcfe8; border-radius: 14px; padding: 14px; margin-top: 16px;">
         <div style="font-size: 12px; font-weight: 800; color: #db2777; margin-bottom: 6px; text-transform: uppercase;">💰 Estate Dues & Levy Ledger</div>
-        <div style="font-size: 11px; color: #475569; margin-bottom: 10px;">Your assigned community levies and payment statuses:</div>
         <div id="resident-dues-feed" style="display: flex; flex-direction: column; gap: 8px;">
           <small style='color:#64748b;'>Loading your financial ledger...</small>
         </div>
-      </div>
-
-      <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 14px; margin-top: 16px;">
-        <div style="font-size: 12px; font-weight: 800; color: #166534; margin-bottom: 6px; text-transform: uppercase;">👨‍👩‍👧‍👦 Household & Family Badges</div>
-        <form id="family-badge-form" onsubmit="generateFamilyMemberBadge(event); return false;">
-          <div class="form-group" style="margin-bottom:8px;">
-            <label>Family Surname</label>
-            <input id="fam-surname" type="text" placeholder="e.g. Mitchelle Family" required style="background:#fff;" />
-          </div>
-          <div class="form-row form-group">
-            <div>
-              <label>Member Name</label>
-              <input id="fam-member-name" type="text" placeholder="e.g. Simi Mitchelle" required style="background:#fff;" />
-            </div>
-            <div>
-              <label>Role</label>
-              <select id="fam-member-role" style="background:#fff;">
-                <option value="Spouse">Spouse</option>
-                <option value="Child">Child / Dependent</option>
-              </select>
-            </div>
-          </div>
-          <button type="submit" class="btn-action btn-emerald" style="margin-top:8px;">Generate Cloud Family Badge</button>
-        </form>
-        <div id="family-members-list" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;"></div>
       </div>
     </div>
 
@@ -410,9 +417,93 @@
       <div class="panel-sub">Role-Restricted Cloud Management & Approvals</div>
       <div id="admin-auth-warning" style="color:#b91c1c; font-size:12px; font-weight:700; margin-bottom:10px;"></div>
       
-      <!-- DEVICE PAIRING MANAGER -->
+      <!-- EVENT PERMIT CREATOR -->
+      <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #166534; margin-bottom: 8px; text-transform: uppercase;">🎉 Create Event Center Permit</div>
+        <form id="admin-event-form" onsubmit="createEventPermit(event); return false;">
+          <div class="form-row form-group">
+            <div>
+              <label>Event Name</label>
+              <input id="ev-name" type="text" placeholder="Birthday Ceremony" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Event Date</label>
+              <input id="ev-date" type="date" required style="background:#fff;" />
+            </div>
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Start Time</label>
+              <input id="ev-start" type="time" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>End Time</label>
+              <input id="ev-end" type="time" required style="background:#fff;" />
+            </div>
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Venue</label>
+              <input id="ev-venue" type="text" placeholder="Community Hall" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Organizer</label>
+              <input id="ev-org" type="text" placeholder="Chief Organizer" required style="background:#fff;" />
+            </div>
+          </div>
+          <button type="submit" class="btn-action btn-emerald" style="margin-top:8px;">Publish Event Pass & Grace Period (+1hr)</button>
+        </form>
+      </div>
+
+      <!-- BUSINESS STAFF CREDENTIAL MANAGER -->
+      <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #b45309; margin-bottom: 8px; text-transform: uppercase;">🧑‍💼 Add Business Staff Credential</div>
+        <form id="admin-staff-form" onsubmit="createBusinessStaff(event); return false;">
+          <div class="form-row form-group">
+            <div>
+              <label>Select Verified Business</label>
+              <select id="staff-biz-select" style="background:#fff;"></select>
+            </div>
+            <div>
+              <label>Staff Full Name</label>
+              <input id="staff-name" type="text" placeholder="John Doe" required style="background:#fff;" />
+            </div>
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Phone Number</label>
+              <input id="staff-phone" type="tel" placeholder="08000000000" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Role / Position</label>
+              <input id="staff-role" type="text" placeholder="Cashier / Attendant" required style="background:#fff;" />
+            </div>
+          </div>
+          <button type="submit" class="btn-action btn-amber" style="margin-top:8px;">Issue 30-Day Staff Credential</button>
+        </form>
+      </div>
+
+      <!-- AUTHORIZED PROPERTY REPRESENTATIVE MANAGER -->
       <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
-        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🛡️ Guard Terminal Pairing & Management</div>
+        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🛡️ Authorize Property Representative</div>
+        <form id="admin-rep-form" onsubmit="createPropertyRep(event); return false;">
+          <div class="form-row form-group">
+            <div>
+              <label>Representative Full Name</label>
+              <input id="rep-name" type="text" placeholder="Mr. Adewale XYZ" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Property / Plot Assignment</label>
+              <input id="rep-prop" type="text" placeholder="Plot 27, Road D" required style="background:#fff;" />
+            </div>
+          </div>
+          <button type="submit" class="btn-action btn-blue" style="margin-top:8px;">Grant 90-Day Property Rep Credential</button>
+        </form>
+      </div>
+
+      <!-- DEVICE PAIRING MANAGER -->
+      <div style="background: #fdf2f8; border: 1.5px solid #fbcfe8; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #db2777; margin-bottom: 8px; text-transform: uppercase;">🛡️ Guard Terminal Pairing</div>
         <form id="admin-terminal-form" onsubmit="createGuardTerminal(event); return false;">
           <div class="form-row form-group">
             <div>
@@ -424,7 +515,7 @@
               <input id="term-loc" type="text" placeholder="Main Gate" required style="background:#fff;" />
             </div>
           </div>
-          <button type="submit" class="btn-action btn-blue" style="margin-top:8px;">Generate Pairing Code ⚙️</button>
+          <button type="submit" class="btn-action btn-rose" style="margin-top:8px;">Generate Pairing Code ⚙️</button>
         </form>
         <div id="admin-terminals-feed" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;"></div>
       </div>
@@ -435,50 +526,6 @@
         <div id="admin-sos-feed" style="display:flex; flex-direction:column; gap:6px;">
           <small style='color:#64748b;'>No active emergencies.</small>
         </div>
-      </div>
-
-      <!-- PASS REVOCATION MANAGER -->
-      <div style="background: #fdf2f8; border: 1.5px solid #fbcfe8; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
-        <div style="font-size: 12px; font-weight: 800; color: #db2777; margin-bottom: 8px; text-transform: uppercase;">🚫 Active Passes & Revocation</div>
-        <div style="font-size: 11px; color: #475569; margin-bottom: 8px;">Tap revoke to instantly invalidate any visitor or business pass:</div>
-        <div id="admin-active-passes-feed" style="max-height: 160px; overflow-y: auto; display:flex; flex-direction:column; gap:6px;">
-          <small style='color:#64748b;'>Loading active passes...</small>
-        </div>
-      </div>
-
-      <!-- ADMIN LEVY PUBLISHER FORM -->
-      <div style="background: #fef3c7; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
-        <div style="font-size: 12px; font-weight: 800; color: #b45309; margin-bottom: 8px; text-transform: uppercase;">➕ Publish Resident Levy / Due</div>
-        <form id="admin-levy-form" onsubmit="publishEstateLevy(event); return false;">
-          <div class="form-group">
-            <label>Resident Full Name</label>
-            <input id="adm-levy-name" type="text" placeholder="e.g. Chief Owueme Mitchelle" required style="background:#fff;" />
-          </div>
-          <div class="form-row form-group">
-            <div>
-              <label>Address / Plot</label>
-              <input id="adm-levy-address" type="text" placeholder="Plot 14, Avenue 2" required style="background:#fff;" />
-            </div>
-            <div>
-              <label>Amount (₦)</label>
-              <input id="adm-levy-amount" type="number" placeholder="15000" required style="background:#fff;" />
-            </div>
-          </div>
-          <div class="form-row form-group">
-            <div>
-              <label>Levy Title</label>
-              <input id="adm-levy-title" type="text" placeholder="Perimeter Security Levy" required style="background:#fff;" />
-            </div>
-            <div>
-              <label>Status</label>
-              <select id="adm-levy-status" style="background:#fff;">
-                <option value="PENDING">PENDING</option>
-                <option value="PAID">PAID</option>
-              </select>
-            </div>
-          </div>
-          <button type="submit" class="btn-action btn-amber" style="margin-top:10px;">Publish Levy to Cloud DB</button>
-        </form>
       </div>
 
       <button type="button" class="btn-action btn-emerald" onclick="loadCloudAdminData()">Fetch Pending Cloud Approvals</button>
@@ -493,7 +540,6 @@
       <!-- PAIRING GATEWAY BOX -->
       <div id="guard-pairing-box" style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 14px; border-radius: 14px; margin-bottom: 12px; text-align:center;">
         <div style="font-size: 12px; font-weight: 800; color: #0f2b5c; margin-bottom: 6px; text-transform: uppercase;">🔑 Enter Terminal Pairing Code</div>
-        <div style="font-size: 11px; color: #64748b; margin-bottom: 10px;">Input the pairing code generated by management (e.g. NITEL-7K42):</div>
         <input id="pairing-code-input" type="text" placeholder="NITEL-XXXX" style="text-align:center; font-family:monospace; font-size:16px; font-weight:900; background:#fff; margin-bottom:8px;" />
         <button type="button" class="btn-action btn-emerald" onclick="pairGuardTerminal()">Pair & Activate Tablet 🚀</button>
       </div>
@@ -532,6 +578,14 @@
         </div>
 
         <div id="gate-result" style="display:none; padding:14px; border-radius:14px; margin-top:14px; text-align:left;"></div>
+
+        <div style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 12px; border-radius: 12px; margin-top: 14px;">
+          <div style="font-size: 11px; font-weight: 900; color: #0f2b5c; text-transform: uppercase; margin-bottom: 6px;">⚙️ Controlled Access & Emergency Overrides</div>
+          <div class="form-row form-group">
+            <button type="button" class="btn-action btn-amber" style="margin-top:0;" onclick="openControlledOverrideModal()">Resident Override 🟢</button>
+            <button type="button" class="btn-action btn-rose" style="margin-top:0;" onclick="openEmergencyOverrideModal()">Emergency Override 🚨</button>
+          </div>
+        </div>
 
         <div style="margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 14px;">
           <div style="font-size:12px; font-weight:800; color:#0f2b5c; text-transform:uppercase; margin-bottom:6px;">Live Cloud Audit Trail</div>
@@ -579,13 +633,10 @@
           osc.type = 'sawtooth';
           osc.connect(gain);
           gain.connect(audioCtx.destination);
-          
           osc.frequency.setValueAtTime(400, now + (i * 0.4));
           osc.frequency.linearRampToValueAtTime(880, now + (i * 0.4) + 0.2);
-          
           gain.gain.setValueAtTime(0.2, now + (i * 0.4));
           gain.gain.linearRampToValueAtTime(0.01, now + (i * 0.4) + 0.35);
-          
           osc.start(now + (i * 0.4));
           osc.stop(now + (i * 0.4) + 0.35);
         }
@@ -624,7 +675,6 @@
         document.getElementById("guard-pairing-box").style.display = "none";
         document.getElementById("guard-main-interface").style.display = "block";
         document.getElementById("guard-terminal-subtitle").innerText = "Authorized Terminal: " + pairedTerminal;
-        
         return true;
       }
       return false;
@@ -643,8 +693,8 @@
       });
       if (tab === 'guard') { renderCloudLogs(); renderActiveSOSFeeds(); }
       if (tab === 'directory') renderCloudDirectory();
-      if (tab === 'resident') { renderFamilyMembersList(); loadResidentProfile(); loadResidentDues(); }
-      if (tab === 'admin-post') { loadCloudAdminData(); renderActiveSOSFeeds(); loadAdminActivePasses(); loadAdminTerminals(); }
+      if (tab === 'resident') { loadResidentProfile(); loadResidentDues(); }
+      if (tab === 'admin-post') { loadCloudAdminData(); renderActiveSOSFeeds(); loadAdminTerminals(); loadVerifiedBusinessesForDropdown(); }
       if (tab === 'complaints') renderComplaints();
       if (tab === 'news') renderNewsFeed();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -655,7 +705,6 @@
       var extraFields = document.getElementById("signup-extra-fields");
       var modeBtn = document.getElementById("signup-mode-btn");
       var msg = document.getElementById("auth-status-msg");
-      
       if (isRegistering) {
         extraFields.style.display = "block";
         modeBtn.innerText = "Back to Sign In";
@@ -684,27 +733,11 @@
         }
 
         var { data, error } = await supabaseClient.auth.signUp({ email: email, password: password });
-        if (error) {
-          msg.style.color = "#b91c1c";
-          msg.innerText = "❌ " + error.message;
-          return;
-        }
+        if (error) { msg.style.color = "#b91c1c"; msg.innerText = "❌ " + error.message; return; }
 
         if (data.user) {
-          await supabaseClient.from('profiles').upsert([{
-            id: data.user.id,
-            full_name: fullName,
-            phone: phone,
-            address: address,
-            role: 'resident'
-          }]);
-
-          await supabaseClient.from('resident_profiles').upsert([{
-            user_id: data.user.id,
-            full_name: fullName,
-            phone: phone,
-            address: address
-          }], { onConflict: 'user_id' });
+          await supabaseClient.from('profiles').upsert([{ id: data.user.id, full_name: fullName, phone: phone, address: address, role: 'resident' }]);
+          await supabaseClient.from('resident_profiles').upsert([{ user_id: data.user.id, full_name: fullName, phone: phone, address: address }], { onConflict: 'user_id' });
         }
 
         msg.style.color = "#15803d";
@@ -734,200 +767,78 @@
       switchTab('auth');
     }
 
-    async function createGuardTerminal(event) {
-      if (event) event.preventDefault();
-      try {
-        var name = document.getElementById("term-name").value.trim();
-        var location = document.getElementById("term-loc").value.trim();
-        if (!name || !location) return;
+    function updateCategoryOptions() {
+      var cat = document.getElementById("pass-category-group").value;
+      var dynamicFields = document.getElementById("dynamic-permit-fields");
+      var hotelBox = document.getElementById("hotel-duration-box");
 
-        var code = "NITEL-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+      hotelBox.style.display = (cat === 'HOTEL') ? 'block' : 'none';
 
-        var { error } = await supabaseClient.from('guard_terminals').insert([{
-          terminal_name: name,
-          location: location,
-          pairing_code: code,
-          status: 'AUTHORIZED'
-        }]);
-
-        if (error) { alert("Error: " + error.message); return; }
-
-        playBeep('success');
-        alert("Terminal Pairing Code Generated Successfully!\n\nPAIRING CODE: " + code);
-        document.getElementById("admin-terminal-form").reset();
-        loadAdminTerminals();
-      } catch(e) {
-        alert("Unable to generate terminal code.");
+      if (cat === 'PROPERTY_ENQUIRY') {
+        dynamicFields.innerHTML = `
+          <div class="form-group">
+            <label>Full Name</label>
+            <input id="visitor-name" type="text" placeholder="Visitor Full Name" required />
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Phone Number</label>
+              <input id="host-phone" type="tel" placeholder="08030000000" required />
+            </div>
+            <div>
+              <label>Vehicle Plate Number</label>
+              <input id="visitor-vehicle" type="text" placeholder="KSF-123AA" required />
+            </div>
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Property / Area Interested In</label>
+              <input id="prop-interest" type="text" placeholder="Road D, Plot 12" required />
+            </div>
+            <div>
+              <label>Purpose</label>
+              <select id="prop-purpose">
+                <option value="Rent">Rent</option>
+                <option value="Buy">Buy</option>
+                <option value="Property Inspection">Property Inspection</option>
+                <option value="General Enquiry">General Enquiry</option>
+              </select>
+            </div>
+          </div>
+        `;
+      } else {
+        dynamicFields.innerHTML = `
+          <div class="form-row form-group">
+            <div>
+              <label>Host Name / Sponsor</label>
+              <input id="host-name" type="text" placeholder="Mr. Adeleke" required />
+            </div>
+            <div>
+              <label>Host Phone</label>
+              <input id="host-phone" type="tel" placeholder="08031234567" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Visitor / Guest Full Name</label>
+            <input id="visitor-name" type="text" placeholder="Emmanuel Chukwu" required />
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Estate Road (Road A - U)</label>
+              <select id="visitor-location">
+                <option value="Road A">Road A</option><option value="Road B">Road B</option><option value="Road C">Road C</option><option value="Road D">Road D</option><option value="Road E">Road E</option><option value="Road F">Road F</option><option value="Road G">Road G</option><option value="Road H">Road H</option><option value="Road I">Road I</option><option value="Road J">Road J</option><option value="Road K">Road K</option><option value="Road L">Road L</option><option value="Road M">Road M</option><option value="Road N">Road N</option><option value="Road O">Road O</option><option value="Road P">Road P</option><option value="Road Q">Road Q</option><option value="Road R">Road R</option><option value="Road S">Road S</option><option value="Road T">Road T</option><option value="Road U">Road U</option>
+              </select>
+            </div>
+            <div>
+              <label>Vehicle Plate Number</label>
+              <input id="visitor-vehicle" type="text" placeholder="KSF-123AA" required />
+            </div>
+          </div>
+        `;
       }
     }
 
-    async function loadAdminTerminals() {
-      var container = document.getElementById("admin-terminals-feed");
-      if (!container) return;
-
-      try {
-        var { data: terms } = await supabaseClient.from('guard_terminals').select('*').order('created_at', { ascending: false });
-        if (!terms || terms.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No guard terminals registered.</small>"; return; }
-
-        container.innerHTML = terms.map(function(t) {
-          return "<div style='background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'>" +
-            "<div><b>" + escapeHtml(t.terminal_name) + "</b> (" + escapeHtml(t.location) + ")<br>Code: <code style='font-weight:900; color:#0284c7;'>" + escapeHtml(t.pairing_code) + "</code></div>" +
-            "<button type='button' onclick='revokeTerminal(\"" + t.id + "\")' style='background:#e11d48; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Revoke 🚫</button>" +
-          "</div>";
-        }).join('');
-      } catch(e) {}
-    }
-
-    async function revokeTerminal(termId) {
-      if (!confirm("Revoke this terminal pairing?")) return;
-      await supabaseClient.from('guard_terminals').delete().eq('id', termId);
-      loadAdminTerminals();
-    }
-
-    async function pairGuardTerminal() {
-      var code = document.getElementById("pairing-code-input").value.trim().toUpperCase();
-      if (!code) { alert("Enter pairing code."); return; }
-
-      try {
-        var { data: term, error } = await supabaseClient.from('guard_terminals').select('*').eq('pairing_code', code).single();
-        if (error || !term) {
-          alert("❌ Invalid or expired pairing code.");
-          return;
-        }
-
-        localStorage.setItem("nitel_paired_terminal", term.terminal_name + " (" + term.location + ")");
-        playBeep('success');
-        alert("🟢 Tablet Successfully Paired as " + term.terminal_name + "!");
-        location.reload();
-      } catch(e) {
-        alert("Pairing failed.");
-      }
-    }
-
-    async function triggerEmergencySOS() {
-      playEmergencySiren();
-
-      var session = await supabaseClient.auth.getSession();
-      if (!session.data.session) {
-        alert("🚨 EMERGENCY ACTIVATED! Please sign in so guards know who you are.");
-        switchTab('auth');
-        return;
-      }
-
-      var confirmSOS = confirm("🚨 EMERGENCY CONFIRMATION:\n\nThis will instantly broadcast a high-priority red alert with your profile details to all active Security Guards and Admins. Proceed?");
-      if (!confirmSOS) return;
-
-      try {
-        var userId = session.data.session.user.id;
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).single();
-
-        var residentName = profile ? profile.full_name : session.data.session.user.email;
-        var address = profile ? profile.address : "Estate Resident";
-        var phone = profile ? profile.phone : "Not Provided";
-
-        var { error } = await supabaseClient.from('estate_sos_alerts').insert([{
-          user_id: userId,
-          resident_name: residentName,
-          address: address,
-          phone: phone,
-          status: 'ACTIVE'
-        }]);
-
-        if (error) { alert("SOS Error: " + error.message); return; }
-
-        playEmergencySiren();
-        alert("🚨 EMERGENCY SOS BROADCASTED!\n\nGuards and Administrators have been instantly alerted with your name, address (" + address + "), and phone number (" + phone + ").");
-        switchTab('guard');
-      } catch(e) {
-        alert("Unable to trigger SOS.");
-      }
-    }
-
-    async function renderActiveSOSFeeds() {
-      var feeds = ['guard-sos-feed', 'admin-sos-feed'];
-      
-      try {
-        var { data: activeSOS, error } = await supabaseClient
-          .from('estate_sos_alerts')
-          .select('*')
-          .eq('status', 'ACTIVE')
-          .order('created_at', { ascending: false });
-
-        feeds.forEach(function(feedId) {
-          var container = document.getElementById(feedId);
-          if (!container) return;
-
-          if (error || !activeSOS || activeSOS.length === 0) {
-            container.innerHTML = "<small style='color:#64748b;'>No active emergencies.</small>";
-            return;
-          }
-
-          container.innerHTML = activeSOS.map(function(sos) {
-            return "<div style='background:#ffffff; border:1px solid #fecaca; padding:8px; border-radius:8px; font-size:11px; margin-bottom:6px;'>" +
-              "<b>🚨 " + escapeHtml(sos.resident_name) + "</b><br>" +
-              "🏠 " + escapeHtml(sos.address) + " | 📞 <a href='tel:" + escapeHtml(sos.phone) + "'>" + escapeHtml(sos.phone) + "</a><br>" +
-              "<button type='button' onclick='resolveSOS(\"" + sos.id + "\")' style='background:#059669; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-weight:800; margin-top:4px; cursor:pointer;'>Cancel / Resolve False Alarm ✅</button>" +
-            "</div>";
-          }).join('');
-        });
-      } catch(e) {}
-    }
-
-    async function resolveSOS(sosId) {
-      var confirmResolve = confirm("Mark this emergency alert as resolved / false alarm?");
-      if (!confirmResolve) return;
-
-      var { error } = await supabaseClient.from('estate_sos_alerts').update({ status: 'RESOLVED' }).eq('id', sosId);
-      if (error) { alert("Error updating SOS."); return; }
-
-      playBeep('success');
-      alert("Emergency alert cleared.");
-      renderActiveSOSFeeds();
-    }
-
-    async function loadAdminActivePasses() {
-      var container = document.getElementById("admin-active-passes-feed");
-      if (!container) return;
-
-      try {
-        var { data: passes, error } = await supabaseClient
-          .from('estate_passes')
-          .select('*')
-          .in('status', ['ACTIVE', 'USED'])
-          .order('created_at', { ascending: false })
-          .limit(20);
-
-        if (error || !passes || passes.length === 0) {
-          container.innerHTML = "<small style='color:#64748b;'>No active passes in Cloud DB.</small>";
-          return;
-        }
-
-        container.innerHTML = passes.map(function(p) {
-          return "<div style='background:#ffffff; border:1px solid #fbcfe8; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'>" +
-            "<div>" +
-              "<b>👤 " + escapeHtml(p.visitor_name) + "</b><br>" +
-              "<small style='color:#64748b;'>PIN: <b>" + escapeHtml(p.pin) + "</b> | Type: " + escapeHtml(p.pass_type) + "</small>" +
-            "</div>" +
-            "<button type='button' onclick='revokePass(\"" + p.id + "\")' style='background:#e11d48; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Revoke 🚫</button>" +
-          "</div>";
-        }).join('');
-      } catch(e) {
-        container.innerHTML = "<small style='color:#b91c1c;'>Error loading passes.</small>";
-      }
-    }
-
-    async function revokePass(passId) {
-      var confirmRevoke = confirm("Are you sure you want to revoke this pass? It will instantly fail verification at the gate.");
-      if (!confirmRevoke) return;
-
-      var { error } = await supabaseClient.from('estate_passes').update({ status: 'REVOKED' }).eq('id', passId);
-      if (error) { alert("Error revoking pass: " + error.message); return; }
-
-      playBeep('success');
-      alert("Pass successfully revoked!");
-      loadAdminActivePasses();
-    }
-
+    // --- COLOR-GRADED PERMIT AUTHORIZATION ---
     async function generateVisitorPass(event) {
       if (event) event.preventDefault();
       var session = await supabaseClient.auth.getSession();
@@ -938,46 +849,81 @@
       }
 
       try {
-        var hostName = document.getElementById('host-name')?.value.trim();
+        var cat = document.getElementById("pass-category-group").value;
         var visitorName = document.getElementById('visitor-name')?.value.trim();
-        var vehicle = document.getElementById('visitor-vehicle')?.value.trim();
-        var location = document.getElementById('visitor-location')?.value;
-        var passType = document.getElementById('visitor-pass-type')?.value;
+        var vehicle = document.getElementById('visitor-vehicle')?.value.trim() || 'N/A';
+        var now = new Date();
+        var durationHours = 24;
+        var hostName = "";
 
-        if (!hostName || !visitorName || !vehicle) {
-          alert("Please fill in all required fields.");
-          return;
+        if (cat === 'RESIDENTIAL') durationHours = 24;
+        else if (cat === 'CHURCH' || cat === 'MOSQUE') durationHours = 4;
+        else if (cat === 'SPA' || cat === 'FOOD_VENDOR' || cat === 'BUSINESS_APPOINTMENT') durationHours = 3;
+        else if (cat === 'SUPERMARKET' || cat === 'ARTISAN') durationHours = 2;
+        else if (cat === 'PROPERTY_ENQUIRY') durationHours = 1;
+        else if (cat === 'HOTEL') {
+          var days = parseInt(document.getElementById('hotel-days').value);
+          durationHours = days * 24;
         }
 
-        var opaqueToken = "NITEL-VST-" + crypto.randomUUID();
-        var pin = String(Math.floor(100000 + Math.random() * 900000));
-        var now = new Date();
-        var durationHours = passType === 'CANOPY_RENTAL' ? 12 : (passType === 'LABORER' ? 8 : 24);
         var expiresAt = new Date(now.getTime() + durationHours * 60 * 60 * 1000).toISOString();
+        var pin = String(Math.floor(100000 + Math.random() * 900000));
+        var opaqueToken = "NITEL-PRM-" + crypto.randomUUID();
+
+        if (cat === 'PROPERTY_ENQUIRY') {
+          var prop = document.getElementById('prop-interest').value.trim();
+          var purpose = document.getElementById('prop-purpose').value;
+          hostName = "Property Enquiry: " + prop + " (" + purpose + ")";
+        } else {
+          var hName = document.getElementById('host-name')?.value.trim();
+          var loc = document.getElementById('visitor-location')?.value || 'Estate';
+          hostName = hName + " (" + loc + ")";
+        }
 
         var pass = {
           pin: pin,
           secure_token: opaqueToken,
           visitor_name: visitorName,
-          host_name: hostName + " (" + location + ")",
+          host_name: hostName,
           vehicle: vehicle,
-          pass_type: passType,
-          status: "ACTIVE",
+          pass_type: cat,
+          status: "VALID",
           expires_at: expiresAt
         };
 
         var { error } = await supabaseClient.from('estate_passes').insert([pass]);
-        if (error) { alert("Cloud Database Error: " + error.message); return; }
+        if (error) { alert("Database Error: " + error.message); return; }
 
         var result = document.getElementById("visitor-result");
         if (result) { result.classList.remove("hidden"); result.style.display = "block"; }
 
+        // --- COLOR-GRADING LOGIC ---
+        var cardBg = "#f0fdf4"; var cardBorder = "#22c55e"; var badgeBg = "#dcfce7"; var badgeColor = "#15803d";
+        if (cat === 'CHURCH' || cat === 'MOSQUE') {
+          cardBg = "#fdf4ff"; cardBorder = "#d946ef"; badgeBg = "#f3e8ff"; badgeColor = "#9333ea"; // Purple
+        } else if (cat === 'SPA' || cat === 'SUPERMARKET' || cat === 'FOOD_VENDOR' || cat === 'BUSINESS_APPOINTMENT') {
+          cardBg = "#fffbeb"; cardBorder = "#f59e0b"; badgeBg = "#fef3c7"; badgeColor = "#b45309"; // Amber
+        } else if (cat === 'PROPERTY_ENQUIRY') {
+          cardBg = "#eff6ff"; cardBorder = "#3b82f6"; badgeBg = "#dbeafe"; badgeColor = "#1d4ed8"; // Blue
+        } else if (cat === 'ARTISAN') {
+          cardBg = "#f4f2ef"; cardBorder = "#78350f"; badgeBg = "#e7e5e4"; badgeColor = "#44403c"; // Brown
+        } else if (cat === 'HOTEL' || cat === 'EVENT') {
+          cardBg = "#fff1f2"; cardBorder = "#f43f5e"; badgeBg = "#ffe4e6"; badgeColor = "#e11d48"; // Crimson Red
+        }
+
+        result.style.background = cardBg;
+        result.style.border = "2px solid " + cardBorder;
+        var badge = document.getElementById("pass-category-badge");
+        badge.style.background = badgeBg;
+        badge.style.color = badgeColor;
+        badge.innerText = cat.replace('_', ' ') + " Permit Authorized";
+
         var pinDisplay = document.getElementById("pass-display-pin");
-        if (pinDisplay) pinDisplay.textContent = pin;
+        if (pinDisplay) { pinDisplay.textContent = pin; pinDisplay.style.color = badgeColor; }
 
         var summary = document.getElementById("visitor-summary-display");
         if (summary) {
-          summary.innerHTML = "<b>Visitor:</b> " + escapeHtml(visitorName) + "<br><b>Host:</b> " + escapeHtml(pass.host_name) + "<br><b>Vehicle:</b> " + escapeHtml(vehicle);
+          summary.innerHTML = "<b>Visitor:</b> " + escapeHtml(visitorName) + "<br><b>Type:</b> " + escapeHtml(cat) + "<br><b>Destination:</b> " + escapeHtml(hostName);
         }
 
         var qrBox = document.getElementById("qrcode-box");
@@ -988,388 +934,160 @@
 
         playBeep('success');
       } catch (error) {
-        alert("Unable to generate pass.");
+        alert("Unable to generate permit.");
       }
     }
 
-    async function submitBusinessRegistration(event) {
+    async function createEventPermit(event) {
       if (event) event.preventDefault();
       try {
-        var bName = document.getElementById("biz-name")?.value.trim();
-        var category = document.getElementById("biz-category")?.value;
-        var shopNo = document.getElementById("biz-shop-no")?.value.trim();
-        var avenue = document.getElementById("biz-avenue")?.value.trim();
-        var ownerName = document.getElementById("biz-owner-name")?.value.trim();
-        var phone = document.getElementById("biz-owner-phone")?.value.trim();
+        var name = document.getElementById("ev-name").value.trim();
+        var date = document.getElementById("ev-date").value;
+        var start = document.getElementById("ev-start").value;
+        var end = document.getElementById("ev-end").value;
+        var venue = document.getElementById("ev-venue").value.trim();
+        var org = document.getElementById("ev-org").value.trim();
 
-        if (!bName || !ownerName || !phone || !shopNo || !avenue) {
-          alert("Please complete all required fields.");
-          return;
-        }
+        var endDateTime = new Date(date + "T" + end);
+        endDateTime.setHours(endDateTime.getHours() + 1);
 
-        var business = {
-          id: 'biz_' + Date.now(),
-          business_name: bName,
-          category: category,
-          location: shopNo + ", " + avenue,
-          owner_name: ownerName,
-          phone: phone,
-          status: "PENDING"
-        };
+        var { error } = await supabaseClient.from('event_permits').insert([{
+          event_name: name, event_date: date, start_time: start, end_time: end, venue: venue, organizer: org, expires_at: endDateTime.toISOString()
+        }]);
 
-        var { error } = await supabaseClient.from('estate_businesses').insert([business]);
-        if (error) { alert("Cloud DB Error: " + error.message); return; }
-
-        var resBox = document.getElementById("business-submit-result");
-        if (resBox) {
-          resBox.style.display = "block";
-          resBox.innerText = "⏳ Business submitted securely to Supabase DB! Awaiting Admin Approval.";
-        }
-        var form = document.getElementById("business-registration-form");
-        if (form) form.reset();
+        if (error) { alert("Error: " + error.message); return; }
         playBeep('success');
-      } catch (error) {
-        alert("Unable to submit business registration.");
-      }
+        alert("Event Permit Published Successfully! Grace period (+1 hr) applied.");
+        document.getElementById("admin-event-form").reset();
+      } catch(e) { alert("Error publishing event."); }
     }
 
-    async function saveResidentProfile(event) {
+    async function loadVerifiedBusinessesForDropdown() {
+      var select = document.getElementById("staff-biz-select");
+      if (!select) return;
+      var { data: bizs } = await supabaseClient.from('verified_businesses').select('*');
+      if (!bizs || bizs.length === 0) { select.innerHTML = "<option value=''>No verified businesses found</option>"; return; }
+      select.innerHTML = bizs.map(function(b) {
+        return "<option value='" + b.id + "'>" + escapeHtml(b.business_name) + " (" + escapeHtml(b.category) + ")</option>";
+      }).join('');
+    }
+
+    async function createBusinessStaff(event) {
       if (event) event.preventDefault();
       try {
-        var session = await supabaseClient.auth.getSession();
-        if (!session.data.session) { alert("Please sign in first."); return; }
+        var bizId = document.getElementById("staff-biz-select").value;
+        var name = document.getElementById("staff-name").value.trim();
+        var phone = document.getElementById("staff-phone").value.trim();
+        var role = document.getElementById("staff-role").value.trim();
+        var credId = "NITEL-STF-" + Math.floor(100000 + Math.random() * 900000);
+        var validUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-        var name = document.getElementById("res-profile-name")?.value.trim();
-        var phone = document.getElementById("res-profile-phone")?.value.trim();
-        var emergency = document.getElementById("res-profile-emergency")?.value.trim();
-        var avenue = document.getElementById("res-profile-avenue")?.value.trim();
-        var plot = document.getElementById("res-profile-plot")?.value.trim();
+        var { error } = await supabaseClient.from('business_staff').insert([{
+          business_id: bizId, staff_name: name, phone: phone, role: role, credential_id: credId, status: 'ACTIVE', valid_until: validUntil
+        }]);
 
-        if (!name || !phone || !avenue || !plot) { alert("Fill in required fields."); return; }
-
-        var profile = {
-          user_id: session.data.session.user.id,
-          full_name: name,
-          phone: phone,
-          emergency_contact: emergency,
-          address: avenue + " - " + plot
-        };
-
-        var { error } = await supabaseClient.from('resident_profiles').upsert([profile], { onConflict: 'user_id' });
-        if (error) { alert("Cloud DB Error: " + error.message); return; }
-
+        if (error) { alert("Error: " + error.message); return; }
         playBeep('success');
-        alert("Resident profile saved to Supabase Cloud DB!");
-        loadResidentDues();
-      } catch(e) { alert("Error saving profile."); }
+        alert("30-Day Staff Credential Issued! ID: " + credId);
+        document.getElementById("admin-staff-form").reset();
+      } catch(e) { alert("Error issuing staff credential."); }
     }
 
-    async function loadResidentProfile() {
+    async function createPropertyRep(event) {
+      if (event) event.preventDefault();
       try {
-        var session = await supabaseClient.auth.getSession();
-        if (!session.data.session) return;
+        var name = document.getElementById("rep-name").value.trim();
+        var prop = document.getElementById("rep-prop").value.trim();
+        var validUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
 
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', session.data.session.user.id).single();
-        if (!profile) return;
+        var { error } = await supabaseClient.from('property_representatives').insert([{
+          representative_name: name, property_address: prop, status: 'ACTIVE', valid_until: validUntil
+        }]);
 
-        var nameEl = document.getElementById("res-profile-name");
-        var phoneEl = document.getElementById("res-profile-phone");
-        if (nameEl) nameEl.value = profile.full_name;
-        if (phoneEl) phoneEl.value = profile.phone;
-      } catch(e) {}
+        if (error) { alert("Error: " + error.message); return; }
+        playBeep('success');
+        alert("90-Day Property Representative Credential Created!");
+        document.getElementById("admin-rep-form").reset();
+      } catch(e) { alert("Error creating rep."); }
     }
 
-    async function loadResidentDues() {
-      var container = document.getElementById("resident-dues-feed");
+    async function createGuardTerminal(event) {
+      if (event) event.preventDefault();
+      try {
+        var name = document.getElementById("term-name").value.trim();
+        var location = document.getElementById("term-loc").value.trim();
+        var code = "NITEL-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+
+        var { error } = await supabaseClient.from('guard_terminals').insert([{
+          terminal_name: name, location: location, pairing_code: code, status: 'AUTHORIZED'
+        }]);
+
+        if (error) { alert("Error: " + error.message); return; }
+        playBeep('success');
+        alert("Pairing Code Generated: " + code);
+        document.getElementById("admin-terminal-form").reset();
+        loadAdminTerminals();
+      } catch(e) { alert("Error generating code."); }
+    }
+
+    async function loadAdminTerminals() {
+      var container = document.getElementById("admin-terminals-feed");
       if (!container) return;
-
-      try {
-        var session = await supabaseClient.auth.getSession();
-        if (!session.data.session) {
-          container.innerHTML = "<small style='color:#b91c1c;'>Please sign in to view your dues ledger.</small>";
-          return;
-        }
-
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('full_name').eq('user_id', session.data.session.user.id).single();
-        var searchName = profile ? profile.full_name : "";
-
-        var query = supabaseClient.from('estate_dues').select('*');
-        if (searchName) {
-          query = query.ilike('resident_name', '%' + searchName + '%');
-        }
-
-        var { data: dues, error } = await query;
-        if (error || !dues || dues.length === 0) {
-          container.innerHTML = "<small style='color:#64748b;'>No dues records found for your profile name (" + escapeHtml(searchName || 'Not Set') + ").</small>";
-          return;
-        }
-
-        container.innerHTML = dues.map(function(d) {
-          var isPaid = d.status === 'PAID';
-          var badgeColor = isPaid ? '#15803d' : '#b45309';
-          var badgeBg = isPaid ? '#dcfce7' : '#fef3c7';
-          return "<div style='background:#fff; border:1px solid #cbd5e1; padding:10px; border-radius:10px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'>" +
-            "<div>" +
-              "<b>" + escapeHtml(d.levy_title) + "</b><br>" +
-              "<small style='color:#64748b;'>📍 " + escapeHtml(d.address) + " | ₦" + Number(d.amount).toLocaleString() + "</small>" +
-            "</div>" +
-            "<span style='background:" + badgeBg + "; color:" + badgeColor + "; padding:4px 8px; border-radius:6px; font-weight:800; font-size:10px;'>" + escapeHtml(d.status) + "</span>" +
-          "</div>";
-        }).join('');
-      } catch(e) {
-        container.innerHTML = "<small style='color:#b91c1c;'>Error loading dues ledger.</small>";
-      }
+      var { data: terms } = await supabaseClient.from('guard_terminals').select('*').order('created_at', { ascending: false });
+      if (!terms || terms.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No terminals registered.</small>"; return; }
+      container.innerHTML = terms.map(function(t) {
+        return "<div style='background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'>" +
+          "<div><b>" + escapeHtml(t.terminal_name) + "</b> (" + escapeHtml(t.location) + ")<br>Code: <code>" + escapeHtml(t.pairing_code) + "</code></div>" +
+          "<button type='button' onclick='revokeTerminal(\"" + t.id + "\")' style='background:#e11d48; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Revoke 🚫</button>" +
+        "</div>";
+      }).join('');
     }
 
-    async function publishEstateLevy(event) {
-      if (event) event.preventDefault();
-      try {
-        var session = await supabaseClient.auth.getSession();
-        if (!session.data.session) { alert("Please sign in."); return; }
-
-        var name = document.getElementById("adm-levy-name")?.value.trim();
-        var address = document.getElementById("adm-levy-address")?.value.trim();
-        var amount = document.getElementById("adm-levy-amount")?.value.trim();
-        var title = document.getElementById("adm-levy-title")?.value.trim();
-        var status = document.getElementById("adm-levy-status")?.value;
-
-        if (!name || !address || !amount || !title) {
-          alert("Please fill in all levy fields.");
-          return;
-        }
-
-        var record = {
-          resident_name: name,
-          address: address,
-          levy_title: title,
-          amount: parseFloat(amount),
-          status: status,
-          updated_by: session.data.session.user.id
-        };
-
-        var { error } = await supabaseClient.from('estate_dues').insert([record]);
-        if (error) { alert("Cloud DB Error: " + error.message); return; }
-
-        playBeep('success');
-        alert("Levy published successfully to Supabase DB!");
-        document.getElementById("admin-levy-form").reset();
-      } catch(e) {
-        alert("Error publishing levy.");
-      }
+    async function revokeTerminal(id) {
+      if (!confirm("Revoke terminal?")) return;
+      await supabaseClient.from('guard_terminals').delete().eq('id', id);
+      loadAdminTerminals();
     }
 
-    async function generateFamilyMemberBadge(event) {
-      if (event) event.preventDefault();
-      try {
-        var surname = document.getElementById("fam-surname")?.value.trim();
-        var name = document.getElementById("fam-member-name")?.value.trim();
-        var role = document.getElementById("fam-member-role")?.value;
-        var session = await supabaseClient.auth.getSession();
-        if (!session.data.session) { alert("Please sign in first."); return; }
-
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('address').eq('user_id', session.data.session.user.id).single();
-        var address = profile ? profile.address : "Estate Resident";
-
-        if (!surname || !name) { alert("Enter surname and name."); return; }
-
-        var code = "55" + String(Math.floor(1000 + Math.random() * 9000));
-        var record = {
-          pin: code, secure_token: "NITEL-FAM-" + crypto.randomUUID(),
-          visitor_name: surname + " Family — " + name + " (" + role + ")",
-          host_name: address, pass_type: 'FAMILY_MEMBER', status: 'ACTIVE',
-          expires_at: new Date(Date.now() + 365*24*3600*1000).toISOString()
-        };
-
-        var { error } = await supabaseClient.from('estate_passes').insert([record]);
-        if (error) { alert("Cloud DB Error: " + error.message); return; }
-
-        document.getElementById("fam-member-name").value = "";
-        playBeep('success');
-        alert("Household Badge Generated in Cloud DB! PIN: " + code);
-        renderFamilyMembersList();
-      } catch(e) {}
-    }
-
-    async function renderFamilyMembersList() {
-      try {
-        var container = document.getElementById("family-members-list");
-        if (!container) return;
-
-        var { data: fam } = await supabaseClient.from('estate_passes').select('*').eq('pass_type', 'FAMILY_MEMBER');
-        if (!fam || fam.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No household badges in Cloud DB yet.</small>"; return; }
-        
-        container.innerHTML = fam.map(function(item) {
-          return "<div style='background:#fff; border:1px solid #cbd5e1; padding:6px; border-radius:6px; display:flex; justify-content:space-between; font-size:11px;'>" +
-            "<span><b>" + escapeHtml(item.visitor_name) + "</b> (PIN: <b>" + escapeHtml(item.pin) + "</b>)</span>" +
-          "</div>";
-        }).join('');
-      } catch(e) {}
-    }
-
-    async function submitComplaint() {
-      var msg = document.getElementById("complaint-msg")?.value.trim();
-      var session = await supabaseClient.auth.getSession();
-      if (!msg) { alert("Write a message."); return; }
-      if (!session.data.session) { alert("Sign in required to post."); return; }
-
-      var { error } = await supabaseClient.from('community_posts').insert([{
-        author_id: session.data.session.user.id,
-        author_email: session.data.session.user.email,
-        message: msg,
-        status: 'ACTIVE'
-      }]);
-
-      if (error) { alert("Error: " + error.message); return; }
-      document.getElementById("complaint-msg").value = "";
-      renderComplaints();
+    async function pairGuardTerminal() {
+      var code = document.getElementById("pairing-code-input").value.trim().toUpperCase();
+      var { data: term, error } = await supabaseClient.from('guard_terminals').select('*').eq('pairing_code', code).single();
+      if (error || !term) { alert("❌ Invalid pairing code."); return; }
+      localStorage.setItem("nitel_paired_terminal", term.terminal_name + " (" + term.location + ")");
       playBeep('success');
-    }
-
-    async function renderComplaints() {
-      var container = document.getElementById("complaints-feed");
-      if (!container) return;
-
-      var { data: posts } = await supabaseClient.from('community_posts').select('*').order('created_at', { ascending: false }).limit(20);
-      if (!posts || posts.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No community posts yet.</small>"; return; }
-      
-      container.innerHTML = posts.map(function(p) {
-        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:11px; margin-bottom:6px;'>" +
-          "<b>👤 " + escapeHtml(p.author_email || 'Resident') + "</b><br><small>" + escapeHtml(p.message) + "</small>" +
-        "</div>";
-      }).join('');
-    }
-
-    function renderNewsFeed() {
-      var container = document.getElementById("news-feed");
-      if (!container) return;
-      container.innerHTML = "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px; font-size:12px;'>" +
-        "<b>🏗️ Perimeter Solar Lighting Project Commences</b><br><small style='color:#64748b;'>August 2026 • NITEL CDA Executive</small>" +
-        "<p style='margin-top:6px; color:#334155;'>Installation of solar security floodlights along Road A through Road H has officially begun.</p>" +
-      "</div>";
-    }
-
-    async function loadCloudAdminData() {
-      var container = document.getElementById("admin-cloud-feed");
-      var warningBox = document.getElementById("admin-auth-warning");
-      if (!container) return;
-
-      var session = await supabaseClient.auth.getSession();
-      if (!session.data.session) {
-        if (warningBox) warningBox.innerText = "⛔ Please sign in via the lock icon first.";
-        container.innerHTML = "<p style='color:#b91c1c; font-size:11px; text-align:center;'>Not authenticated.</p>";
-        return;
-      }
-
-      var userEmail = session.data.session.user.email;
-      var userId = session.data.session.user.id;
-      
-      var { data: userProfile } = await supabaseClient
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
-
-      var liveRole = (userEmail === 'ayoolaezekiel234@gmail.com') ? 'admin' : (userProfile ? userProfile.role : 'resident');
-
-      if (liveRole !== 'admin') {
-        if (warningBox) warningBox.innerText = "⛔ Access Denied: DB Role is currently '" + liveRole + "'. Admin privileges required.";
-        container.innerHTML = "<p style='color:#b91c1c; font-size:11px; text-align:center;'>Unauthorized role.</p>";
-        return;
-      }
-
-      if (warningBox) warningBox.innerText = "";
-
-      var { data: dbBusinesses, error } = await supabaseClient.from('estate_businesses').select('*').eq('status', 'PENDING');
-      if (error || !dbBusinesses || dbBusinesses.length === 0) {
-        container.innerHTML = "<p style='color:#64748b; font-size:11px; text-align:center;'>No pending business approvals in Cloud DB.</p>";
-        return;
-      }
-
-      container.innerHTML = dbBusinesses.map(function(item) {
-        return "<div style='background:#fef3c7; border:1px solid #fde68a; padding:10px; border-radius:8px; font-size:11px;'>" +
-          "<b>" + escapeHtml(item.business_name) + "</b> | Owner: " + escapeHtml(item.owner_name) + "<br>" +
-          "<button type='button' onclick='approveCloudBusiness(\"" + item.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; margin-top:6px; cursor:pointer;'>Approve in Cloud DB ✅</button>" +
-        "</div>";
-      }).join('');
-    }
-
-    async function approveCloudBusiness(bizId) {
-      var session = await supabaseClient.auth.getSession();
-      if (!session.data.session) return;
-
-      var { data: biz } = await supabaseClient.from('estate_businesses').select('*').eq('id', bizId).single();
-      if (!biz) return;
-
-      await supabaseClient.from('estate_businesses').update({ status: "APPROVED" }).eq('id', bizId);
-
-      var now = new Date();
-      var expiry = new Date(now);
-      expiry.setMonth(expiry.getMonth() + 6);
-
-      var ownerPin = "99" + String(Math.floor(1000 + Math.random() * 9000));
-      await supabaseClient.from('estate_passes').insert([{
-        pin: ownerPin, secure_token: "NITEL-BIZ-" + crypto.randomUUID(),
-        visitor_name: biz.owner_name + " (Owner — " + biz.business_name + ")",
-        host_name: biz.location, pass_type: "BUSINESS_OWNER", status: "ACTIVE", expires_at: expiry.toISOString()
-      }]);
-
-      playBeep('success');
-      alert("Business Approved in Cloud DB! Owner PIN: " + ownerPin);
-      loadCloudAdminData();
-      loadAdminActivePasses();
-    }
-
-    async function renderCloudDirectory() {
-      var container = document.getElementById("directory-listings-feed");
-      if (!container) return;
-
-      var { data: dbApproved } = await supabaseClient.from('estate_businesses').select('*').eq('status', 'APPROVED');
-      if (!dbApproved || dbApproved.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No approved businesses in Cloud DB yet.</small>"; return; }
-      
-      container.innerHTML = dbApproved.map(function(item) {
-        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:11px; margin-bottom:6px;'>" +
-          "<b>" + escapeHtml(item.business_name) + "</b><br>📍 " + escapeHtml(item.location) +
-        "</div>";
-      }).join('');
-    }
-
-    function initCameraScanner() {
-      if (typeof Html5Qrcode === "undefined") { alert("QR library loading..."); return; }
-      if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("qr-reader");
-      }
-      html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 200 },
-        async function(decodedText) {
-          await verifyTokenOrPin(decodedText);
-          html5QrCode.stop();
-        },
-        function(errorMessage) {}
-      ).catch(function(err) {
-        alert("Camera permission denied or unavailable.");
-      });
-    }
-
-    function pressKey(n) {
-      if (enteredPin.length < 8) { enteredPin += n; document.getElementById("pin-display").innerText = enteredPin; }
-    }
-
-    function clearPin() {
-      enteredPin = ""; document.getElementById("pin-display").innerText = "------";
-      var res = document.getElementById("gate-result"); if (res) res.style.display = "none";
-    }
-
-    async function verifyCloudPass() {
-      await verifyTokenOrPin(enteredPin);
-      enteredPin = "";
-      document.getElementById("pin-display").innerText = "------";
+      alert("🟢 Tablet Paired Successfully!");
+      location.reload();
     }
 
     async function verifyTokenOrPin(queryValue) {
       var res = document.getElementById("gate-result");
       if (!res) return;
       res.style.display = "block";
+      var now = new Date();
+
+      var { data: staff } = await supabaseClient.from('business_staff').select('*').eq('credential_id', queryValue).single();
+      if (staff) {
+        if (staff.status !== 'ACTIVE') {
+          res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
+          res.innerHTML = "<b>❌ BUSINESS STAFF CREDENTIAL " + staff.status + "</b>";
+          playBeep('error'); return;
+        }
+        res.style.background = "#fffbeb"; res.style.color = "#b45309";
+        res.innerHTML = "<b>🟠 VERIFIED BUSINESS STAFF</b><br>👤 " + escapeHtml(staff.staff_name) + "<br>📋 Role: " + escapeHtml(staff.role);
+        playBeep('success'); return;
+      }
+
+      var { data: rep } = await supabaseClient.from('property_representatives').select('*').ilike('representative_name', '%' + queryValue + '%').single();
+      if (rep) {
+        if (rep.status !== 'ACTIVE') {
+          res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
+          res.innerHTML = "<b>❌ REPRESENTATIVE CREDENTIAL " + rep.status + "</b>";
+          playBeep('error'); return;
+        }
+        res.style.background = "#eff6ff"; res.style.color = "#1d4ed8";
+        res.innerHTML = "<b>🔵 AUTHORIZED PROPERTY REPRESENTATIVE</b><br>👤 " + escapeHtml(rep.representative_name) + "<br>🏠 Property: " + escapeHtml(rep.property_address);
+        playBeep('success'); return;
+      }
 
       var query = supabaseClient.from('estate_passes').select('*');
       if (queryValue.startsWith("NITEL-")) {
@@ -1379,82 +1097,122 @@
       }
 
       var { data: found, error } = await query.single();
-      var now = new Date();
 
       if (error || !found) {
         res.style.background = "#fee2e2"; res.style.color = "#991b1b";
-        res.innerHTML = "<b>❌ CLOUD ACCESS DENIED</b><br><small>Credential not found in Supabase database.</small>";
+        res.innerHTML = "<b>⚠️ PERSON NOT REGISTERED AS AN AUTHORIZED PROPERTY REPRESENTATIVE</b><br><small>If claiming property representation, verification required.</small>" +
+          "<div style='display:flex; gap:6px; margin-top:8px;'>" +
+            "<button type='button' onclick='alert(\"Contacting Estate Management...\")' style='flex:1; background:#d97706; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Contact Estate Management</button>" +
+            "<button type='button' onclick='alert(\"Temporary Authorization Request Sent.\")' style='flex:1; background:#0284c7; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Request Temporary Auth</button>" +
+          "</div>";
         playBeep('error');
-      } else if (found.status === "REVOKED") {
-        res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
-        res.innerHTML = "<b>❌ ACCESS DENIED — PASS REVOKED BY ADMIN/GUARD</b>";
-        playBeep('error');
-      } else if (found.status === "USED" && found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "FAMILY_MEMBER") {
-        res.style.background = "#fff1f2"; res.style.color = "#be123c";
-        res.innerHTML = "<b>⚠️ ACCESS DENIED: Visitor Pass Already Used</b>";
-        playBeep('error');
-      } else if (found.expires_at && now >= new Date(found.expires_at)) {
+        return;
+      }
+
+      if (found.expires_at && now >= new Date(found.expires_at)) {
         await supabaseClient.from('estate_passes').update({ status: "EXPIRED" }).eq('id', found.id);
         res.style.background = "#fef3c7"; res.style.color = "#b45309";
-        res.innerHTML = "<b>⏱️ ACCESS DENIED: Credential Expired</b>";
+        res.innerHTML = "<b>🚨 VISITOR PASS EXPIRED</b><br>Visitor Name: " + escapeHtml(found.visitor_name) + "<br>Current Status: INSIDE (Expired)";
         playBeep('error');
-      } else {
-        if (found.pass_type !== "BUSINESS_OWNER" && found.pass_type !== "FAMILY_MEMBER") {
-          await supabaseClient.from('estate_passes').update({ status: "USED" }).eq('id', found.id);
-        }
-
-        await supabaseClient.from('estate_audit_logs').insert([{
-          visitor: found.visitor_name, host: found.host_name, status: "GRANTED", guard: "Main Gate", time: now.toLocaleTimeString()
-        }]);
-
-        res.style.background = "#f0fdf4"; res.style.color = "#0f172a";
-        res.innerHTML = 
-          "<div style='border-bottom:1.5px solid #22c55e; padding-bottom:6px; margin-bottom:8px; font-size:12px; font-weight:900; color:#059669;'>🟢 CLOUD VERIFIED</div>" +
-          "<div style='font-size:13px; font-weight:800; color:#0f2b5c; margin-bottom:4px;'>👤 " + escapeHtml(found.visitor_name) + "</div>" +
-          "<div style='font-size:11px; color:#475569;'>🏠 <b>Destination:</b> " + escapeHtml(found.host_name) + "</div>" +
-          "<div style='display:flex; gap:6px; margin-top:10px;'>" +
-            "<button type='button' onclick='alert(\"Gate barrier opened via IoT relay API.\")' style='flex:1; background:#059669; color:#fff; border:none; padding:8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>🟢 Confirm Entry & Open Gate</button>" +
-          "</div>";
-        playBeep('success');
-        renderCloudLogs();
+        return;
       }
+
+      if (found.status === 'INSIDE') {
+        res.style.background = "#fff1f2"; res.style.color = "#be123c";
+        res.innerHTML = "<b>🟠 PASS ALREADY ACTIVE — VISITOR CURRENTLY INSIDE</b><br>👤 " + escapeHtml(found.visitor_name) +
+          "<div style='margin-top:8px;'><button type='button' onclick='checkoutVisitor(\"" + found.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Check Out Visitor (Mark EXITED) 🚪</button></div>";
+        playBeep('error');
+        return;
+      }
+
+      await supabaseClient.from('estate_passes').update({ status: "INSIDE", entry_time: now.toISOString() }).eq('id', found.id);
+      await supabaseClient.from('estate_audit_logs').insert([{
+        visitor: found.visitor_name, host: found.host_name, status: "AUTHORIZED", guard: "Main Gate", time: now.toLocaleTimeString()
+      }]);
+
+      res.style.background = "#f0fdf4"; res.style.color = "#0f172a";
+      res.innerHTML = 
+        "<div style='border-bottom:1.5px solid #22c55e; padding-bottom:6px; margin-bottom:8px; font-size:12px; font-weight:900; color:#059669;'>🟢 VALID — ACCESS PERMITTED</div>" +
+        "<div style='font-size:13px; font-weight:800; color:#0f2b5c; margin-bottom:4px;'>👤 " + escapeHtml(found.visitor_name) + "</div>" +
+        "<div style='font-size:11px; color:#475569;'>🏠 <b>Destination:</b> " + escapeHtml(found.host_name) + "</div>" +
+        "<div style='font-size:11px; color:#475569;'>🚗 <b>Vehicle:</b> " + escapeHtml(found.vehicle) + "</div>" +
+        "<div style='margin-top:10px;'><button type='button' onclick='checkoutVisitor(\"" + found.id + "\")' style='background:#059669; color:#fff; border:none; padding:8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;'>Check Out Visitor (Mark EXITED) 🚪</button></div>";
+      playBeep('success');
+      renderCloudLogs();
     }
+
+    async function checkoutVisitor(passId) {
+      var now = new Date();
+      await supabaseClient.from('estate_passes').update({ status: "EXITED", exit_time: now.toISOString() }).eq('id', passId);
+      playBeep('success');
+      alert("Visitor checked out successfully.");
+      document.getElementById("gate-result").style.display = "none";
+    }
+
+    function openControlledOverrideModal() {
+      var residentName = prompt("Enter Resident Name or House/Plot Number for verification:");
+      if (!residentName) return;
+      var reason = prompt("Select Override Reason:\n1. Phone unavailable\n2. Credential unavailable\n3. Emergency\n4. Other", "Phone unavailable");
+      if (!reason) return;
+
+      supabaseClient.from('access_overrides').insert([{
+        person_name: residentName, property_details: "Verified Resident", override_type: "CONTROLLED_OVERRIDE", reason: reason
+      }]).then(function() {
+        playBeep('success');
+        alert("🟢 VERIFIED RESIDENT OVERRIDE LOGGED.");
+      });
+    }
+
+    function openEmergencyOverrideModal() {
+      var reason = prompt("Select Emergency Override Reason:\n1. Medical Emergency\n2. Fire Emergency\n3. Police / Emergency Service\n4. Other Emergency", "Medical Emergency");
+      if (!reason) return;
+      var person = prompt("Person / Vehicle Admitted:");
+      if (!person) return;
+
+      supabaseClient.from('access_overrides').insert([{
+        person_name: person, property_details: "Emergency Transit", override_type: "EMERGENCY", reason: reason
+      }]).then(function() {
+        playEmergencySiren();
+        alert("🚨 EMERGENCY OVERRIDE LOGGED & RECORDED.");
+      });
+    }
+
+    function initCameraScanner() {
+      if (typeof Html5Qrcode === "undefined") { alert("QR library loading..."); return; }
+      if (!html5QrCode) html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 200 }, async function(text) {
+        await verifyTokenOrPin(text);
+        html5QrCode.stop();
+      }, function() {}).catch(function() { alert("Camera unavailable."); });
+    }
+
+    function pressKey(n) { if (enteredPin.length < 8) { enteredPin += n; document.getElementById("pin-display").innerText = enteredPin; } }
+    function clearPin() { enteredPin = ""; document.getElementById("pin-display").innerText = "------"; document.getElementById("gate-result").style.display = "none"; }
+    async function verifyCloudPass() { await verifyTokenOrPin(enteredPin); enteredPin = ""; document.getElementById("pin-display").innerText = "------"; }
 
     async function renderCloudLogs() {
       var container = document.getElementById("audit-log-feed");
       if (!container) return;
-
-      var { data: dbLogs } = await supabaseClient.from('audit_logs').select('*').order('id', { ascending: false }).limit(30);
-      if (!dbLogs || dbLogs.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No cloud logs recorded yet.</small>"; return; }
-      
+      var { data: dbLogs } = await supabaseClient.from('estate_audit_logs').select('*').order('id', { ascending: false }).limit(30);
+      if (!dbLogs || dbLogs.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No audit logs yet.</small>"; return; }
       container.innerHTML = dbLogs.map(function(l) {
-        return "<div class='log-item'>" +
-          "<div style='display:flex; justify-content:space-between;'><b style='font-size:11px;'>👤 " + escapeHtml(l.visitor) + "</b><span class='log-badge badge-used'>" + escapeHtml(l.status) + "</span></div>" +
-          "<small style='color:#475569;'>🏠 " + escapeHtml(l.host) + " | ⏱️ " + escapeHtml(l.time) + "</small>" +
-        "</div>";
+        return "<div class='log-item'><div style='display:flex; justify-content:space-between;'><b style='font-size:11px;'>👤 " + escapeHtml(l.visitor) + "</b><span class='log-badge badge-used'>" + escapeHtml(l.status) + "</span></div><small style='color:#475569;'>🏠 " + escapeHtml(l.host) + " | ⏱️ " + escapeHtml(l.time) + "</small></div>";
       }).join('');
     }
 
     window.onload = function() {
-      // --- EMERGENCY RESET HELPER ---
       if (window.location.search.includes('reset=true')) {
         localStorage.removeItem("nitel_paired_terminal");
-        alert("Terminal pairing cleared successfully!");
+        alert("Terminal pairing cleared!");
         window.location.href = window.location.pathname;
         return;
       }
-
       updateNetworkStatus();
-      if (!checkGuardTerminalLockdown()) {
-        switchTab('auth');
-      } else {
-        switchTab('guard');
-      }
+      if (!checkGuardTerminalLockdown()) { switchTab('auth'); } else { switchTab('guard'); }
       renderCloudDirectory();
       renderComplaints();
       renderNewsFeed();
       renderActiveSOSFeeds();
-      loadAdminActivePasses();
     };
   </script>
 </body>
