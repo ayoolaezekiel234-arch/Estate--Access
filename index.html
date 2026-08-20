@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NITEL Estate — Enterprise Security & Intelligence Platform</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 430px;
+      background: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 18px 16px 40px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.06);
+    }
+    
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .header-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .brand-section {
+      margin-bottom: 14px;
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #0f2b5c;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .brand-accent {
+      color: #0ea5e9;
+      font-weight: 900;
+    }
+    .brand-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .grid-card {
+      border-radius: 10px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      min-height: 72px;
+    }
+    .grid-card:active {
+      transform: scale(0.97);
+    }
+    
+    .card-dark { background: #3b506e; color: #ffffff; }
+    .card-light { background: #e2e8f0; color: #1e293b; }
+    .card-admin { background: #7c2d12; color: #ffffff; }
+    .card-guard { background: #065f46; color: #ffffff; }
+    .card-business { background: #78350f; color: #ffffff; }
+    .card-resident { background: #1e40af; color: #ffffff; }
+    .card-biker { background: #0f766e; color: #ffffff; }
+    
+    .grid-card .card-icon { font-size: 16px; margin-bottom: 2px; }
+    .grid-card .card-title { font-size: 8.5px; font-weight: 700; line-height: 1.15; }
+
+    .btn-hero {
+      width: 100%;
+      padding: 13px;
+      background: #1e2e4a;
+      color: #ffffff;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(30, 46, 74, 0.25);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .btn-hero:active {
+      background: #0f1c30;
+      transform: scale(0.98);
+    }
+
+    .btn-sos {
+      width: 100%;
+      padding: 14px;
+      background: #dc2626;
+      color: #ffffff;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 900;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      animation: pulseSOS 2s infinite;
+    }
+    .btn-sos:active {
+      background: #991b1b;
+      transform: scale(0.98);
+    }
+    @keyframes pulseSOS {
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+
+    .panel-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .panel-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f2b5c;
+      margin-bottom: 2px;
+    }
+    .panel-sub {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 10px;
+    }
+    .form-row {
+      display: flex;
+      gap: 8px;
+    }
+    .form-row > div {
+      flex: 1;
+    }
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      color: #0f172a;
+      font-size: 13px;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #0284c7;
+      background: #ffffff;
+    }
+
+    .btn-action {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+    .btn-blue { background: #0284c7; color: #ffffff; }
+    .btn-emerald { background: #059669; color: #ffffff; }
+    .btn-amber { background: #d97706; color: #ffffff; }
+    .btn-rose { background: #e11d48; color: #ffffff; }
+    .btn-teal { background: #0f766e; color: #ffffff; }
+    .btn-outline {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #475569;
+      padding: 7px 12px;
+      font-size: 11px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .error-banner {
+      display: none;
+      padding: 10px;
+      background: #fee2e2;
+      border: 1px solid #ef4444;
+      border-radius: 10px;
+      color: #b91c1c;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+    .hidden { display: none !important; }
+
+    .result-card {
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      margin-top: 14px;
+    }
+    .pin-hero {
+      font-size: 40px;
+      font-weight: 900;
+      font-family: monospace;
+      letter-spacing: 5px;
+      margin: 4px 0;
+    }
+    .qr-container {
+      display: flex;
+      justify-content: center;
+      margin: 12px 0;
+      padding: 8px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      width: 146px;
+      height: 146px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .keypad-btn {
+      padding: 13px;
+      font-size: 18px;
+      font-weight: 800;
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .keypad-btn:active { background: #e2e8f0; }
+
+    .hotline-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 9px;
+      margin-top: 8px;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      border-radius: 10px;
+      color: #be123c;
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .network-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #dcfce7;
+      color: #15803d;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="top-bar">
+      <div class="icon-btn" onclick="switchTab('auth')">🔐</div>
+      <div id="network-indicator" class="network-badge">🟢 Cloud Secure</div>
+      <div class="header-icons" id="header-nav-icons">
+        <div class="icon-btn" onclick="switchTab('news')">📰</div>
+        <div class="icon-btn" onclick="switchTab('directory')">🏢</div>
+        <div class="icon-btn" onclick="switchTab('resident')">📍</div>
+        <div class="icon-btn" onclick="switchTab('biker-portal')">🏍️</div>
+        <div class="icon-btn" onclick="switchTab('admin-post')">👑</div>
+        <div class="icon-btn" onclick="switchTab('guard')">🛡️</div>
+      </div>
+    </div>
+
+    <div class="brand-section">
+      <div class="brand-title">
+        <span>NiT<span class="brand-accent">E</span>L</span> Estate
+      </div>
+      <div class="brand-sub">Enterprise Security & Intelligence Platform</div>
+    </div>
+
+    <!-- Navigation Grid -->
+    <div class="quick-grid" id="main-quick-grid">
+      <div class="grid-card card-dark" onclick="switchTab('visitor')">
+        <div class="card-icon">🚗</div>
+        <div class="card-title">Pass</div>
+      </div>
+      <div class="grid-card card-business" onclick="switchTab('business-portal')">
+        <div class="card-icon">🏪</div>
+        <div class="card-title">Business</div>
+      </div>
+      <div class="grid-card card-resident" onclick="switchTab('resident')">
+        <div class="card-icon">🏠</div>
+        <div class="card-title">Resident</div>
+      </div>
+      <div class="grid-card card-biker" onclick="switchTab('biker-portal')">
+        <div class="card-icon">🏍️</div>
+        <div class="card-title">Biker</div>
+      </div>
+      <div class="grid-card card-light" onclick="switchTab('directory')">
+        <div class="card-icon">🏢</div>
+        <div class="card-title">Directory</div>
+      </div>
+      <div class="grid-card card-light" onclick="switchTab('complaints')">
+        <div class="card-icon">💬</div>
+        <div class="card-title">Feed</div>
+      </div>
+      <div class="grid-card card-light" onclick="switchTab('news')">
+        <div class="card-icon">📰</div>
+        <div class="card-title">Magazine</div>
+      </div>
+      <div class="grid-card card-guard" onclick="switchTab('guard')">
+        <div class="card-icon">🛡️</div>
+        <div class="card-title">Guard</div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-hero" id="hero-pass-btn" onclick="switchTab('visitor')">
+      + Create Visitor Pass
+    </button>
+
+    <!-- SOS EMERGENCY PANIC BUTTON -->
+    <button type="button" class="btn-sos" id="hero-sos-btn" onclick="triggerEmergencySOS()">
+      🚨 EMERGENCY SOS PANIC BUTTON
+    </button>
+
+    <a href="tel:08108429710" class="hotline-banner">
+      🚨 Gate Security Hotline: 0810 842 9710
+    </a>
+
+    <!-- 0. SECURE CLOUD AUTHENTICATION PANEL -->
+    <div id="view-auth" class="panel-card" style="display: block;">
+      <div class="panel-title">🔐 Enterprise Cloud Sign-In</div>
+      <div class="panel-sub">Role-Based Access Control (RBAC) via Supabase Auth</div>
+
+      <div class="form-group">
+        <label>User Email</label>
+        <input id="auth-email" type="email" placeholder="user@nitel.estate" style="background:#fff;" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input id="auth-password" type="password" placeholder="••••••••" style="background:#fff;" />
+      </div>
+
+      <div id="signup-extra-fields" style="display:none; background:#f8fafc; padding:10px; border-radius:10px; border:1px solid #cbd5e1; margin-top:10px;">
+        <div style="font-size:11px; font-weight:800; color:#0f2b5c; margin-bottom:6px;">📝 Additional Details for Registration</div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input id="reg-fullname" type="text" placeholder="Chief Owueme Mitchelle" style="background:#fff;" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input id="reg-phone" type="tel" placeholder="08108429710" style="background:#fff;" />
+        </div>
+        <div class="form-group">
+          <label>House Address (Plot & Road)</label>
+          <input id="reg-address" type="text" placeholder="Plot 14, Road A" style="background:#fff;" />
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button type="button" class="btn-action btn-blue" style="flex:1;" onclick="handleLogin()">Secure Sign In</button>
+        <button type="button" class="btn-action btn-outline" style="flex:1;" onclick="toggleSignUpMode()" id="signup-mode-btn">Register Account</button>
+      </div>
+      <button type="button" class="btn-action btn-rose" style="margin-top:8px; display:none;" id="sign-out-btn" onclick="handleSignOut()">Sign Out</button>
+      <div id="auth-status-msg" style="font-size:11px; margin-top:8px; text-align:center; font-weight:700; color:#0369a1;"></div>
+    </div>
+
+    <!-- 🏍️ ESTATE BIKER RESIDENT & DRIVER PORTAL -->
+    <div id="view-biker-portal" class="panel-card" style="display: none;">
+      <div class="panel-title">🏍️ NITEL Estate Biker Service</div>
+      <div class="panel-sub">On-demand secure transit across estate roads</div>
+
+      <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #166534; margin-bottom: 6px; text-transform: uppercase;">📍 Request an Estate Bike</div>
+        <div id="resident-pickup-display" style="font-size: 11px; color: #475569; margin-bottom: 10px;">Pickup Address: Loading your address...</div>
+        
+        <button type="button" class="btn-action btn-emerald" id="request-bike-btn" onclick="requestEstateBike()">Request a Bike 🏍️</button>
+        
+        <div id="biker-request-status-box" style="margin-top:10px; display:none; padding:10px; background:#fff; border-radius:8px; font-size:11px; text-align:center; font-weight:700;"></div>
+        <button type="button" class="btn-action btn-rose" id="cancel-bike-btn" style="display:none; margin-top:8px; background:#e11d48;" onclick="cancelEstateBikeRequest()">Cancel Request ❌</button>
+
+        <div id="assigned-biker-card" style="display:none; margin-top:10px; padding:12px; background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; font-size:11px;">
+          <div style="font-weight:900; color:#1e40af; margin-bottom:4px; text-transform:uppercase;">🟢 Biker Assigned & On The Way!</div>
+          <div id="assigned-biker-info" style="color:#0f172a; line-height:1.4;"></div>
+        </div>
+      </div>
+
+      <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #0f2b5c; margin-bottom: 6px; text-transform: uppercase;">🏍️ Registered Biker Dashboard</div>
+        <div class="form-group" style="margin-bottom: 8px;">
+          <label>Enter Your Bike ID to Activate Dashboard</label>
+          <input id="biker-login-id" type="text" placeholder="e.g. NITEL-BK-09" style="background:#fff;" />
+        </div>
+        <button type="button" class="btn-action btn-teal" onclick="loadBikerDashboard()">Open Biker Terminal 🟢</button>
+        
+        <div id="biker-live-terminal" style="display:none; margin-top:12px; border-top:1px solid #cbd5e1; padding-top:10px;">
+          <div style="font-size:11px; font-weight:800; color:#0f766e; margin-bottom:6px;">Status: 🟢 ONLINE — Accepting Requests</div>
+          <div id="incoming-biker-requests" style="display:flex; flex-direction:column; gap:6px;">
+            <small style='color:#64748b;'>Waiting for ride requests...</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE A: EXPANDED VISITOR PASS & PERMIT PANEL -->
+    <div id="view-visitor" class="panel-card" style="display: none;">
+      <div class="panel-title">Create Secure Visitor Permit</div>
+      <div class="panel-sub">Select categorized permit type & duration</div>
+
+      <div class="form-group">
+        <label>Select Category</label>
+        <select id="pass-category-group" onchange="updateCategoryOptions()">
+          <optgroup label="RESIDENTIAL">
+            <option value="RESIDENTIAL">Residential Guest (24 Hours)</option>
+          </optgroup>
+          <optgroup label="RELIGIOUS / COMMUNITY">
+            <option value="CHURCH">Church Permit (4 Hours)</option>
+            <option value="MOSQUE">Mosque Permit (4 Hours)</option>
+          </optgroup>
+          <optgroup label="BUSINESS">
+            <option value="SPA">Spa Customer (3 Hours)</option>
+            <option value="SUPERMARKET">Supermarket Customer (2 Hours)</option>
+            <option value="FOOD_VENDOR">Food Vendor Customer (3 Hours)</option>
+            <option value="BUSINESS_APPOINTMENT">Business Appointment (3 Hours)</option>
+          </optgroup>
+          <optgroup label="PROPERTY">
+            <option value="PROPERTY_ENQUIRY">Property Enquiry (1 Hour)</option>
+          </optgroup>
+          <optgroup label="WORK & MAINTENANCE">
+            <option value="ARTISAN">🔧 Artisan / Technician (2 Hours)</option>
+            <option value="CONTRACTOR">🏗️ Contractor / Labourer (10 Hours)</option>
+          </optgroup>
+          <optgroup label="HOSPITALITY">
+            <option value="HOTEL">Hotel / Shortlet (Select Days)</option>
+          </optgroup>
+          <optgroup label="EVENTS">
+            <option value="EVENT">Event Center (Dynamic)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <form id="pass-form" onsubmit="generateVisitorPass(event); return false;">
+        <div id="dynamic-permit-fields">
+          <div class="form-row form-group">
+            <div>
+              <label>Host Name / Sponsor</label>
+              <input id="host-name" type="text" placeholder="Mr. Adeleke" required />
+            </div>
+            <div>
+              <label>Host Phone</label>
+              <input id="host-phone" type="tel" placeholder="08031234567" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Visitor / Guest Full Name</label>
+            <input id="visitor-name" type="text" placeholder="Emmanuel Chukwu" required />
+          </div>
+
+          <div class="form-row form-group">
+            <div>
+              <label>Estate Road (Road A - U)</label>
+              <select id="visitor-location">
+                <option value="Road A">Road A</option><option value="Road B">Road B</option><option value="Road C">Road C</option><option value="Road D">Road D</option><option value="Road E">Road E</option><option value="Road F">Road F</option><option value="Road G">Road G</option><option value="Road H">Road H</option><option value="Road I">Road I</option><option value="Road J">Road J</option><option value="Road K">Road K</option><option value="Road L">Road L</option><option value="Road M">Road M</option><option value="Road N">Road N</option><option value="Road O">Road O</option><option value="Road P">Road P</option><option value="Road Q">Road Q</option><option value="Road R">Road R</option><option value="Road S">Road S</option><option value="Road T">Road T</option><option value="Road U">Road U</option>
+              </select>
+            </div>
+            <div>
+              <label>Vehicle Plate Number (Optional)</label>
+              <input id="visitor-vehicle" type="text" placeholder="Leave blank if none" />
+            </div>
+          </div>
+        </div>
+
+        <div id="hotel-duration-box" class="form-group" style="display:none;">
+          <label>Shortlet Duration</label>
+          <select id="hotel-days">
+            <option value="1">1 Day</option><option value="2">2 Days</option><option value="3">3 Days</option><option value="4">4 Days</option><option value="5">5 Days</option><option value="6">6 Days</option><option value="7">7 Days</option>
+          </select>
+        </div>
+
+        <div id="gen-error-banner" class="error-banner"></div>
+
+        <button type="submit" class="btn-action btn-blue" style="margin-top:14px;">
+          Authorize Cloud Permit 🚀
+        </button>
+      </form>
+
+      <div id="visitor-result" class="result-card hidden">
+        <div id="pass-category-badge" style="font-size: 11px; font-weight: 900; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px;">Permit Authorized</div>
+        <div id="pass-display-pin" class="pin-hero">000000</div>
+        
+        <div id="qrcode-box" class="qr-container"></div>
+        <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Show Opaque QR or PIN at Gate</div>
+
+        <div id="visitor-summary-display" style="font-size: 12px; font-weight: 700; color: #0f172a;"></div>
+      </div>
+    </div>
+
+    <!-- PHASE B: BUSINESS REGISTRATION PANEL -->
+    <div id="view-business-portal" class="panel-card" style="display: none;">
+      <div class="panel-title">🏪 NITEL Business & Shop Registration</div>
+      <div class="panel-sub">Submit your shop or service to Cloud DB for Administrator Review</div>
+
+      <form id="business-registration-form" onsubmit="submitBusinessRegistration(event); return false;">
+        <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 14px; margin-top: 10px;">
+          <div class="form-group">
+            <label>Business / Service Name</label>
+            <input id="biz-name" type="text" placeholder="e.g. Alaba Chairs & Canopy / My Fashion Boutique" required style="background:#fff;" />
+          </div>
+
+          <div class="form-group">
+            <label>Business Description / Category (Type your own)</label>
+            <input id="biz-category-text" type="text" placeholder="e.g. Tailoring, Provisions, POS, Water Vendor" required style="background:#fff;" />
+          </div>
+
+          <div class="form-row form-group">
+            <div>
+              <label>Shop Number / Location</label>
+              <input id="biz-shop-no" type="text" placeholder="Shop 4 / Home Service" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Estate Road</label>
+              <input id="biz-avenue" type="text" placeholder="Road C" required style="background:#fff;" />
+            </div>
+          </div>
+
+          <div class="form-row form-group">
+            <div>
+              <label>Owner's Full Name</label>
+              <input id="biz-owner-name" type="text" placeholder="Mr. Alaba" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Owner's Phone</label>
+              <input id="biz-owner-phone" type="tel" placeholder="08031234567" required style="background:#fff;" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-action btn-amber" style="margin-top:16px; background:#d97706;">Submit Business to Cloud DB</button>
+        </div>
+      </form>
+      <div id="business-submit-result" style="display:none; margin-top:12px; padding:10px; background:#fef3c7; border-radius:8px; font-size:12px; text-align:center; font-weight:700; color:#92400e;"></div>
+    </div>
+
+    <!-- PHASE C: CLOUD RESIDENT MANAGEMENT PANEL -->
+    <div id="view-resident" class="panel-card" style="display: none;">
+      <div class="panel-title">🏠 Resident Profile & Financial Dues</div>
+      <div class="panel-sub">Cloud-synchronized resident profiles & levy payment ledger</div>
+
+      <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-top: 10px;">
+        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🪪 Cloud Resident Profile</div>
+        <form id="resident-profile-form" onsubmit="saveResidentProfile(event); return false;">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input id="res-profile-name" type="text" placeholder="Chief Owueme Mitchelle" required style="background:#fff;" />
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Phone Number</label>
+              <input id="res-profile-phone" type="tel" placeholder="08108429710" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Emergency Contact</label>
+              <input id="res-profile-emergency" type="tel" placeholder="Next of kin phone" style="background:#fff;" />
+            </div>
+          </div>
+          <div class="form-row form-group">
+            <div>
+              <label>Estate Road</label>
+              <input id="res-profile-avenue" type="text" placeholder="Road A" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Plot / House No.</label>
+              <input id="res-profile-plot" type="text" placeholder="Plot 14" required style="background:#fff;" />
+            </div>
+          </div>
+          <button type="submit" class="btn-action btn-blue" style="margin-top:12px;">Save Profile to Cloud DB</button>
+        </form>
+      </div>
+
+      <div style="background: #fdf2f8; border: 1.5px solid #fbcfe8; border-radius: 14px; padding: 14px; margin-top: 16px;">
+        <div style="font-size: 12px; font-weight: 800; color: #db2777; margin-bottom: 6px; text-transform: uppercase;">💰 Estate Dues & Levy Ledger</div>
+        <div id="resident-dues-feed" style="display: flex; flex-direction: column; gap: 8px;">
+          <small style='color:#64748b;'>Loading your financial ledger...</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUSINESS DIRECTORY -->
+    <div id="view-directory" class="panel-card" style="display: none;">
+      <div class="panel-title">🏢 Estate Business Directory</div>
+      <div class="panel-sub">Verified in-estate shops from Cloud DB</div>
+      <div id="directory-listings-feed" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- COMMUNITY COMPLAINTS WALL -->
+    <div id="view-complaints" class="panel-card" style="display: none;">
+      <div class="panel-title">💬 Community Social Feed</div>
+      <div class="panel-sub">Cloud-synchronized estate notices</div>
+      <div class="form-group" style="margin-top: 10px;">
+        <textarea id="complaint-msg" rows="3" placeholder="Share a notice or update..."></textarea>
+      </div>
+      <button type="button" class="btn-action btn-blue" onclick="submitComplaint()">Post to Cloud Wall</button>
+      <div id="complaints-feed" style="margin-top:12px; max-height:260px; overflow-y:auto;"></div>
+    </div>
+
+    <!-- ESTATE NEWS & MAGAZINE -->
+    <div id="view-news" class="panel-card" style="display: none;">
+      <div class="panel-title">📰 Estate Magazine & News</div>
+      <div class="panel-sub">Official CDA announcements</div>
+      <div id="news-feed" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- ADMIN PORTAL -->
+    <div id="view-admin-post" class="panel-card" style="display: none;">
+      <div class="panel-title">👑 Executive Admin Command Center</div>
+      <div class="panel-sub">Role-Restricted Cloud Management & Approvals</div>
+      <div id="admin-auth-warning" style="color:#b91c1c; font-size:12px; font-weight:700; margin-bottom:10px;"></div>
+      
+      <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #166534; margin-bottom: 8px; text-transform: uppercase;">🏍️ Register Estate Biker</div>
+        <form id="admin-biker-form" onsubmit="registerEstateBiker(event); return false;">
+          <div class="form-row form-group">
+            <div>
+              <label>Biker Full Name</label>
+              <input id="adm-biker-name" type="text" placeholder="Adewale" required style="background:#fff;" />
+            </div>
+            <div>
+              <label>Bike ID</label>
+              <input id="adm-bike-id" type="text" placeholder="NITEL-BK-09" required style="background:#fff;" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input id="adm-biker-phone" type="tel" placeholder="08031234567" required style="background:#fff;" />
+          </div>
+          <button type="submit" class="btn-action btn-emerald" style="margin-top:8px;">Register Active Biker 🏍️</button>
+        </form>
+        <div id="admin-bikers-feed" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;"></div>
+      </div>
+
+      <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: #1e40af; margin-bottom: 8px; text-transform: uppercase;">🔍 Resident Directory Lookup</div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <input id="resident-search-input" type="text" placeholder="Search resident name or road..." onkeyup="searchResidentDirectory()" style="background:#fff;" />
+        </div>
+        <div id="resident-search-results" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+          <small style="color:#64748b;">Type above to search registered residents...</small>
+        </div>
+      </div>
+
+      <div style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 900; color: #dc2626; margin-bottom: 8px; text-transform: uppercase;">🚨 Active Emergency SOS Feed</div>
+        <div id="admin-sos-feed" style="display:flex; flex-direction:column; gap:6px;">
+          <small style='color:#64748b;'>No active emergencies.</small>
+        </div>
+      </div>
+
+      <button type="button" class="btn-action btn-emerald" onclick="loadCloudAdminData()">Fetch Pending Cloud Approvals</button>
+      <div id="admin-cloud-feed" style="margin-top:10px; display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+
+    <!-- GUARD GATE TERMINAL -->
+    <div id="view-guard" class="panel-card" style="display: none;">
+      <div class="panel-title">🛡️ Secure Gate Terminal</div>
+      <div class="panel-sub" id="guard-terminal-subtitle">Device pairing required for gate authorization</div>
+
+      <div id="guard-pairing-box" style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 14px; border-radius: 14px; margin-bottom: 12px; text-align:center;">
+        <div style="font-size: 12px; font-weight: 800; color: #0f2b5c; margin-bottom: 6px; text-transform: uppercase;">🔑 Enter Terminal Pairing Code</div>
+        <input id="pairing-code-input" type="text" placeholder="NITEL-XXXX" style="text-align:center; font-family:monospace; font-size:16px; font-weight:900; background:#fff; margin-bottom:8px;" />
+        <button type="button" class="btn-action btn-emerald" onclick="pairGuardTerminal()">Pair & Activate Tablet 🚀</button>
+      </div>
+
+      <div id="guard-main-interface" style="display:none;">
+        <div style="background:#fef2f2; border:1.5px solid #fecaca; padding: 12px; border-radius: 12px; margin-bottom: 12px;">
+          <div style="font-size: 11px; font-weight: 900; color: #dc2626; text-transform: uppercase; margin-bottom: 6px;">🚨 Active SOS Emergency Alerts</div>
+          <div id="guard-sos-feed">
+            <small style="color:#64748b;">No active emergencies.</small>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 10px; border-radius: 12px; text-align:center; margin-bottom: 12px;">
+          <div id="qr-reader" style="width:100%;"></div>
+          <button type="button" class="btn-outline" style="margin-top:8px;" onclick="initCameraScanner()">📷 Start Camera QR Scanner</button>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; padding: 12px; border-radius: 12px; text-align:center; margin: 12px 0;">
+          <span id="pin-display" style="font-size: 34px; font-family: monospace; letter-spacing: 5px; color: #0f2b5c; font-weight: 900;">------</span>
+        </div>
+
+        <div class="keypad-grid">
+          <button type="button" class="keypad-btn" onclick="pressKey('1')">1</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('2')">2</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('3')">3</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('4')">4</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('5')">5</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('6')">6</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('7')">7</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('8')">8</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('9')">9</button>
+          <button type="button" class="keypad-btn" style="background:#fee2e2; color:#b91c1c;" onclick="clearPin()">CLR</button>
+          <button type="button" class="keypad-btn" onclick="pressKey('0')">0</button>
+          <button type="button" class="keypad-btn" style="background:#dcfce7; color:#15803d;" onclick="verifyCloudPass()">ENTER</button>
+        </div>
+
+        <div id="gate-result" style="display:none; padding:14px; border-radius:14px; margin-top:14px; text-align:left;"></div>
+
+        <div style="background:#f8fafc; border:1.5px solid #cbd5e1; padding: 12px; border-radius: 12px; margin-top: 14px;">
+          <div style="font-size: 11px; font-weight: 900; color: #0f2b5c; text-transform: uppercase; margin-bottom: 6px;">⚙️ Controlled Access & Emergency Overrides</div>
+          <div class="form-row form-group">
+            <button type="button" class="btn-action btn-amber" style="margin-top:0;" onclick="openControlledOverrideModal()">Resident Override 🟢</button>
+            <button type="button" class="btn-action btn-rose" style="margin-top:0;" onclick="openEmergencyOverrideModal()">Emergency Override 🚨</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 14px;">
+          <div style="font-size:12px; font-weight:800; color:#0f2b5c; text-transform:uppercase; margin-bottom:6px;">Live Cloud Audit Trail</div>
+          <div id="audit-log-feed" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
+    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
+    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    var enteredPin = "";
+    var html5QrCode = null;
+    var isRegistering = false;
+    var activeBikerTimer = null;
+    var currentActiveRequestId = null;
+
+    function escapeHtml(unsafe) {
+      if (!unsafe) return "";
+      return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function playBeep(type) {
+      try {
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(type === 'success' ? 600 : 200, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+      } catch(e) {}
+    }
+
+    function playEmergencySiren() {
+      try {
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var now = audioCtx.currentTime;
+        for (var i = 0; i < 4; i++) {
+          var osc = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.setValueAtTime(400, now + (i * 0.4));
+          osc.frequency.linearRampToValueAtTime(880, now + (i * 0.4) + 0.2);
+          gain.gain.setValueAtTime(0.2, now + (i * 0.4));
+          gain.gain.linearRampToValueAtTime(0.01, now + (i * 0.4) + 0.35);
+          osc.start(now + (i * 0.4));
+          osc.stop(now + (i * 0.4) + 0.35);
+        }
+      } catch(e) {}
+    }
+
+    function playBikerAlertTone() {
+      try {
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var now = audioCtx.currentTime;
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.15);
+        osc.frequency.setValueAtTime(783.99, now + 0.3);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } catch(e) {}
+    }
+
+    function updateNetworkStatus() {
+      var indicator = document.getElementById("network-indicator");
+      if (!indicator) return;
+      if (navigator.onLine) {
+        indicator.textContent = "🟢 Cloud Secure";
+        indicator.style.color = "#15803d";
+        indicator.style.background = "#dcfce7";
+      } else {
+        indicator.textContent = "🔴 Offline Mode";
+        indicator.style.color = "#b91c1c";
+        indicator.style.background = "#fee2e2";
+      }
+    }
+    window.addEventListener("online", updateNetworkStatus);
+    window.addEventListener("offline", updateNetworkStatus);
+
+    function checkGuardTerminalLockdown() {
+      var pairedTerminal = localStorage.getItem("nitel_paired_terminal");
+      if (pairedTerminal) {
+        var quickGrid = document.getElementById("main-quick-grid");
+        var heroBtn = document.getElementById("hero-pass-btn");
+        var heroSos = document.getElementById("hero-sos-btn");
+        var headerIcons = document.getElementById("header-nav-icons");
+
+        if (quickGrid) quickGrid.style.display = "none";
+        if (heroBtn) heroBtn.style.display = "none";
+        if (heroSos) heroSos.style.display = "none";
+        if (headerIcons) headerIcons.innerHTML = "<div class='icon-btn' onclick=\"switchTab('guard')\">🛡️</div><div class='icon-btn' onclick=\"switchTab('news')\">📰</div>";
+
+        document.getElementById("guard-pairing-box").style.display = "none";
+        document.getElementById("guard-main-interface").style.display = "block";
+        document.getElementById("guard-terminal-subtitle").innerText = "Authorized Terminal: " + pairedTerminal;
+        return true;
+      }
+      return false;
+    }
+
+    function switchTab(tab) {
+      if (checkGuardTerminalLockdown() && tab !== 'guard' && tab !== 'news' && tab !== 'auth') {
+        alert("🔒 Restricted: This gate tablet is locked to the Guard Terminal.");
+        tab = 'guard';
+      }
+
+      var views = ['auth', 'visitor', 'business-portal', 'resident', 'directory', 'complaints', 'news', 'admin-post', 'guard', 'biker-portal'];
+      views.forEach(function(v) {
+        var el = document.getElementById("view-" + v);
+        if (el) el.style.display = (v === tab) ? 'block' : 'none';
+      });
+      if (tab === 'guard') { renderCloudLogs(); renderActiveSOSFeeds(); }
+      if (tab === 'directory') renderCloudDirectory();
+      if (tab === 'resident') { loadResidentProfile(); loadResidentDues(); }
+      if (tab === 'admin-post') { loadCloudAdminData(); renderActiveSOSFeeds(); loadAdminBikers(); }
+      if (tab === 'biker-portal') { loadResidentPickupAddress(); }
+      if (tab === 'complaints') renderComplaints();
+      if (tab === 'news') renderNewsFeed();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleSignUpMode() {
+      isRegistering = !isRegistering;
+      var extraFields = document.getElementById("signup-extra-fields");
+      var modeBtn = document.getElementById("signup-mode-btn");
+      var msg = document.getElementById("auth-status-msg");
+      if (isRegistering) {
+        extraFields.style.display = "block";
+        modeBtn.innerText = "Back to Sign In";
+        msg.innerText = "Fill in your details to register a new account.";
+      } else {
+        extraFields.style.display = "none";
+        modeBtn.innerText = "Register Account";
+        msg.innerText = "";
+      }
+    }
+
+    async function handleLogin() {
+      var email = document.getElementById("auth-email").value.trim();
+      var password = document.getElementById("auth-password").value.trim();
+      var msg = document.getElementById("auth-status-msg");
+
+      if (isRegistering) {
+        var fullName = document.getElementById("reg-fullname").value.trim();
+        var phone = document.getElementById("reg-phone").value.trim();
+        var address = document.getElementById("reg-address").value.trim();
+
+        if (!fullName || !phone || !address) {
+          msg.style.color = "#b91c1c";
+          msg.innerText = "❌ Please fill in all registration fields.";
+          return;
+        }
+
+        var { data, error } = await supabaseClient.auth.signUp({ email: email, password: password });
+        if (error) { msg.style.color = "#b91c1c"; msg.innerText = "❌ " + error.message; return; }
+
+        if (data.user) {
+          await supabaseClient.from('profiles').upsert([{ id: data.user.id, full_name: fullName, phone: phone, address: address, role: 'resident' }]);
+          await supabaseClient.from('resident_profiles').upsert([{ user_id: data.user.id, full_name: fullName, phone: phone, address: address }], { onConflict: 'user_id' });
+        }
+
+        msg.style.color = "#15803d";
+        msg.innerText = "🟢 Account Created & Profile Saved! You can now sign in.";
+        isRegistering = false;
+        document.getElementById("signup-extra-fields").style.display = "none";
+        document.getElementById("signup-mode-btn").innerText = "Register Account";
+        return;
+      }
+
+      var { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+      if (error) {
+        msg.style.color = "#b91c1c";
+        msg.innerText = "❌ " + error.message;
+      } else {
+        msg.style.color = "#15803d";
+        msg.innerText = "🟢 Authenticated Successfully!";
+        document.getElementById("sign-out-btn").style.display = "block";
+        setTimeout(function() { switchTab('visitor'); }, 800);
+      }
+    }
+
+    async function handleSignOut() {
+      await supabaseClient.auth.signOut();
+      document.getElementById("sign-out-btn").style.display = "none";
+      document.getElementById("auth-status-msg").innerText = "Signed out securely.";
+      switchTab('auth');
+    }
+
+    async function pairGuardTerminal() {
+      var code = document.getElementById("pairing-code-input").value.trim().toUpperCase();
+      if (!code) {
+        alert("⚠️ Please enter a valid pairing code.");
+        return;
+      }
+
+      try {
+        var { data: term, error } = await supabaseClient
+          .from('guard_terminals')
+          .select('*')
+          .eq('pairing_code', code)
+          .single();
+
+        if (error || !term) {
+          playBeep('error');
+          alert("❌ Incorrect or invalid terminal pairing code. Please check with an administrator.");
+          return;
+        }
+
+        localStorage.setItem("nitel_paired_terminal", term.terminal_name + " (" + term.location + ")");
+        playBeep('success');
+        alert("🟢 Tablet Successfully Paired as " + term.terminal_name + "!");
+        location.reload();
+      } catch(e) {
+        alert("❌ Error verifying pairing code. Please check your connection.");
+      }
+    }
+
+    async function triggerEmergencySOS() {
+      playEmergencySiren();
+      var session = await supabaseClient.auth.getSession();
+      
+      var residentName = "Estate Resident / Guest";
+      var address = "NITEL Estate";
+      var phone = "Not Provided";
+      var userId = null;
+
+      if (session.data && session.data.session) {
+        userId = session.data.session.user.id;
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).single();
+        if (profile) {
+          residentName = profile.full_name || residentName;
+          address = profile.address || address;
+          phone = profile.phone || phone;
+        } else {
+          residentName = session.data.session.user.email;
+        }
+      }
+
+      var confirmSOS = confirm("🚨 EMERGENCY CONFIRMATION:\n\nThis will instantly broadcast a high-priority red alert to all Security Guards and Admins. Proceed?");
+      if (!confirmSOS) return;
+
+      try {
+        var { error } = await supabaseClient.from('estate_sos_alerts').insert([{
+          user_id: userId, resident_name: residentName, address: address, phone: phone, status: 'ACTIVE'
+        }]);
+
+        if (error) { alert("SOS Error: " + error.message); return; }
+        playEmergencySiren();
+        alert("🚨 EMERGENCY SOS BROADCASTED SUCCESSFULLY!");
+        switchTab('guard');
+      } catch(e) { alert("Unable to trigger SOS."); }
+    }
+
+    async function renderActiveSOSFeeds() {
+      var feeds = ['guard-sos-feed', 'admin-sos-feed'];
+      try {
+        var { data: activeSOS } = await supabaseClient.from('estate_sos_alerts').select('*').eq('status', 'ACTIVE').order('created_at', { ascending: false });
+        feeds.forEach(function(feedId) {
+          var container = document.getElementById(feedId);
+          if (!container) return;
+          if (!activeSOS || activeSOS.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No active emergencies.</small>"; return; }
+          container.innerHTML = activeSOS.map(function(sos) {
+            return "<div style='background:#ffffff; border:1px solid #fecaca; padding:8px; border-radius:8px; font-size:11px; margin-bottom:6px;'><b>🚨 " + escapeHtml(sos.resident_name) + "</b><br>🏠 " + escapeHtml(sos.address) + " | 📞 <a href='tel:" + escapeHtml(sos.phone) + "'>" + escapeHtml(sos.phone) + "</a><br><button type='button' onclick='resolveSOS(\"" + sos.id + "\")' style='background:#059669; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-weight:800; margin-top:4px; cursor:pointer;'>Resolve / Clear ✅</button></div>";
+          }).join('');
+        });
+      } catch(e) {}
+    }
+
+    async function resolveSOS(sosId) {
+      if (!confirm("Clear this emergency alert?")) return;
+      await supabaseClient.from('estate_sos_alerts').update({ status: 'RESOLVED' }).eq('id', sosId);
+      playBeep('success');
+      renderActiveSOSFeeds();
+    }
+
+    async function submitComplaint() {
+      var msg = document.getElementById("complaint-msg")?.value.trim();
+      var session = await supabaseClient.auth.getSession();
+      if (!msg) { alert("Write a message."); return; }
+      if (!session.data.session) { alert("Sign in required to post."); switchTab('auth'); return; }
+
+      var { error } = await supabaseClient.from('community_posts').insert([{
+        author_id: session.data.session.user.id,
+        author_email: session.data.session.user.email,
+        message: msg,
+        status: 'ACTIVE'
+      }]);
+
+      if (error) { alert("Error posting: " + error.message); return; }
+      document.getElementById("complaint-msg").value = "";
+      renderComplaints();
+      playBeep('success');
+      alert("Notice posted successfully to Community Wall!");
+    }
+
+    async function renderComplaints() {
+      var container = document.getElementById("complaints-feed");
+      if (!container) return;
+      var { data: posts } = await supabaseClient.from('community_posts').select('*').order('created_at', { ascending: false }).limit(20);
+      if (!posts || posts.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No community posts yet.</small>"; return; }
+      container.innerHTML = posts.map(function(p) {
+        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:11px; margin-bottom:6px;'><b>👤 " + escapeHtml(p.author_email || 'Resident') + "</b><br><small>" + escapeHtml(p.message) + "</small></div>";
+      }).join('');
+    }
+
+    async function submitBusinessRegistration(event) {
+      if (event) event.preventDefault();
+      try {
+        var bName = document.getElementById("biz-name")?.value.trim();
+        var categoryText = document.getElementById("biz-category-text")?.value.trim();
+        var shopNo = document.getElementById("biz-shop-no")?.value.trim();
+        var avenue = document.getElementById("biz-avenue")?.value.trim();
+        var ownerName = document.getElementById("biz-owner-name")?.value.trim();
+        var phone = document.getElementById("biz-owner-phone")?.value.trim();
+
+        if (!bName || !ownerName || !phone || !shopNo || !avenue || !categoryText) {
+          alert("Please complete all required fields.");
+          return;
+        }
+
+        var business = {
+          id: 'biz_' + Date.now(),
+          business_name: bName,
+          category: categoryText,
+          location: shopNo + ", " + avenue,
+          owner_name: ownerName,
+          phone: phone,
+          status: "PENDING"
+        };
+
+        var { error } = await supabaseClient.from('estate_businesses').insert([business]);
+        if (error) { alert("Cloud DB Error: " + error.message); return; }
+
+        var resBox = document.getElementById("business-submit-result");
+        if (resBox) {
+          resBox.style.display = "block";
+          resBox.innerText = "⏳ Business submitted securely! Awaiting Admin Approval.";
+        }
+        document.getElementById("business-registration-form").reset();
+        playBeep('success');
+      } catch (error) {
+        alert("Unable to submit business registration.");
+      }
+    }
+
+    async function renderCloudDirectory() {
+      var container = document.getElementById("directory-listings-feed");
+      if (!container) return;
+      var { data: dbApproved } = await supabaseClient.from('estate_businesses').select('*').eq('status', 'APPROVED');
+      if (!dbApproved || dbApproved.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No approved businesses in Cloud DB yet.</small>"; return; }
+      container.innerHTML = dbApproved.map(function(item) {
+        return "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:11px; margin-bottom:6px;'><b>" + escapeHtml(item.business_name) + "</b> (" + escapeHtml(item.category) + ")<br>📍 " + escapeHtml(item.location) + " | 📞 " + escapeHtml(item.phone) + "</div>";
+      }).join('');
+    }
+
+    async function saveResidentProfile(event) {
+      if (event) event.preventDefault();
+      var name = document.getElementById("res-profile-name").value.trim();
+      var phone = document.getElementById("res-profile-phone").value.trim();
+      var emergency = document.getElementById("res-profile-emergency").value.trim();
+      var avenue = document.getElementById("res-profile-avenue").value.trim();
+      var plot = document.getElementById("res-profile-plot").value.trim();
+      
+      var fullAddress = plot + ", " + avenue;
+      var session = await supabaseClient.auth.getSession();
+      var userId = session.data.session ? session.data.session.user.id : 'anon_' + Date.now();
+
+      var { error } = await supabaseClient.from('resident_profiles').insert([
+        { user_id: userId, full_name: name, phone: phone, address: fullAddress }
+      ]);
+
+      if (error) {
+        alert("Error saving profile: " + error.message);
+        return;
+      }
+
+      playBeep('success');
+      alert("🟢 Resident Profile Saved Successfully to Cloud DB!");
+    }
+
+    async function searchResidentDirectory() {
+      var queryText = document.getElementById("resident-search-input").value.trim();
+      var container = document.getElementById("resident-search-results");
+      if (!container) return;
+
+      if (!queryText) { 
+        container.innerHTML = "<small style='color:#64748b;'>Type above to search registered residents...</small>"; 
+        return; 
+      }
+
+      var { data: residents, error } = await supabaseClient
+        .from('resident_profiles')
+        .select('*')
+        .ilike('full_name', '%' + queryText + '%');
+
+      if (error || !residents || residents.length === 0) {
+        container.innerHTML = "<small style='color:#b91c1c;'>No residents found matching '" + escapeHtml(queryText) + "'</small>";
+        return;
+      }
+
+      container.innerHTML = residents.map(function(r) {
+        return "<div style='background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; margin-bottom:4px;'>" +
+          "<b>👤 " + escapeHtml(r.full_name) + "</b><br>" +
+          "🏠 " + escapeHtml(r.address) + " | 📞 <a href='tel:" + escapeHtml(r.phone) + "'>" + escapeHtml(r.phone) + "</a>" +
+        "</div>";
+      }).join('');
+    }
+
+    async function loadResidentPickupAddress() {
+      var display = document.getElementById("resident-pickup-display");
+      if (!display) return;
+      
+      var { data: profiles, error } = await supabaseClient
+        .from('resident_profiles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error || !profiles || profiles.length === 0) {
+        display.innerText = "Pickup Address: Plot 14, Road A";
+        return;
+      }
+
+      display.innerText = "Pickup Address: " + (profiles[0].address || "Plot 14, Road A");
+    }
+
+    async function requestEstateBike() {
+      var session = await supabaseClient.auth.getSession();
+      if (!session.data.session) { alert("Please sign in first."); switchTab('auth'); return; }
+      var display = document.getElementById("resident-pickup-display").innerText.replace("Pickup Address: ", "");
+      var statusBox = document.getElementById("biker-request-status-box");
+      var cancelBtn = document.getElementById("cancel-bike-btn");
+      var requestBtn = document.getElementById("request-bike-btn");
+
+      var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', session.data.session.user.id).single();
+      var resName = profile ? profile.full_name : session.data.session.user.email;
+
+      var { data: req, error } = await supabaseClient.from('biker_requests').insert([{
+        resident_id: session.data.session.user.id,
+        resident_name: resName,
+        pickup_address: display,
+        status: 'SEARCHING'
+      }]).select().single();
+
+      if (error) { alert("Error: " + error.message); return; }
+
+      currentActiveRequestId = req.id;
+      playBikerAlertTone();
+      requestBtn.style.display = "none";
+      statusBox.style.display = "block";
+      cancelBtn.style.display = "block";
+      statusBox.innerHTML = "⏳ SEARCHING FOR BIKER... (02:00)";
+      
+      var timeLeft = 120;
+      if (activeBikerTimer) clearInterval(activeBikerTimer);
+
+      activeBikerTimer = setInterval(async function() {
+        timeLeft--;
+        var mins = Math.floor(timeLeft / 60);
+        var secs = timeLeft % 60;
+        statusBox.innerHTML = "⏳ SEARCHING FOR BIKER... (" + (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs + ")";
+
+        var { data: checkReq } = await supabaseClient.from('biker_requests').select('*, estate_bikers(biker_name, bike_id, phone)').eq('id', req.id).single();
+        if (checkReq && checkReq.status === 'ACCEPTED') {
+          clearInterval(activeBikerTimer);
+          cancelBtn.style.display = "none";
+          statusBox.style.display = "none";
+          
+          var bikerCard = document.getElementById("assigned-biker-card");
+          var bikerInfo = document.getElementById("assigned-biker-info");
+          bikerCard.style.display = "block";
+          
+          var bName = checkReq.estate_bikers ? checkReq.estate_bikers.biker_name : "Assigned Biker";
+          var bId = checkReq.estate_bikers ? checkReq.estate_bikers.bike_id : "NITEL-BK";
+          var bPhone = checkReq.estate_bikers ? checkReq.estate_bikers.phone : "N/A";
+
+          bikerInfo.innerHTML = "<b>Name:</b> " + escapeHtml(bName) + "<br><b>Bike ID:</b> " + escapeHtml(bId) + "<br><b>Phone:</b> <a href='tel:" + escapeHtml(bPhone) + "'>" + escapeHtml(bPhone) + "</a>";
+          playBeep('success');
+          return;
+        }
+
+        if (timeLeft <= 0) {
+          clearInterval(activeBikerTimer);
+          await supabaseClient.from('biker_requests').update({ status: 'CANCELLED' }).eq('id', req.id);
+          statusBox.innerHTML = "❌ No biker available right now. Please retry.";
+          cancelBtn.style.display = "none";
+          requestBtn.style.display = "block";
+        }
+      }, 1000);
+    }
+
+    async function cancelEstateBikeRequest() {
+      if (!currentActiveRequestId) return;
+      if (activeBikerTimer) clearInterval(activeBikerTimer);
+
+      await supabaseClient.from('biker_requests').update({ status: 'CANCELLED' }).eq('id', currentActiveRequestId);
+      currentActiveRequestId = null;
+
+      document.getElementById("biker-request-status-box").style.display = "none";
+      document.getElementById("cancel-bike-btn").style.display = "none";
+      document.getElementById("request-bike-btn").style.display = "block";
+      alert("Ride request cancelled successfully.");
+    }
+
+    async function registerEstateBiker(event) {
+      if (event) event.preventDefault();
+      var name = document.getElementById("adm-biker-name").value.trim();
+      var bikeId = document.getElementById("adm-bike-id").value.trim();
+      var phone = document.getElementById("adm-biker-phone").value.trim();
+
+      var { error } = await supabaseClient.from('estate_bikers').insert([{ biker_name: name, bike_id: bikeId, phone: phone, status: 'ACTIVE' }]);
+      if (error) { alert("Error: " + error.message); return; }
+      playBeep('success');
+      alert("Biker Registered Successfully!");
+      document.getElementById("admin-biker-form").reset();
+      loadAdminBikers();
+    }
+
+    async function loadAdminBikers() {
+      var container = document.getElementById("admin-bikers-feed");
+      if (!container) return;
+      var { data: bikers } = await supabaseClient.from('estate_bikers').select('*').order('created_at', { ascending: false });
+      if (!bikers || bikers.length === 0) { container.innerHTML = "<small style='color:#64748b;'>No bikers registered.</small>"; return; }
+      container.innerHTML = bikers.map(function(b) {
+        return "<div style='background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; font-size:11px; display:flex; justify-content:space-between; align-items:center;'><div><b>🏍️ " + escapeHtml(b.biker_name) + "</b> (" + escapeHtml(b.bike_id) + ")</div><span>" + b.status + "</span></div>";
+      }).join('');
+    }
+
+    async function loadBikerDashboard() {
+      var bikeId = document.getElementById("biker-login-id").value.trim().toUpperCase();
+      var terminal = document.getElementById("biker-live-terminal");
+      if (!bikeId) { alert("Enter your Bike ID."); return; }
+      var { data: biker, error } = await supabaseClient.from('estate_bikers').select('*').eq('bike_id', bikeId).single();
+      if (error || !biker) { alert("❌ Biker ID not found."); return; }
+      terminal.style.display = "block";
+      playBeep('success');
+      alert("🟢 Biker Terminal Active!");
+
+      setInterval(async function() {
+        var { data: reqs } = await supabaseClient
+          .from('biker_requests')
+          .select('*')
+          .eq('status', 'SEARCHING')
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        var feed = document.getElementById("incoming-biker-requests");
+        if (!feed) return;
+        
+        if (!reqs || reqs.length === 0) { 
+          feed.innerHTML = "<small style='color:#64748b;'>Waiting for ride requests...</small>"; 
+          return; 
+        }
+
+        feed.innerHTML = reqs.map(function(r) {
+          return "<div style='background:#fff; border:1.5px solid #0f766e; padding:8px; border-radius:8px; font-size:11px;'><b>📍 " + escapeHtml(r.pickup_address) + "</b><br><button type='button' onclick='acceptBikerRequest(\"" + r.id + "\", \"" + biker.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px; border-radius:6px; font-weight:800; margin-top:6px; cursor:pointer;'>ACCEPT RIDE 🏍️</button></div>";
+        }).join('');
+      }, 3000);
+    }
+
+    async function acceptBikerRequest(reqId, bikerId) {
+      await supabaseClient.from('biker_requests').update({ status: 'ACCEPTED', accepted_by: bikerId }).eq('id', reqId);
+      playBeep('success');
+      alert("Ride Accepted!");
+    }
+
+    async function loadCloudAdminData() {
+      var container = document.getElementById("admin-cloud-feed");
+      if (!container) return;
+      
+      var { data: pendingBiz, error } = await supabaseClient
+        .from('estate_businesses')
+        .select('*')
+        .eq('status', 'PENDING');
+
+      if (error || !pendingBiz || pendingBiz.length === 0) {
+        container.innerHTML = "<small style='color:#64748b;'>No pending business approvals.</small>";
+        return;
+      }
+
+      container.innerHTML = pendingBiz.map(function(b) {
+        return "<div style='background:#fff; border:1.5px solid #d97706; padding:10px; border-radius:10px; font-size:11px; margin-bottom:8px;'>" +
+          "<b>🏪 " + escapeHtml(b.business_name) + "</b> (" + escapeHtml(b.category) + ")<br>" +
+          "📍 " + escapeHtml(b.location) + " | 👤 " + escapeHtml(b.owner_name) + " | 📞 " + escapeHtml(b.phone) + "<br>" +
+          "<div style='display:flex; gap:6px; margin-top:6px;'>" +
+            "<button type='button' onclick='approveBusiness(\"" + b.id + "\")' style='background:#059669; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; cursor:pointer;'>Approve ✅</button>" +
+            "<button type='button' onclick='rejectBusiness(\"" + b.id + "\")' style='background:#dc2626; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; cursor:pointer;'>Reject ❌</button>" +
+          "</div>" +
+        "</div>";
+      }).join('');
+    }
+
+    async function approveBusiness(bizId) {
+      await supabaseClient.from('estate_businesses').update({ status: 'APPROVED' }).eq('id', bizId);
+      playBeep('success');
+      alert("Business Approved & Added to Directory!");
+      loadCloudAdminData();
+    }
+
+    async function rejectBusiness(bizId) {
+      await supabaseClient.from('estate_businesses').update({ status: 'REJECTED' }).eq('id', bizId);
+      alert("Business application rejected.");
+      loadCloudAdminData();
+    }
+
+    function updateCategoryOptions() {
+      var cat = document.getElementById("pass-category-group").value;
+      var dynamicFields = document.getElementById("dynamic-permit-fields");
+      var hotelBox = document.getElementById("hotel-duration-box");
+      hotelBox.style.display = (cat === 'HOTEL') ? 'block' : 'none';
+
+      if (cat === 'PROPERTY_ENQUIRY') {
+        dynamicFields.innerHTML = `
+          <div class="form-group"><label>Full Name</label><input id="visitor-name" type="text" placeholder="Visitor Full Name" required /></div>
+          <div class="form-row form-group">
+            <div><label>Phone Number</label><input id="host-phone" type="tel" placeholder="08030000000" required /></div>
+            <div><label>Vehicle (Optional)</label><input id="visitor-vehicle" type="text" placeholder="Blank if none" /></div>
+          </div>
+          <div class="form-row form-group">
+            <div><label>Property / Area Interested In</label><input id="prop-interest" type="text" placeholder="Road D, Plot 12" required /></div>
+            <div><label>Purpose</label><select id="prop-purpose"><option value="Rent">Rent</option><option value="Buy">Buy</option><option value="Property Inspection">Property Inspection</option></select></div>
+          </div>`;
+      } else if (cat === 'ARTISAN') {
+        dynamicFields.innerHTML = `
+          <div class="form-row form-group">
+            <div><label>Host Name / Sponsor</label><input id="host-name" type="text" placeholder="Mr. Adeleke" required /></div>
+            <div><label>Host Phone</label><input id="host-phone" type="tel" placeholder="08031234567" /></div>
+          </div>
+          <div class="form-group"><label>Artisan / Technician Full Name</label><input id="visitor-name" type="text" placeholder="Musa Ibrahim" required /></div>
+          <div class="form-row form-group">
+            <div><label>Trade / Type of Work</label><input id="artisan-trade" type="text" placeholder="Plumber, Electrician..." required /></div>
+            <div><label>Job Description</label><input id="artisan-job" type="text" placeholder="Repair leaking kitchen pipe" required /></div>
+          </div>
+          <div class="form-row form-group">
+            <div><label>Estate Road</label><select id="visitor-location"><option value="Road A">Road A</option><option value="Road B">Road B</option><option value="Road C">Road C</option><option value="Road D">Road D</option><option value="Road E">Road E</option><option value="Road F">Road F</option><option value="Road G">Road G</option><option value="Road H">Road H</option><option value="Road I">Road I</option><option value="Road J">Road J</option><option value="Road K">Road K</option><option value="Road L">Road L</option><option value="Road M">Road M</option><option value="Road N">Road N</option><option value="Road O">Road O</option><option value="Road P">Road P</option><option value="Road Q">Road Q</option><option value="Road R">Road R</option><option value="Road S">Road S</option><option value="Road T">Road T</option><option value="Road U">Road U</option></select></div>
+            <div><label>Vehicle (Optional)</label><input id="visitor-vehicle" type="text" placeholder="Blank if none" /></div>
+          </div>`;
+      } else if (cat === 'CONTRACTOR') {
+        dynamicFields.innerHTML = `
+          <div class="form-row form-group">
+            <div><label>Host / Resident Name</label><input id="host-name" type="text" placeholder="Mr. Adeleke" required /></div>
+            <div><label>Host Phone</label><input id="host-phone" type="tel" placeholder="08031234567" /></div>
+          </div>
+          <div class="form-row form-group">
+            <div><label>Worker Full Name</label><input id="visitor-name" type="text" placeholder="Superintendent John" required /></div>
+            <div><label>Company Name (if any)</label><input id="contractor-company" type="text" placeholder="BuildCraft Ltd" /></div>
+          </div>
+          <div class="form-group"><label>Project / Job Description</label><input id="contractor-job" type="text" placeholder="Foundation casting & brickwork" required /></div>
+          <div class="form-row form-group">
+            <div><label>Estate Road / Location</label><select id="visitor-location"><option value="Road A">Road A</option><option value="Road B">Road B</option><option value="Road C">Road C</option><option value="Road D">Road D</option><option value="Road E">Road E</option><option value="Road F">Road F</option><option value="Road G">Road G</option><option value="Road H">Road H</option><option value="Road I">Road I</option><option value="Road J">Road J</option><option value="Road K">Road K</option><option value="Road L">Road L</option><option value="Road M">Road M</option><option value="Road N">Road N</option><option value="Road O">Road O</option><option value="Road P">Road P</option><option value="Road Q">Road Q</option><option value="Road R">Road R</option><option value="Road S">Road S</option><option value="Road T">Road T</option><option value="Road U">Road U</option></select></div>
+            <div><label>Vehicle / Truck Plate</label><input id="visitor-vehicle" type="text" placeholder="Blank if none" /></div>
+          </div>`;
+      } else {
+        dynamicFields.innerHTML = `
+          <div class="form-row form-group">
+            <div><label>Host Name / Sponsor</label><input id="host-name" type="text" placeholder="Mr. Adeleke" required /></div>
+            <div><label>Host Phone</label><input id="host-phone" type="tel" placeholder="08031234567" /></div>
+          </div>
+          <div class="form-group"><label>Visitor / Guest Full Name</label><input id="visitor-name" type="text" placeholder="Emmanuel Chukwu" required /></div>
+          <div class="form-row form-group">
+            <div><label>Estate Road</label><select id="visitor-location"><option value="Road A">Road A</option><option value="Road B">Road B</option><option value="Road C">Road C</option><option value="Road D">Road D</option><option value="Road E">Road E</option><option value="Road F">Road F</option><option value="Road G">Road G</option><option value="Road H">Road H</option><option value="Road I">Road I</option><option value="Road J">Road J</option><option value="Road K">Road K</option><option value="Road L">Road L</option><option value="Road M">Road M</option><option value="Road N">Road N</option><option value="Road O">Road O</option><option value="Road P">Road P</option><option value="Road Q">Road Q</option><option value="Road R">Road R</option><option value="Road S">Road S</option><option value="Road T">Road T</option><option value="Road U">Road U</option></select></div>
+            <div><label>Vehicle (Optional)</label><input id="visitor-vehicle" type="text" placeholder="Leave blank if none" /></div>
+          </div>`;
+      }
+    }
+
+    async function generateVisitorPass(event) {
+      if (event) event.preventDefault();
+      var session = await supabaseClient.auth.getSession();
+      if (!session.data.session) { alert("Authentication required."); switchTab('auth'); return; }
+
+      var cat = document.getElementById("pass-category-group").value;
+      var visitorName = document.getElementById('visitor-name')?.value.trim();
+      var vehicle = document.getElementById('visitor-vehicle')?.value.trim() || "Walk-In";
+      var pin = String(Math.floor(100000 + Math.random() * 900000));
+      var opaqueToken = "NITEL-PRM-" + crypto.randomUUID();
+      
+      var durationHours = 24;
+      if (cat === 'ARTISAN') durationHours = 2;
+      else if (cat === 'CONTRACTOR') durationHours = 10;
+      else if (cat === 'PROPERTY_ENQUIRY') durationHours = 1;
+
+      var expiresAt = new Date(Date.now() + durationHours * 3600 * 1000).toISOString();
+      
+      var hostName = cat === 'PROPERTY_ENQUIRY' ? "Property Enquiry" : (document.getElementById('host-name')?.value.trim() + " (" + document.getElementById('visitor-location')?.value + ")");
+      if (cat === 'ARTISAN') {
+        var trade = document.getElementById('artisan-trade')?.value.trim();
+        var job = document.getElementById('artisan-job')?.value.trim();
+        hostName = hostName + " [🔧 " + trade + ": " + job + "]";
+      } else if (cat === 'CONTRACTOR') {
+        var comp = document.getElementById('contractor-company')?.value.trim();
+        var proj = document.getElementById('contractor-job')?.value.trim();
+        hostName = hostName + " [🏗️ " + (comp ? comp + " - " : "") + proj + " (10hr limit)]";
+      }
+
+      var pass = { pin: pin, secure_token: opaqueToken, visitor_name: visitorName, host_name: hostName, vehicle: vehicle, pass_type: cat, status: "VALID", expires_at: expiresAt };
+      var { error } = await supabaseClient.from('estate_passes').insert([pass]);
+      if (error) { alert("Database Error: " + error.message); return; }
+      
+      var result = document.getElementById("visitor-result");
+      result.classList.remove("hidden"); result.style.display = "block";
+      document.getElementById("pass-display-pin").textContent = pin;
+      document.getElementById("visitor-summary-display").innerHTML = "<b>Visitor:</b> " + escapeHtml(visitorName) + "<br><b>Details:</b> " + escapeHtml(hostName) + "<br><b>Duration:</b> " + durationHours + " Hours";
+      
+      var qrBox = document.getElementById("qrcode-box");
+      if (qrBox && typeof QRCode !== "undefined") {
+        qrBox.innerHTML = "";
+        new QRCode(qrBox, { text: opaqueToken, width: 120, height: 120 });
+      }
+      playBeep('success');
+    }
+
+    async function verifyTokenOrPin(queryValue) {
+      var res = document.getElementById("gate-result");
+      res.style.display = "block";
+      var query = supabaseClient.from('estate_passes').select('*');
+      if (queryValue.startsWith("NITEL-")) { query = query.eq('secure_token', queryValue); } else { query = query.eq('pin', queryValue); }
+      var { data: found, error } = await query.single();
+
+      if (error || !found) {
+        res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
+        res.innerHTML = "<b>⚠️ ACCESS DENIED</b>";
+        playBeep('error'); return;
+      }
+      res.style.background = "#f0fdf4"; res.style.color = "#0f172a";
+      res.innerHTML = "<b>🟢 VALID — ACCESS PERMITTED</b><br>👤 " + escapeHtml(found.visitor_name) + "<br>📋 " + escapeHtml(found.host_name);
+      playBeep('success');
+    }
+
+    function initCameraScanner() {
+      if (!html5QrCode) html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 200 }, async function(text) { await verifyTokenOrPin(text); html5QrCode.stop(); }, function() {});
+    }
+
+    function pressKey(n) { if (enteredPin.length < 8) { enteredPin += n; document.getElementById("pin-display").innerText = enteredPin; } }
+    function clearPin() { enteredPin = ""; document.getElementById("pin-display").innerText = "------"; document.getElementById("gate-result").style.display = "none"; }
+    async function verifyCloudPass() { await verifyTokenOrPin(enteredPin); enteredPin = ""; document.getElementById("pin-display").innerText = "------"; }
+
+    function renderNewsFeed() {
+      var container = document.getElementById("news-feed");
+      if (!container) return;
+      container.innerHTML = "<div style='background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px; font-size:12px;'><b>🏗️ Perimeter Solar Lighting Project Commences</b><br><small style='color:#64748b;'>August 2026 • NITEL CDA Executive</small><p style='margin-top:6px; color:#334155;'>Installation of solar security floodlights along Road A through Road H has officially begun.</p></div>";
+    }
+
+    window.onload = function() {
+      if (window.location.search.includes('reset=true')) {
+        localStorage.removeItem("nitel_paired_terminal");
+        alert("Terminal pairing cleared!");
+        window.location.href = window.location.pathname;
+        return;
+      }
+      updateNetworkStatus();
+      if (!checkGuardTerminalLockdown()) { switchTab('auth'); } else { switchTab('guard'); }
+      renderNewsFeed();
+      renderComplaints();
+      renderActiveSOSFeeds();
+    };
+  </script>
+</body>
+</html>
