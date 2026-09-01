@@ -258,17 +258,15 @@
       <button type="button" class="btn-action btn-outline" style="margin-top:10px;" onclick="handleSignOut()">Sign Out 🔒</button>
     </div>
 
-    <!-- VISITOR PASS PANEL -->
-    <div id="view-visitor" class="panel-card" style="display: none;">
-      <div class="panel-title">Create Secure Visitor Permit</div>
-      <div class="form-group">
+    <!      <div class="form-group">
         <label>Select Visit Purpose / Category</label>
         <select id="pass-category-group" onchange="handlePassCategoryChange()">
-          <option value="CHURCH">⛪ Church Visit (4 Hours)</option>
-          <option value="MOSQUE">🕌 Mosque Visit (4 Hours)</option>
+          <option value="RESIDENTIAL">🏡 Residential Guest / Family Visit (24 Hours)</option>
+          <option value="CHURCH">⛪ Church Program (4 Hours)</option>
+          <option value="MOSQUE">🕌 Mosque Program (4 Hours)</option>
           <option value="HOTEL">🏨 Hotel / Shortlet (1-7 Days)</option>
-          <option value="SUPERMARKET">🛒 Supermarket (1 Hour)</option>
-          <option value="EVENT">🎉 Event Center (12 Hours)</option>
+          <option value="SUPERMARKET">🛒 Supermarket / Quick Drop (1 Hour)</option>
+          <option value="EVENT">🎉 Event / Party (12 Hours)</option>
         </select>
       </div>
 
