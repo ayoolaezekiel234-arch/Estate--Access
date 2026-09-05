@@ -197,7 +197,6 @@
         <button class="btn-outline" style="flex:1; min-width:40px; font-size:8px; padding:6px 2px;" onclick="loadAdminSection('levies')">Levies</button>
         <button class="btn-outline" style="flex:1; min-width:40px; font-size:8px; padding:6px 2px;" onclick="loadAdminSection('magazine')">Magazine</button>
         <button class="btn-outline" style="flex:1; min-width:40px; font-size:8px; padding:6px 2px;" onclick="loadAdminSection('enquiries')">Enquiries</button>
-        <button class="btn-outline" style="flex:1; min-width:40px; font-size:8px; padding:6px 2px;" onclick="loadAdminSection('activity')">Search</button>
         <button class="btn-outline" style="flex:1; min-width:40px; font-size:8px; display:none;" id="super-admin-tab-btn" onclick="loadAdminSection('super')">⚡ Roles</button>
       </div>
 
@@ -394,15 +393,6 @@
 
   </div>
 
-  <!-- EMERGENCY SOS 5-SECOND CANCELLATION MODAL -->
-  <div id="sos-countdown-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(220,38,38,0.9); z-index:9999; justify-content:center; align-items:center; flex-direction:column; color:#fff; text-align:center; padding:20px;">
-    <div style="font-size:40px; margin-bottom:10px;">🚨</div>
-    <div style="font-weight:900; font-size:20px; margin-bottom:6px;">EMERGENCY SOS TRIGGERED</div>
-    <div style="font-size:13px; opacity:0.9; margin-bottom:16px;">Siren sounding & alert broadcasting in...</div>
-    <div id="sos-timer-display" style="font-size:50px; font-weight:900; background:#fff; color:#dc2626; width:90px; height:90px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">5</div>
-    <button class="btn-action" style="background:#ffffff; color:#dc2626; width:80%; max-width:280px; font-size:14px; font-weight:900;" onclick="cancelEmergencySOS()">❌ CANCEL FALSE ALARM</button>
-  </div>
-
   <!-- SECURITY OVERRIDE MODAL POPUP -->
   <div id="override-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
     <div style="background:#fff; width:90%; max-width:400px; padding:18px; border-radius:14px; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
@@ -433,7 +423,6 @@
     var supabaseClient;
     var activeScannerInstance = null;
     var deviceMonitorInterval = null;
-    var sosCountdownInterval = null;
 
     try {
       supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -951,7 +940,7 @@
           var { data: passes } = await supabaseClient.from('estate_passes').select('*').order('created_at', { ascending: false }).limit(10);
           if (!passes || passes.length === 0) { area.innerHTML = "<p>No visitor passes found.</p>"; return; }
           area.innerHTML = passes.map(function(p) {
-            var passKey = p.pin || p.secure_token || p.secure_qr_token;
+            var passKey = p.id || p.secure_token || p.pin;
             return `
               <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:8px; margin-bottom:6px;">
                 <div><b>Visitor: ${escapeHtml(p.visitor_name)}</b> (PIN: <b>${p.pin}</b>)</div>
@@ -1028,37 +1017,6 @@
               </div>
             `;
           }).join('');
-        } else if (section === 'activity') {
-          var { data: passes } = await supabaseClient.from('estate_passes').select('*').order('created_at', { ascending: false });
-          var { data: residents } = await supabaseClient.from('resident_profiles').select('*').order('created_at', { ascending: false });
-
-          var residentLookupOptions = residents ? residents.map(r => `
-            <div style="background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; margin-bottom:6px;">
-              <div><b>${escapeHtml(r.full_name)}</b> (${escapeHtml(r.address)})</div>
-              <div>Phone: ${escapeHtml(r.phone)} | RFID Tag: <code>${escapeHtml(r.rfid_tag || 'None')}</code></div>
-              <div>Access Status: <b>${r.access_status}</b> | Levy: <b>${r.levy_status}</b></div>
-            </div>
-          `).join('') : '<small>No residents found.</small>';
-
-          var passesLog = passes ? passes.map(p => `
-            <div style="background:#fff; border:1px solid #cbd5e1; padding:8px; border-radius:8px; margin-bottom:6px;">
-              <div><b>Visitor: ${escapeHtml(p.visitor_name)}</b> (PIN: <code>${p.pin}</code>)</div>
-              <div>Host: ${escapeHtml(p.host_name)} (${escapeHtml(p.host_address)})</div>
-              <div>Type: ${p.pass_type} | Status: <b>${p.status}</b></div>
-              <small style="color:#64748b;">Created: ${new Date(p.created_at).toLocaleString()}</small>
-            </div>
-          `).join('') : '<small>No pass history found.</small>';
-
-          area.innerHTML = `
-            <div style="font-weight:800; margin-bottom:6px;">🔍 Resident & Gate Activity Search</div>
-            <div class="form-group"><label>Filter Residents or Passes</label><input id="gate-search-filter" type="text" placeholder="Type name, plot or visitor..." oninput="filterGateActivityLogs(this.value)" style="background:#fff;" /></div>
-            
-            <div style="font-weight:800; margin-top:12px; margin-bottom:4px;">👥 Registered Residents (${residents ? residents.length : 0})</div>
-            <div id="searchable-residents-list" style="max-height:200px; overflow-y:auto; margin-bottom:12px;">${residentLookupOptions}</div>
-
-            <div style="font-weight:800; margin-top:12px; margin-bottom:4px;">🚗 Visitor Pass Log History</div>
-            <div id="searchable-passes-list" style="max-height:200px; overflow-y:auto;">${passesLog}</div>
-          `;
         } else if (section === 'super' && currentUserRole === 'SUPER_ADMIN') {
           var { data: residentsList } = await supabaseClient.from('resident_profiles').select('user_id, full_name, address');
           var { data: rolesList } = await supabaseClient.from('user_roles').select('user_id, role');
@@ -1093,34 +1051,6 @@
       } catch (err) {
         area.innerHTML = "<p style='color:#b91c1c;'>Error loading section data.</p>";
       }
-    }
-
-    function filterGateActivityLogs(query) {
-      var q = query.toLowerCase();
-      var resCards = document.querySelectorAll('#searchable-residents-list > div');
-      resCards.forEach(function(card) {
-        var text = card.innerText.toLowerCase();
-        card.style.display = text.includes(q) ? 'block' : 'none';
-      });
-
-      var passCards = document.querySelectorAll('#searchable-passes-list > div');
-      passCards.forEach(function(card) {
-        var text = card.innerText.toLowerCase();
-        card.style.display = text.includes(q) ? 'block' : 'none';
-      });
-    }
-
-    async function adminRevokePass(passIdentifier) {
-      if (!confirm("Immediately revoke and cancel this visitor pass?")) return;
-      try {
-        var { error } = await supabaseClient.from('estate_passes').update({ status: 'REVOKED' }).eq('pin', String(passIdentifier));
-        if (error) {
-          var { error: err2 } = await supabaseClient.from('estate_passes').update({ status: 'REVOKED' }).eq('secure_token', String(passIdentifier));
-          if (err2) throw err2;
-        }
-        alert("Visitor pass revoked successfully.");
-        loadAdminSection('passes');
-      } catch (err) { alert("Error revoking pass: " + err.message); }
     }
 
     async function assignIndividualResidentDebt() {
@@ -1205,6 +1135,16 @@
         alert("Business removed from directory.");
         loadAdminSection('businesses');
       } catch (err) { alert("Error deleting business: " + err.message); }
+    }
+
+    async function adminRevokePass(passIdentifier) {
+      if (!confirm("Immediately revoke and cancel this visitor pass?")) return;
+      try {
+        var { error } = await supabaseClient.from('estate_passes').update({ status: 'REVOKED' }).or(`id.eq.${passIdentifier},pin.eq.${passIdentifier},secure_token.eq.${passIdentifier}`);
+        if (error) throw error;
+        alert("Visitor pass revoked successfully.");
+        loadAdminSection('passes');
+      } catch (err) { alert("Error revoking pass: " + err.message); }
     }
 
     async function updateResidentLevyStatus(userId, newStatus) {
@@ -1362,7 +1302,7 @@
       if (!title || !body) { alert("Enter title and message."); return; }
 
       try {
-        var { error } = await supabaseClient.from('community_posts').insert([{ author_id: currentUserId, author_email: 'Estate Management (Admin)', message: `📰 *${title}*\n${body}` }]);
+        var { error } = await supabaseClient.from('community_posts').insert([{ author_email: 'Estate Management (Admin)', message: `📰 *${title}*\n${body}` }]);
         if (error) throw error;
         alert("🟢 Magazine Notice Broadcasted Successfully!");
         document.getElementById("mag-title").value = "";
@@ -1377,24 +1317,7 @@
       if (!listDiv) return;
       var { data: posts } = await supabaseClient.from('community_posts').select('*').order('created_at', { ascending: false }).limit(5);
       if (!posts || posts.length === 0) { listDiv.innerHTML = "<small>No announcements published.</small>"; return; }
-      
-      var nowTime = Date.now();
-      listDiv.innerHTML = posts.map(p => {
-        var postTime = new Date(p.created_at).getTime();
-        var isWithinOneHour = (nowTime - postTime) < 3600000;
-        var isAuthor = currentUserId && p.author_id === currentUserId;
-        var canDelete = (isAuthor && isWithinOneHour) || currentUserRole === 'ADMIN' || currentUserRole === 'SUPER_ADMIN';
-
-        return `
-          <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:6px; border-radius:6px; margin-bottom:4px; font-size:11px;">
-            <div>${escapeHtml(p.message)}</div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-              <small style="color:#64748b;">${new Date(p.created_at).toLocaleTimeString()}</small>
-              ${canDelete ? `<button class="btn-outline" style="font-size:8px; color:#b91c1c; padding:2px 6px;" onclick="deleteCommunityPost('${p.id}')">Delete 🗑️</button>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
+      listDiv.innerHTML = posts.map(p => `<div style="background:#f8fafc; border:1px solid #cbd5e1; padding:6px; border-radius:6px; margin-bottom:4px;">${escapeHtml(p.message)}</div>`).join('');
     }
 
     async function renderMagazineFeed() {
@@ -1406,24 +1329,7 @@
           feed.innerHTML = "<div style='font-size:12px; background:#f8fafc; padding:10px; border-radius:8px;'><b>🏗️ Perimeter Solar Lighting Project</b><br>Installation along Road A through Road H has commenced.</div>";
           return;
         }
-
-        var nowTime = Date.now();
-        feed.innerHTML = posts.map(p => {
-          var postTime = new Date(p.created_at).getTime();
-          var isWithinOneHour = (nowTime - postTime) < 3600000;
-          var isAuthor = currentUserId && p.author_id === currentUserId;
-          var canDelete = (isAuthor && isWithinOneHour) || currentUserRole === 'ADMIN' || currentUserRole === 'SUPER_ADMIN';
-
-          return `
-            <div style='font-size:12px; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px;'>
-              ${escapeHtml(p.message)}
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-                <small style="color:#64748b;">Posted: ${new Date(p.created_at).toLocaleDateString()}</small>
-                ${canDelete ? `<button class="btn-outline" style="font-size:8px; color:#b91c1c; padding:2px 6px;" onclick="deleteCommunityPost('${p.id}')">Delete 🗑️</button>` : ''}
-              </div>
-            </div>
-          `;
-        }).join('');
+        feed.innerHTML = posts.map(p => `<div style='font-size:12px; margin-top:8px; background:#f8fafc; padding:10px; border-radius:8px;'>${escapeHtml(p.message)}<br><small style="color:#64748b;">Posted: ${new Date(p.created_at).toLocaleDateString()}</small></div>`).join('');
       } catch(e) { feed.innerHTML = "<small>Could not load magazine.</small>"; }
     }
 
@@ -1634,7 +1540,868 @@
       switchTab('auth');
     }
 
-    // Escape HTML Helper
+    async function loadResidentProfile() {
+      var nameEl = document.getElementById("res-disp-name");
+      var addrEl = document.getElementById("res-disp-address");
+      var phoneEl = document.getElementById("res-disp-phone");
+      var rfidEl = document.getElementById("res-disp-rfid");
+      var statusEl = document.getElementById("res-disp-status");
+      var levyEl = document.getElementById("res-disp-levy");
+      var qrBox = document.getElementById("resident-qr-box");
+
+      try {
+        var sessionRes = await supabaseClient.auth.getSession();
+        if (!sessionRes.data.session) {
+          if (nameEl) nameEl.innerText = "Resident profile unavailable.";
+          if (addrEl) addrEl.innerText = "Please sign in via 🔐 tab.";
+          if (phoneEl) phoneEl.innerText = "N/A";
+          return;
+        }
+
+        var userId = sessionRes.data.session.user.id;
+        var { data: profile, error } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).maybeSingle();
+
+        if (error || !profile) {
+          if (nameEl) nameEl.innerText = "Resident profile unavailable.";
+          if (addrEl) addrEl.innerText = "Database profile record not found.";
+          return;
+        }
+
+        if (nameEl) nameEl.innerText = profile.full_name;
+        if (addrEl) addrEl.innerText = profile.address;
+        if (phoneEl) phoneEl.innerText = profile.phone;
+        
+        if (statusEl) {
+          statusEl.innerText = profile.access_status;
+          statusEl.style.color = profile.access_status === 'AUTHORIZED' ? '#15803d' : '#d97706';
+        }
+        
+        if (levyEl) {
+          levyEl.innerText = profile.levy_status;
+          levyEl.style.color = profile.levy_status && profile.levy_status.includes('PAID') ? '#15803d' : '#d97706';
+        }
+
+        if (profile.rfid_tag) {
+          if (rfidEl) {
+            rfidEl.innerText = profile.rfid_tag;
+            rfidEl.style.color = "#1e40af";
+          }
+          if (qrBox) {
+            qrBox.style.display = "flex";
+            qrBox.innerHTML = "";
+            if (typeof QRCode !== "undefined") {
+              new QRCode(qrBox, { text: profile.rfid_tag, width: 110, height: 110 });
+            }
+          }
+        } else {
+          if (rfidEl) {
+            rfidEl.innerText = "RFID Pending Estate Approval";
+            rfidEl.style.color = "#b91c1c";
+          }
+          if (qrBox) qrBox.style.display = "none";
+        }
+      } catch (err) { 
+        if (nameEl) nameEl.innerText = "Resident profile unavailable."; 
+      }
+    }
+
+    async function verifyGateTag() {
+      var scanInput = document.getElementById("scan-input");
+      var res = document.getElementById("gate-res");
+      if (!scanInput || !res) return;
+      var tag = scanInput.value.trim();
+      res.style.display = "block";
+
+      if (!tag) { res.style.color = "#b91c1c"; res.innerHTML = "❌ Please enter or scan an RFID tag."; return; }
+
+      try {
+        var { data, error } = await supabaseClient.rpc('verify_gate_rfid', { p_rfid_tag: tag });
+        if (error) throw error;
+
+        if (data && data.success) {
+          res.style.color = "#15803d";
+          res.innerHTML = "🟢 AUTHORIZED RESIDENT<br>" + escapeHtml(data.full_name) + " — " + escapeHtml(data.address) + "<br>Access Granted ✅";
+        } else {
+          res.style.color = "#b91c1c";
+          res.innerHTML = "❌ " + (data ? data.message : "ACCESS DENIED");
+        }
+      } catch (err) { res.style.color = "#b91c1c"; res.innerHTML = "❌ Verification failed."; }
+    }
+
+    async function verifyVisitorPassToken() {
+      var scanInput = document.getElementById("scan-input");
+      var res = document.getElementById("gate-res");
+      if (!scanInput || !res) return;
+      var token = scanInput.value.trim();
+      res.style.display = "block";
+
+      if (!token) { res.style.color = "#b91c1c"; res.innerHTML = "❌ Please enter a pass token or PIN."; return; }
+
+      try {
+        var activeDevCode = localStorage.getItem("nitel_guard_device_code") || "";
+        var { data, error } = await supabaseClient.rpc('verify_gate_pass_token', { p_token: token, p_device_code: activeDevCode });
+        if (error) throw error;
+
+        if (data && data.success) {
+          res.style.color = "#15803d";
+          res.innerHTML = `🟢 VISITOR PASS AUTHORIZED<br><b>Visitor:</b> ${escapeHtml(data.visitor_name)} (${data.expected_guests} Guests)<br><b>Host:</b> ${escapeHtml(data.host_name)} — ${escapeHtml(data.host_address)}<br>Access Granted ✅`;
+        } else {
+          res.style.color = "#b91c1c";
+          res.innerHTML = "❌ " + (data ? data.message : "PASS EXPIRED OR INVALID");
+        }
+      } catch (err) { res.style.color = "#b91c1c"; res.innerHTML = "❌ Verification failed."; }
+    }
+
+    async function verifyGateEntityPass() {
+      var scanInput = document.getElementById("scan-input");
+      var res = document.getElementById("gate-res");
+      if (!scanInput || !res) return;
+      var token = scanInput.value.trim();
+      res.style.display = "block";
+
+      if (!token) { res.style.color = "#b91c1c"; res.innerHTML = "❌ Please enter token."; return; }
+
+      try {
+        var { data, error } = await supabaseClient.rpc('verify_gate_entity', { p_identifier: token });
+        if (error) throw error;
+
+        if (data && data.success) {
+          res.style.color = "#15803d";
+          if (data.entity_type === 'STAKEHOLDER') {
+            res.innerHTML = `🟢 STAKEHOLDER PASS<br><b>Name:</b> ${escapeHtml(data.name)}<br>Access Granted ✅`;
+          } else {
+            res.innerHTML = `🟢 BUSINESS WORKER<br><b>Name:</b> ${escapeHtml(data.name)}<br>Access Granted ✅`;
+          }
+        } else {
+          res.style.color = "#b91c1c";
+          res.innerHTML = "❌ " + (data ? data.message : "INVALID");
+        }
+      } catch (err) { res.style.color = "#b91c1c"; res.innerHTML = "❌ Error."; }
+    }
+
+    async function generateVisitorPass() {
+      var btn = document.getElementById("btn-gen-pass");
+      var vNameEl = document.getElementById("visitor-name");
+      var catEl = document.getElementById("pass-category-group");
+      var guestCountEl = document.getElementById("visitor-count");
+      var resBox = document.getElementById("visitor-pass-result");
+      var textOut = document.getElementById("pass-text-output");
+      var qrBox = document.getElementById("visitor-qr-box");
+      var waBtn = document.getElementById("whatsapp-share-btn");
+
+      if (!vNameEl || !resBox || !textOut) return;
+
+      var vName = vNameEl.value.trim();
+      var cat = catEl ? catEl.value : 'RESIDENTIAL';
+      var guestCount = guestCountEl ? (parseInt(guestCountEl.value) || 1) : 1;
+
+      resBox.style.display = "block";
+
+      if (!vName) {
+        textOut.style.color = "#b91c1c";
+        textOut.innerText = "❌ Please enter visitor full name.";
+        if (qrBox) qrBox.style.display = "none";
+        if (waBtn) waBtn.style.display = "none";
+        return;
+      }
+
+      try {
+        var sessionRes = await supabaseClient.auth.getSession();
+        if (!sessionRes.data.session) { textOut.style.color = "#b91c1c"; textOut.innerText = "❌ Authentication required."; return; }
+
+        var user = sessionRes.data.session.user;
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', user.id).maybeSingle();
+        
+        if (!profile) { textOut.style.color = "#b91c1c"; textOut.innerText = "❌ Resident profile required."; return; }
+
+        var pin = Math.floor(100000 + Math.random() * 900000);
+        var opaqueToken = "NITEL-PASS-" + crypto.randomUUID();
+        var durationHours = 24; // Default for residential guest
+        if (cat === 'HOTEL') {
+          var hotelDaysEl = document.getElementById("pass-hotel-days");
+          var days = hotelDaysEl ? (parseInt(hotelDaysEl.value) || 1) : 1;
+          durationHours = days * 24;
+        } else if (cat === 'SUPERMARKET') { durationHours = 1; }
+        else if (cat === 'EVENT') { durationHours = 12; }
+        else if (cat === 'CHURCH' || cat === 'MOSQUE') { durationHours = 4; }
+        else if (cat === 'CONSTRUCTION') { durationHours = 4; }
+
+        var expiresAt = new Date(Date.now() + durationHours * 3600000).toISOString();
+
+        if (btn) btn.disabled = true;
+        var { error } = await supabaseClient.from('estate_passes').insert([{
+          pin: String(pin), secure_qr_token: opaqueToken, secure_token: opaqueToken, visitor_name: vName, host_id: user.id, host_name: profile.full_name, host_address: profile.address, pass_type: cat, expected_guests: guestCount, status: "VALID", expires_at: expiresAt
+        }]);
+
+        if (error) throw error;
+
+        textOut.style.color = "#15803d";
+        textOut.innerHTML = `🟢 Permit Authorized!<br>PIN: <b>${pin}</b><br>Visitor: ${escapeHtml(vName)} (${guestCount} Guests)`;
+
+        if (qrBox) {
+          qrBox.style.display = "flex";
+          qrBox.innerHTML = "";
+          if (typeof QRCode !== "undefined") { new QRCode(qrBox, { text: opaqueToken, width: 110, height: 110 }); }
+        }
+
+        if (waBtn) {
+          var waMessage = encodeURIComponent(`*NITEL Estate Gate Pass* 🚪\n\nHello ${vName},\nYour entry pass has been authorized by ${profile.full_name} (${profile.address}).\n\n*PIN:* ${pin}\n*Guests:* ${guestCount}\n*Valid Until:* ${new Date(expiresAt).toLocaleString()}`);
+          waBtn.href = `https://wa.me/?text=${waMessage}`;
+          waBtn.style.display = "block";
+        }
+
+      } catch (err) { textOut.style.color = "#b91c1c"; textOut.innerText = "❌ Error creating pass."; }
+      finally { if (btn) btn.disabled = false; }
+    }
+
+    async function submitBusinessRegistration(e) {
+      e.preventDefault();
+      var bName = document.getElementById("biz-name").value.trim();
+      var cat = document.getElementById("biz-cat").value.trim();
+      var shop = document.getElementById("biz-shop").value.trim();
+      var road = document.getElementById("biz-road").value.trim();
+      var owner = document.getElementById("biz-owner").value.trim();
+      var phone = document.getElementById("biz-phone").value.trim();
+
+      try {
+        var { error } = await supabaseClient.from('estate_businesses').insert([{
+          id: 'biz_' + Date.now(), business_name: bName, category: cat, location: shop + ", " + road, owner_name: owner, phone: phone, status: "PENDING", photos: []
+        }]);
+        if (error) throw error;
+        alert("Business submitted successfully!");
+        switchTab('directory');
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function renderCloudDirectory() {
+      var feed = document.getElementById("directory-listings-feed");
+      if (!feed) return;
+      try {
+        var { data: list, error } = await supabaseClient.from('estate_businesses').select('*').eq('status', 'ACTIVE');
+        if (error) throw error;
+        if (!list || list.length === 0) { feed.innerHTML = "<small>No active businesses approved yet.</small>"; return; }
+        
+        feed.innerHTML = list.map(function(b) {
+          var cleanPhone = formatTelPhone(b.phone);
+          var waPhone = formatWhatsAppPhone(b.phone);
+          return `
+            <div style='background:#f8fafc; border:1.5px solid #cbd5e1; padding:12px; border-radius:12px; margin-bottom:8px; font-size:11px;'>
+              <div><b>🏪 ${escapeHtml(b.business_name)}</b> (${escapeHtml(b.category)})</div>
+              <div style="margin-top:4px; color:#475569;">📍 ${escapeHtml(b.location)} | 👤 ${escapeHtml(b.owner_name)}</div>
+              <div style="margin-top:4px; font-weight:700; color:#0f2b5c;">📞 Phone: ${escapeHtml(b.phone || 'N/A')}</div>
+              ${cleanPhone ? `
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <a href="tel:${cleanPhone}" class="btn-action" style="flex:1; background:#059669; color:#fff; text-decoration:none; padding:8px; text-align:center; border-radius:8px; font-size:10px; font-weight:800; text-transform:uppercase;">📞 Call Owner</a>
+                  <a href="https://wa.me/${waPhone}" target="_blank" class="btn-action" style="flex:1; background:#25d366; color:#fff; text-decoration:none; padding:8px; text-align:center; border-radius:8px; font-size:10px; font-weight:800; text-transform:uppercase;">💬 WhatsApp</a>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      } catch (err) { feed.innerHTML = "<small>Error loading directory listings.</small>"; }
+    }
+
+    async function submitComplaint() {
+      var msgInput = document.getElementById("complaint-msg");
+      if (!msgInput) return;
+      var msg = msgInput.value.trim();
+      if (!msg) return;
+      try {
+        var sessionRes = await supabaseClient.auth.getSession();
+        if (!sessionRes.data.session) { alert("Sign in required."); switchTab('auth'); return; }
+        var user = sessionRes.data.session.user;
+        var { error } = await supabaseClient.from('community_posts').insert([{ author_id: user.id, author_email: user.email, message: msg }]);
+        if (error) throw error;
+        msgInput.value = "";
+        renderComplaints();
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function renderComplaints() {
+      var feed = document.getElementById("complaints-feed");
+      if (!feed) return;
+      try {
+        var { data: posts } = await supabaseClient.from('community_posts').select('*').order('created_at', { ascending: false });
+        if (!posts || posts.length === 0) { feed.innerHTML = "<small>No posts yet.</small>"; return; }
+        feed.innerHTML = posts.map(p => `<div style='background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:6px; margin-bottom:4px; font-size:11px;'><b>${escapeHtml(p.author_email)}</b>: ${escapeHtml(p.message)}</div>`).join('');
+      } catch (err) { feed.innerHTML = "<small>Error loading feed.</small>"; }
+    }
+
+    async function triggerEmergencySOS() {
+      if (!confirm("🚨 BROADCAST EMERGENCY SOS?")) return;
+      try {
+        var sessionRes = await supabaseClient.auth.getSession();
+        var userId = sessionRes.data.session ? sessionRes.data.session.user.id : null;
+        var name = "Resident", phone = "N/A", address = "NITEL Estate";
+        if (userId) {
+          var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).maybeSingle();
+          if (profile) { name = profile.full_name; phone = profile.phone; address = profile.address; }
+        }
+        var { error } = await supabaseClient.from('estate_sos_alerts').insert([{ user_id: userId, resident_name: name, address: address, phone: phone, status: "ACTIVE" }]);
+        if (error) throw error;
+        alert("🚨 EMERGENCY SOS BROADCASTED!");
+      } catch (err) { alert("SOS Error: " + err.message); }
+    }
+
+    async function initBikerPortal() {
+      var container = document.getElementById("biker-view-container");
+      if (!container) return;
+      container.innerHTML = "<div style='font-size:12px; color:#64748b;'>Checking biker credentials...</div>";
+      
+      try {
+        var { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+        if (authError || !user) {
+          container.innerHTML = `<div style="background:#fef2f2; border:1.5px solid #fecaca; border-radius:14px; padding:14px; font-size:12px; color:#b91c1c;"><b>Please sign in to access the Biker Portal.</b></div>`;
+          return;
+        }
+
+        var { data: biker, error: queryError } = await supabaseClient
+          .from('biker_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (!biker || biker.biker_status !== 'APPROVED') {
+          container.innerHTML = `<div style="background:#fefce8; border:1.5px solid #fef08a; border-radius:14px; padding:14px; font-size:12px; color:#a16207;"><b>Notice:</b> This account is registered as an Admin/Resident. You do not have an approved delivery biker profile attached to this login.</div>`;
+          return;
+        }
+
+        var plateDisplay = biker.bike_plate_number || biker.plate_number || 'NITEL-BIKE';
+        var modelDisplay = biker.bike_model || 'Standard Delivery Bike';
+
+        container.innerHTML = `
+          <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:14px; padding:14px; font-size:12px; margin-bottom:12px;">
+            <div style="font-weight:900; font-size:14px; color:#065f46; margin-bottom:8px;">🏍️ Biker Profile & Status</div>
+            <div><b>Full Name:</b> ${escapeHtml(biker.full_name)}</div>
+            <div><b>Phone Number:</b> ${escapeHtml(biker.phone || 'Not Provided')}</div>
+            <div><b>Bike Model:</b> ${escapeHtml(modelDisplay)}</div>
+            <div><b>Plate Number:</b> ${escapeHtml(plateDisplay)}</div>
+            <div><b>Status:</b> <span style="color:#15803d; font-weight:800;">APPROVED</span></div>
+            <div><b>Estate Access:</b> <span style="color:#15803d; font-weight:800;">ACTIVE GATE ACCESS</span></div>
+          </div>
+          <div style="font-size:13px; font-weight:800; color:#0f2b5c; margin-bottom:6px;">📦 Available Dispatch Requests</div>
+          <div id="biker-requests-feed"><small>Loading active requests...</small></div>
+        `;
+
+        loadBikerFeeds(biker);
+      } catch (err) {
+        container.innerHTML = `<div style="background:#fef2f2; border:1.5px solid #fecaca; border-radius:14px; padding:14px; font-size:12px; color:#b91c1c;"><b>Error loading Biker Portal.</b></div>`;
+      }
+    }
+
+    async function loadBikerFeeds(bikerProfile) {
+      var feed = document.getElementById("biker-requests-feed");
+      if (!feed) return;
+      try {
+        var { data: myJob } = await supabaseClient.from('bike_requests').select('*').eq('assigned_biker_id', bikerProfile.user_id).in('request_status', ['ACCEPTED', 'ARRIVING', 'PICKED_UP']).maybeSingle();
+        if (myJob) {
+          feed.innerHTML = `<div style="background:#eff6ff; border:1.5px solid #bfdbfe; padding:12px; border-radius:10px; font-size:11px;"><div><b>Active Assigned Job</b></div><div style="margin-top:4px;"><b>Resident:</b> ${escapeHtml(myJob.requester_name || 'Resident')} (${escapeHtml(myJob.requester_phone || 'N/A')})</div><div style="margin-top:2px;"><b>Pickup:</b> ${escapeHtml(myJob.pickup_location || 'NITEL Estate')}</div><div style="margin-top:2px;"><b>Destination:</b> ${escapeHtml(myJob.destination || 'N/A')}</div><div style="margin-top:2px;"><b>Notes:</b> ${escapeHtml(myJob.request_notes || 'None')}</div><div style="display:flex; gap:6px; margin-top:8px;"><button class="btn-action btn-emerald" style="margin:0; font-size:10px; padding:8px;" onclick="completeBikeRequestRPC('${myJob.id}')">Complete Job ✅</button><button class="btn-action btn-rose" style="margin:0; font-size:10px; padding:8px; background:#b91c1c;" onclick="cancelBikeRequestRPC('${myJob.id}')">Cancel Job ❌</button></div></div>`;
+          return;
+        }
+        var { data: availableReqs } = await supabaseClient.from('bike_requests').select('*').in('request_status', ['AVAILABLE', 'SEARCHING']).order('created_at', { ascending: false });
+        if (!availableReqs || availableReqs.length === 0) { feed.innerHTML = "<small style='color:#64748b;'>No active dispatch requests.</small>"; return; }
+        feed.innerHTML = availableReqs.map(req => `<div style="background:#f8fafc; border:1px solid #cbd5e1; padding:10px; border-radius:8px; margin-bottom:8px; font-size:11px;"><div><b>🏠 Resident:</b> ${escapeHtml(req.requester_name || 'Resident')} (${escapeHtml(req.requester_phone || 'N/A')})</div><div><b>Pickup:</b> ${escapeHtml(req.pickup_location || 'NITEL Estate')}</div><div><b>Destination:</b> ${escapeHtml(req.destination || 'N/A')}</div><div><b>Notes:</b> ${escapeHtml(req.request_notes || 'None')}</div><button class="btn-action btn-emerald" style="margin-top:6px; font-size:11px; padding:8px;" onclick="acceptBikeRequestRPC('${req.id}')">Accept Request ✅</button></div>`).join('');
+      } catch (err) { feed.innerHTML = "<small>Error loading dispatch feeds.</small>"; }
+    }
+
+    async function acceptBikeRequestRPC(requestId) {
+      try {
+        var { data, error } = await supabaseClient.rpc('accept_bike_request', { p_request_id: requestId });
+        if (error) throw error;
+        if (data && data.success) {
+          alert("🟢 Request accepted successfully!");
+          initBikerPortal();
+        } else {
+          alert("❌ " + (data ? data.message : "Failed to accept request."));
+          initBikerPortal();
+        }
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function completeBikeRequestRPC(requestId) {
+      try {
+        var { data, error } = await supabaseClient.rpc('complete_bike_request', { p_request_id: requestId });
+        if (error) throw error;
+        if (data && data.success) {
+          alert("🟢 Request completed!");
+          initBikerPortal();
+        } else {
+          alert("❌ " + (data ? data.message : "Failed"))
+        }
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function cancelBikeRequestRPC(requestId) {
+      if (!confirm("Are you sure you want to return this request to the available queue?")) return;
+      try {
+        var { data, error } = await supabaseClient.rpc('cancel_bike_request', { p_request_id: requestId });
+        if (error) throw error;
+        if (data && data.success) {
+          alert("🟢 Request returned to available queue.");
+          initBikerPortal();
+        } else {
+          alert("❌ " + (data ? data.message : "Failed"))
+        }
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    // ============================================================
+    // ADVERTISEMENT SYSTEM FUNCTIONS
+    // ============================================================
+
+    async function loadHomeAdvertisements() {
+      var container = document.getElementById("home-ads-container");
+      var wrapper = document.getElementById("home-ads-slides-wrapper");
+      var navControls = document.getElementById("home-ad-nav-controls");
+      if (!container || !wrapper) return;
+
+      try {
+        var nowISO = new Date().toISOString();
+        var { data: ads, error } = await supabaseClient
+          .from('estate_advertisements')
+          .select('*')
+          .in('placement', ['HOME', 'BOTH'])
+          .eq('status', 'ACTIVE')
+          .lte('start_date', nowISO)
+          .gt('expires_at', nowISO)
+          .order('priority', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(6);
+
+        if (error || !ads || ads.length === 0) {
+          container.style.display = "block";
+          wrapper.innerHTML = `
+            <div class="home-ad-slide active-slide">
+              <div style="width:100%; height:140px; border-radius:10px; background:linear-gradient(135deg, #0f2b5c, #0284c7); display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; text-align:center; padding:12px; margin-bottom:8px;">
+                <div style="font-size:14px; font-weight:900; margin-bottom:4px;">📢 YOUR SPACE FOR ADS</div>
+                <div style="font-size:11px; opacity:0.9; margin-bottom:8px;">Promote your business or service here!</div>
+                <a href="tel:08100324793" style="background:#25d366; color:#fff; padding:6px 14px; border-radius:20px; font-size:11px; font-weight:800; text-decoration:none;">📞 Call Admin: 08100324793</a>
+              </div>
+              <div class="ad-content-box">
+                <h5>✨ Reserve Your Banner Spot</h5>
+                <h4>Reach All Estate Residents Instantly</h4>
+                <p>Contact management or call 08100324793 to place your advertisement banner on the main home screen and directory.</p>
+              </div>
+            </div>
+          `;
+          if (navControls) navControls.style.display = "none";
+          var counterEl = document.getElementById("home-ad-counter");
+          if (counterEl) counterEl.innerText = "Ad Space Available";
+          if (homeAdTimer) clearInterval(homeAdTimer);
+          return;
+        }
+
+        homeAdsList = ads;
+        currentHomeAdIndex = 0;
+        container.style.display = "block";
+        renderHomeAdSlide();
+
+        if (homeAdsList.length > 1) {
+          if (navControls) navControls.style.display = "flex";
+          renderHomeAdDots();
+          if (homeAdTimer) clearInterval(homeAdTimer);
+          homeAdTimer = setInterval(function() {
+            slideHomeAd(1);
+          }, 6000);
+        } else {
+          if (navControls) navControls.style.display = "none";
+          if (homeAdTimer) clearInterval(homeAdTimer);
+        }
+      } catch (err) {
+        container.style.display = "none";
+      }
+    }
+
+    function renderHomeAdSlide() {
+      var wrapper = document.getElementById("home-ads-slides-wrapper");
+      var counterEl = document.getElementById("home-ad-counter");
+      if (!wrapper || homeAdsList.length === 0) return;
+
+      var ad = homeAdsList[currentHomeAdIndex];
+      var advertiserName = ad.business_name || ad.title || "Featured Sponsor";
+      
+      var cleanTel = formatTelPhone(ad.contact_phone);
+      var phoneBtn = cleanTel ? `<a href="tel:${cleanTel}" class="btn-action" style="flex:1; background:#059669; color:#fff; text-decoration:none; padding:8px; text-align:center; border-radius:8px; font-size:10px; font-weight:800; text-transform:uppercase; margin-top:0;">📞 Call</a>` : '';
+      var cleanWa = formatWhatsAppPhone(ad.whatsapp_number || ad.contact_phone);
+      var waBtn = cleanWa ? `<a href="https://wa.me/${cleanWa}" target="_blank" class="btn-action" style="flex:1; background:#25d366; color:#fff; text-decoration:none; padding:8px; text-align:center; border-radius:8px; font-size:10px; font-weight:800; text-transform:uppercase; margin-top:0;">💬 WhatsApp</a>` : '';
+
+      wrapper.innerHTML = `
+        <div class="home-ad-slide active-slide">
+          <div class="ad-banner-img-wrap">
+            <img src="${escapeHtml(ad.image_url)}" alt="${escapeHtml(ad.title)}" style="object-fit: cover;" />
+          </div>
+          <div class="ad-content-box">
+            <h5>📢 ${escapeHtml(advertiserName)}</h5>
+            <h4>${escapeHtml(ad.title)}</h4>
+            <p>${escapeHtml(ad.description || '')}</p>
+            ${(phoneBtn || waBtn) ? `<div class="ad-actions-row">${phoneBtn}${waBtn}</div>` : ''}
+          </div>
+        </div>
+      `;
+
+      if (counterEl) {
+        counterEl.innerText = (currentHomeAdIndex + 1) + " / " + homeAdsList.length;
+      }
+      updateHomeAdDots();
+    }
+
+    function slideHomeAd(direction) {
+      if (homeAdsList.length <= 1) return;
+      currentHomeAdIndex += direction;
+      if (currentHomeAdIndex >= homeAdsList.length) {
+        currentHomeAdIndex = 0;
+      } else if (currentHomeAdIndex < 0) {
+        currentHomeAdIndex = homeAdsList.length - 1;
+      }
+      renderHomeAdSlide();
+    }
+
+    function renderHomeAdDots() {
+      var dotsContainer = document.getElementById("home-ad-pagination-dots");
+      if (!dotsContainer) return;
+      dotsContainer.innerHTML = homeAdsList.map(function(_, idx) {
+        return `<div class="ad-dot ${idx === currentHomeAdIndex ? 'active' : ''}" onclick="jumpToHomeAd(${idx})"></div>`;
+      }).join('');
+    }
+
+    function updateHomeAdDots() {
+      var dots = document.querySelectorAll('#home-ad-pagination-dots .ad-dot');
+      dots.forEach(function(dot, idx) {
+        if (idx === currentHomeAdIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+
+    function jumpToHomeAd(index) {
+      currentHomeAdIndex = index;
+      renderHomeAdSlide();
+    }
+
+    async function loadDirectorySponsoredAds() {
+      var container = document.getElementById("directory-sponsored-container");
+      var listWrapper = document.getElementById("directory-sponsored-list");
+      if (!container || !listWrapper) return;
+
+      try {
+        var nowISO = new Date().toISOString();
+        var { data: ads, error } = await supabaseClient
+          .from('estate_advertisements')
+          .select('*')
+          .in('placement', ['DIRECTORY', 'BOTH'])
+          .eq('status', 'ACTIVE')
+          .lte('start_date', nowISO)
+          .gt('expires_at', nowISO)
+          .order('priority', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(2);
+
+        if (error || !ads || ads.length === 0) {
+          container.style.display = "none";
+          return;
+        }
+
+        container.style.display = "block";
+        listWrapper.innerHTML = ads.map(function(ad) {
+          var advertiserName = ad.business_name || ad.title || "Sponsored";
+          var cleanTel = formatTelPhone(ad.contact_phone);
+          var phoneBtn = cleanTel ? `<a href="tel:${cleanTel}" class="btn-action" style="flex:1; background:#059669; color:#fff; text-decoration:none; padding:6px; text-align:center; border-radius:6px; font-size:9px; font-weight:800; text-transform:uppercase; margin-top:0;">📞 Call</a>` : '';
+          var cleanWa = formatWhatsAppPhone(ad.whatsapp_number || ad.contact_phone);
+          var waBtn = cleanWa ? `<a href="https://wa.me/${cleanWa}" target="_blank" class="btn-action" style="flex:1; background:#25d366; color:#fff; text-decoration:none; padding:6px; text-align:center; border-radius:6px; font-size:9px; font-weight:800; text-transform:uppercase; margin-top:0;">💬 WhatsApp</a>` : '';
+
+          return `
+            <div class="dir-sponsor-card">
+              <div style="width:100%; height:120px; border-radius:8px; overflow:hidden; margin-bottom:6px; background:#e2e8f0;">
+                <img src="${escapeHtml(ad.image_url)}" alt="${escapeHtml(ad.title)}" style="width:100%; height:100%; object-fit:cover;" />
+              </div>
+              <div style="font-size:10px; font-weight:700; color:#86198f;">✨ Sponsored • ${escapeHtml(advertiserName)}</div>
+              <div style="font-size:12px; font-weight:800; color:#0f2b5c; margin-top:2px;">${escapeHtml(ad.title)}</div>
+              <div style="font-size:11px; color:#475569; margin-top:2px; line-height:1.2;">${escapeHtml(ad.description || '')}</div>
+              ${(phoneBtn || waBtn) ? `<div style="display:flex; gap:6px; margin-top:6px;">${phoneBtn}${waBtn}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        container.style.display = "none";
+      }
+    }
+
+    async function renderAdminAdsManager(areaContainer) {
+      areaContainer.innerHTML = "<small>Loading advertisement management...</small>";
+
+      try {
+        var nowISO = new Date().toISOString();
+        var { data: homeActive } = await supabaseClient
+          .from('estate_advertisements')
+          .select('id')
+          .in('placement', ['HOME', 'BOTH'])
+          .eq('status', 'ACTIVE')
+          .lte('start_date', nowISO)
+          .gt('expires_at', nowISO);
+
+        var { data: dirActive } = await supabaseClient
+          .from('estate_advertisements')
+          .select('id')
+          .in('placement', ['DIRECTORY', 'BOTH'])
+          .eq('status', 'ACTIVE')
+          .lte('start_date', nowISO)
+          .gt('expires_at', nowISO);
+
+        var homeCount = homeActive ? homeActive.length : 0;
+        var dirCount = dirActive ? dirActive.length : 0;
+
+        var { data: allAds } = await supabaseClient
+          .from('estate_advertisements')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        areaContainer.innerHTML = `
+          <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px; margin-bottom:14px;">
+            <div style="font-weight:900; font-size:13px; color:#0f2b5c; margin-bottom:6px;">📢 Advertisement Management Dashboard</div>
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
+              <div style="flex:1; background:#e0f2fe; border:1px solid #bae6fd; border-radius:8px; padding:8px; text-align:center;">
+                <div style="font-size:10px; font-weight:700; color:#0369a1;">Active Home Ads</div>
+                <div style="font-size:16px; font-weight:900; color:#0369a1;">${homeCount} / 6</div>
+              </div>
+              <div style="flex:1; background:#fdf4ff; border:1px solid #f5d0fe; border-radius:8px; padding:8px; text-align:center;">
+                <div style="font-size:10px; font-weight:700; color:#86198f;">Active Directory Ads</div>
+                <div style="font-size:16px; font-weight:900; color:#86198f;">${dirCount} / 2</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#fff; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px; margin-bottom:16px;">
+            <div style="font-weight:900; font-size:13px; color:#0f2b5c; margin-bottom:8px;">➕ Create New Advertisement</div>
+            <form onsubmit="handleCreateAdvertisement(event)">
+              <div class="form-group"><label>Business / Organization Name</label><input id="ad-form-bizname" type="text" placeholder="St. Mary's Church / School / Store" required /></div>
+              <div class="form-group"><label>Advertisement Title</label><input id="ad-form-title" type="text" placeholder="Weekend Special 20% Off" required /></div>
+              <div class="form-group"><label>Short Description</label><textarea id="ad-form-desc" rows="2" placeholder="Enjoy fresh groceries delivered instantly..."></textarea></div>
+              
+              <div class="form-group">
+                <label>Advertisement Image (JPG, PNG, WEBP — Max 5MB)</label>
+                <input id="ad-form-image-file" type="file" accept="image/jpeg,image/png,image/webp,image/jpg" onchange="previewAdvertisementImage(event)" required style="background:#fff;" />
+                <div id="ad-image-preview-container" style="display:none; margin-top:8px; width:100%; height:140px; border-radius:8px; overflow:hidden; border:1px solid #cbd5e1;">
+                  <img id="ad-image-preview-tag" src="" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />
+                </div>
+              </div>
+
+              <div class="form-row form-group">
+                <div><label>Phone Number</label><input id="ad-form-phone" type="tel" placeholder="08031234567" /></div>
+                <div><label>WhatsApp Number</label><input id="ad-form-whatsapp" type="tel" placeholder="2348031234567" /></div>
+              </div>
+
+              <div class="form-row form-group">
+                <div>
+                  <label>Placement</label>
+                  <select id="ad-form-placement" style="background:#fff;">
+                    <option value="HOME">HOME</option>
+                    <option value="DIRECTORY">DIRECTORY</option>
+                    <option value="BOTH">BOTH</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Priority (Higher runs first)</label>
+                  <input id="ad-form-priority" type="number" value="0" />
+                </div>
+              </div>
+
+              <div class="form-row form-group">
+                <div><label>Start Date & Time</label><input id="ad-form-start" type="datetime-local" required /></div>
+                <div><label>Expiration Date & Time</label><input id="ad-form-expires" type="datetime-local" required /></div>
+              </div>
+
+              <button type="submit" class="btn-action btn-emerald" style="margin-top:12px;" id="ad-submit-btn">Publish Advertisement 🚀</button>
+            </form>
+          </div>
+
+          <div style="font-weight:900; font-size:13px; color:#0f2b5c; margin-bottom:8px;">📋 Existing Advertisements</div>
+          <div id="admin-ads-list-container">
+            ${renderAdminAdsCards(allAds)}
+          </div>
+        `;
+      } catch (err) {
+        areaContainer.innerHTML = "<p style='color:#b91c1c;'>Error loading admin advertisements.</p>";
+      }
+    }
+
+    function previewAdvertisementImage(event) {
+      var file = event.target.files[0];
+      var previewContainer = document.getElementById("ad-image-preview-container");
+      var previewTag = document.getElementById("ad-image-preview-tag");
+
+      if (!file || !previewContainer || !previewTag) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert("❌ File size exceeds 5MB limit. Please choose a smaller image.");
+        event.target.value = "";
+        previewContainer.style.display = "none";
+        return;
+      }
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        previewTag.src = e.target.result;
+        previewContainer.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function renderAdminAdsCards(ads) {
+      if (!ads || ads.length === 0) {
+        return "<small>No advertisements created yet.</small>";
+      }
+
+      var nowTime = new Date().getTime();
+
+      return ads.map(function(ad) {
+        var isExpired = new Date(ad.expires_at).getTime() < nowTime;
+        var statusBadgeColor = isExpired ? '#b91c1c' : ad.status === 'ACTIVE' ? '#15803d' : '#d97706';
+        var statusText = isExpired ? 'EXPIRED' : ad.status;
+        var advName = ad.business_name || 'Sponsor';
+
+        return `
+          <div style="background:#fff; border:1px solid #cbd5e1; border-radius:10px; padding:10px; margin-bottom:8px; font-size:11px;">
+            <div style="display:flex; gap:8px;">
+              <div style="width:70px; height:70px; border-radius:6px; overflow:hidden; flex-shrink:0; background:#e2e8f0;">
+                <img src="${escapeHtml(ad.image_url)}" alt="Ad" style="width:100%; height:100%; object-fit:cover;" />
+              </div>
+              <div style="flex:1;">
+                <div><b>${escapeHtml(ad.title)}</b></div>
+                <div style="color:#475569; font-size:10px;">📢 ${escapeHtml(advName)} • Placement: <b>${ad.placement}</b></div>
+                <div style="font-size:10px; margin-top:2px;">Status: <span style="color:${statusBadgeColor}; font-weight:800;">${statusText}</span> | Priority: ${ad.priority}</div>
+                <div style="font-size:9px; color:#64748b; margin-top:2px;">Expires: ${new Date(ad.expires_at).toLocaleString()}</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:4px; margin-top:8px; border-top:1px solid #f1f5f9; padding-top:6px;">
+              ${ad.status === 'ACTIVE' && !isExpired ? `<button class="btn-outline" style="font-size:9px; color:#d97706; padding:4px 8px; flex:1;" onclick="toggleAdStatus('${ad.id}', 'PAUSED')">Pause ⏸️</button>` : ''}
+              ${ad.status === 'PAUSED' && !isExpired ? `<button class="btn-outline" style="font-size:9px; color:#15803d; padding:4px 8px; flex:1;" onclick="toggleAdStatus('${ad.id}', 'ACTIVE')">Activate ▶️</button>` : ''}
+              <button class="btn-outline" style="font-size:9px; color:#b91c1c; padding:4px 8px; flex:1;" onclick="deleteAdvertisement('${ad.id}')">Delete 🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function handleCreateAdvertisement(e) {
+      e.preventDefault();
+      var btn = document.getElementById("ad-submit-btn");
+      var bizName = document.getElementById("ad-form-bizname").value.trim();
+      var title = document.getElementById("ad-form-title").value.trim();
+      var desc = document.getElementById("ad-form-desc").value.trim();
+      var fileInput = document.getElementById("ad-form-image-file");
+      var phone = document.getElementById("ad-form-phone").value.trim();
+      var whatsapp = document.getElementById("ad-form-whatsapp").value.trim();
+      var placement = document.getElementById("ad-form-placement").value;
+      var priority = parseInt(document.getElementById("ad-form-priority").value) || 0;
+      var startVal = document.getElementById("ad-form-start").value;
+      var expiresVal = document.getElementById("ad-form-expires").value;
+
+      if (!bizName || !title || !fileInput.files[0] || !startVal || !expiresVal) {
+        alert("❌ Please fill in all required fields and select an image.");
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Uploading & Publishing...";
+      }
+
+      try {
+        var file = fileInput.files[0];
+        var fileExt = file.name.split('.').pop();
+        var fileName = 'ad_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7) + '.' + fileExt;
+
+        var { data: uploadData, error: uploadErr } = await supabaseClient.storage
+          .from('advertisements')
+          .upload(fileName, file);
+
+        if (uploadErr) throw uploadErr;
+
+        var { data: publicUrlData } = supabaseClient.storage
+          .from('advertisements')
+          .getPublicUrl(fileName);
+
+        var publicImageUrl = publicUrlData.publicUrl;
+
+        var sessionRes = await supabaseClient.auth.getSession();
+        var creatorId = sessionRes.data.session ? sessionRes.data.session.user.id : null;
+
+        var { error: dbErr } = await supabaseClient.from('estate_advertisements').insert([{
+          business_name: bizName,
+          title: title,
+          description: desc,
+          image_url: publicImageUrl,
+          contact_phone: phone,
+          whatsapp_number: whatsapp,
+          placement: placement,
+          status: 'ACTIVE',
+          start_date: new Date(startVal).toISOString(),
+          expires_at: new Date(expiresVal).toISOString(),
+          priority: priority,
+          created_by: creatorId
+        }]);
+
+        if (dbErr) {
+          var errMessage = dbErr.message || '';
+          if (errMessage.toLowerCase().includes('limit') || errMessage.toLowerCase().includes('maximum')) {
+            if (placement === 'HOME' || placement === 'BOTH') {
+              alert("❌ Home advertisement limit reached. Maximum 6 active advertisements are allowed.");
+            } else {
+              alert("❌ Directory advertisement limit reached. Maximum 2 active advertisements are allowed.");
+            }
+          } else {
+            throw dbErr.message;
+          }
+        } else {
+          alert("🟢 Advertisement Created & Published Successfully!");
+          loadAdminSection('ads');
+          loadHomeAdvertisements();
+        }
+      } catch (err) {
+        alert("❌ Error publishing advertisement: " + err);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "Publish Advertisement 🚀";
+        }
+      }
+    }
+
+    async function toggleAdStatus(adId, newStatus) {
+      try {
+        var { error } = await supabaseClient
+          .from('estate_advertisements')
+          .update({ status: newStatus })
+          .eq('id', adId);
+
+        if (error) throw error;
+        alert("🟢 Advertisement status updated to " + newStatus);
+        loadAdminSection('ads');
+        loadHomeAdvertisements();
+      } catch (err) {
+        alert("❌ Error updating status: " + err.message);
+      }
+    }
+
+    async function deleteAdvertisement(adId) {
+      if (!confirm("Permanently delete this advertisement?")) return;
+      try {
+        var { error } = await supabaseClient
+          .from('estate_advertisements')
+          .delete()
+          .eq('id', adId);
+
+        if (error) throw error;
+        alert("🟢 Advertisement deleted successfully.");
+        loadAdminSection('ads');
+        loadHomeAdvertisements();
+      } catch (err) {
+        alert("❌ Error deleting advertisement: " + err.message);
+      }
+    }
+
     function escapeHtml(str) { return str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : ""; }
   </script>
 </body>
