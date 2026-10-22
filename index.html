@@ -52,7 +52,7 @@
     .auth-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; margin-bottom: 24px; }
     .field { margin-bottom: 16px; }
     .field label { display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px; }
-    .input { width: 100%; height: 46px; border-radius: 10px; border: 1px solid var(--border); outline: none; padding: 0 14px; font-size: 14px; color: var(--text); background: #F8FAFC; }
+    .input, select { width: 100%; height: 46px; border-radius: 10px; border: 1px solid var(--border); outline: none; padding: 0 14px; font-size: 14px; color: var(--text); background: #F8FAFC; }
     .btn { width: 100%; height: 48px; border: 0; border-radius: 10px; background: var(--primary); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: .2s; margin-top: 8px; text-align: center; }
     .btn:hover { background: var(--primary-dark); }
     .auth-footer { margin-top: 24px; text-align: center; font-size: 11px; color: rgba(255,255,255,0.8); line-height: 1.4; }
@@ -65,34 +65,14 @@
     .page-title { font-size: 18px; font-weight: 800; color: #0F172A; margin-bottom: 4px; }
     .page-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
 
-    .qr-container { display: flex; justify-content: center; margin: 12px auto; padding: 8px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; width: 130px; height: 130px; }
-    .network-badge { font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: #dcfce7; color: #15803d; }
-
     #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); background: #0F172A; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 12px; font-weight: 600; opacity: 0; visibility: hidden; transition: .2s; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
     #toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
-  <!-- SVG REPOSITORY -->
-  <svg style="display:none;">
-    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></symbol>
-    <symbol id="i-dash" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></symbol>
-    <symbol id="i-ann" viewBox="0 0 24 24"><path d="M18 16v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-6 6c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/></symbol>
-    <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
-    <symbol id="i-visitors" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
-    <symbol id="i-workers" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z"/></symbol>
-    <symbol id="i-house" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
-    <symbol id="i-tenants" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
-    <symbol id="i-vehicles" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.76l.12.34V17z"/></symbol>
-    <symbol id="i-payments" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></symbol>
-    <symbol id="i-complaints" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></symbol>
-    <symbol id="i-lock" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></symbol>
-    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
-  </svg>
-
   <div class="container">
-    <!-- AUTH LOGIN & SIGNUP SCREEN -->
+    <!-- AUTH LOGIN & SIGNUP -->
     <div id="auth">
       <div class="auth-card">
         <div class="auth-title">Nitel Estate Management System</div>
@@ -127,43 +107,46 @@
       </div>
     </div>
 
-    <!-- MAIN APP DASHBOARD & DRAWER -->
+    <!-- MAIN APP & SIDEBAR -->
     <div id="main" style="display:none; flex-direction:column; width:100%; height:100%; position:relative;">
       <div class="topbar">
         <div class="topbar-left">
           <button class="menu-btn" onclick="toggleSidebar()">
-            <svg class="ico" viewBox="0 0 24 24"><use href="#i-menu"/></svg>
+            <svg class="ico" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
           </button>
           <div class="brand-name">Nitel Estate</div>
         </div>
         <div class="topbar-right">
-          <div id="network-indicator" class="network-badge">🟢 Cloud Secure</div>
           <span class="resident-tag" id="residentTitleTag">RESIDENT</span>
         </div>
       </div>
 
-      <!-- SIDEBAR DRAWER -->
+      <!-- SIDEBAR DRAWER (Exact Screenshot Layout) -->
       <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
       <div class="sidebar" id="sidebar">
         <div class="sidebar-head">Nitel Estate Menu</div>
         <div class="sidebar-menu">
-          <a class="menu-item active" onclick="navigate('dashboard', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-dash"/></svg> Dashboard</a>
-          <a class="menu-item" onclick="navigate('announcements', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-ann"/></svg> Announcements</a>
-          <a class="menu-item" onclick="navigate('profile', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-user"/></svg> My Profile</a>
-          <a class="menu-item" onclick="navigate('visitors', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-visitors"/></svg> My Visitors</a>
-          <a class="menu-item" onclick="navigate('workers', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-workers"/></svg> My Workers</a>
-          <a class="menu-item" onclick="navigate('household', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-house"/></svg> My Household</a>
-          <a class="menu-item" onclick="navigate('tenants', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-tenants"/></svg> My Tenants</a>
-          <a class="menu-item" onclick="navigate('vehicles', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-vehicles"/></svg> My Vehicles</a>
-          <a class="menu-item" onclick="navigate('payments', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-payments"/></svg> My Payments</a>
-          <a class="menu-item" onclick="navigate('complaints', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-complaints"/></svg> My Complaints</a>
-          <a class="menu-item" id="adminMenuBtn" onclick="navigate('admin', this)" style="display:none; color:var(--primary); font-weight:800;"><svg class="ico" viewBox="0 0 24 24" style="color:var(--primary);"><use href="#i-dash"/></svg> Admin Portal (Debt Control)</a>
+          <a class="menu-item active" onclick="navigate('dashboard', this)">Dashboard</a>
+          <a class="menu-item" onclick="navigate('announcements', this)">Announcements</a>
+          <a class="menu-item" onclick="navigate('profile', this)">My Profile</a>
+          <a class="menu-item" onclick="navigate('visitors', this)">My Visitors</a>
+          <a class="menu-item" onclick="navigate('workers', this)">My Workers</a>
+          <a class="menu-item" onclick="navigate('household', this)">My Household</a>
+          <a class="menu-item" onclick="navigate('tenants', this)">My Tenants</a>
+          <a class="menu-item" onclick="navigate('household-approvals', this)">Household Approvals</a>
+          <a class="menu-item" onclick="navigate('vehicles', this)">My Vehicles</a>
+          <a class="menu-item" onclick="navigate('vehicle-approvals', this)">Vehicle Approvals</a>
+          <a class="menu-item" onclick="navigate('payments', this)">My Payments</a>
+          <a class="menu-item" onclick="navigate('complaints', this)">My Complaints</a>
+          <a class="menu-item" onclick="navigate('biker-order', this)" style="color:var(--primary); font-weight:800;">🛵 Order Estate Biker</a>
+          <a class="menu-item" id="adminMenuBtn" onclick="navigate('admin', this)" style="display:none; color:var(--red); font-weight:800;">🛡️ Super Admin & Bikers Portal</a>
           <div class="sidebar-divider"></div>
-          <a class="menu-item" onclick="signOut()" style="color:var(--red);"><svg class="ico" viewBox="0 0 24 24" style="color:var(--red);"><use href="#i-logout"/></svg> Log out</a>
+          <a class="menu-item" onclick="navigate('password', this)">Change password</a>
+          <a class="menu-item" onclick="signOut()" style="color:var(--red);">Log out</a>
         </div>
       </div>
 
-      <!-- CONTENT PAGES -->
+      <!-- PAGES -->
       <div class="content">
         <!-- DASHBOARD -->
         <div id="page-dashboard" class="page active">
@@ -171,148 +154,93 @@
             <div class="page-title">Dashboard</div>
             <div class="page-desc">Overview of your estate activities and status.</div>
             <div style="padding:16px; background:#F8FAFC; border-radius:8px; border:1px solid var(--border);">
-              <div style="font-weight:700; font-size:14px;">Welcome back, <span id="dashName">Resident</span></div>
-              <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="dashAddress">Block A, House 12 · Verified Resident</div>
+              <div style="font-weight:700; font-size:14px;">Welcome, <span id="dashName">Resident</span></div>
+              <div style="font-size:12px; color:var(--muted); margin-top:4px;">Resident portal.</div>
             </div>
-            <button class="btn" style="margin-top:14px;" onclick="triggerEmergencySOS()">🚨 EMERGENCY SOS PANIC BUTTON</button>
           </div>
         </div>
 
         <!-- ANNOUNCEMENTS -->
-        <div id="page-announcements" class="page">
-          <div class="card">
-            <div class="page-title">Announcements</div>
-            <div class="page-desc">Latest estate notices and broadcast memos.</div>
-            <div style="padding:12px 0; border-bottom:1px solid var(--border);">
-              <div style="font-weight:700; font-size:13px;">Water supply maintenance</div>
-              <div style="font-size:11px; color:var(--muted);">Water supply will be off from 10am - 2pm today.</div>
-            </div>
-          </div>
-        </div>
+        <div id="page-announcements" class="page"><div class="card"><div class="page-title">Announcements</div><div class="page-desc">Latest estate notices.</div><p style="font-size:12px;">Water supply maintenance from 10am - 2pm today.</p></div></div>
+        
+        <!-- PROFILE -->
+        <div id="page-profile" class="page"><div class="card"><div class="page-title">My Profile</div><div class="page-desc">Resident details.</div><p style="font-size:13px;" id="profDetails">Loading profile...</p></div></div>
 
-        <!-- MY PROFILE -->
-        <div id="page-profile" class="page">
-          <div class="card">
-            <div class="page-title">My Profile</div>
-            <div class="page-desc">Resident personal verification details & RFID Credential.</div>
-            <div style="font-size:13px; line-height:1.8;">
-              <div><b>Name:</b> <span id="profName">Loading...</span></div>
-              <div><b>Email/Phone:</b> <span id="profEmail">Loading...</span></div>
-              <div><b>Property:</b> <span id="profAddress">Loading...</span></div>
-              <div><b>RFID Tag:</b> <span id="profRfid" style="font-family:monospace; font-weight:700; color:var(--primary);">Pending Approval</span></div>
-              <div id="resident-qr-box" class="qr-container" style="display:none;"></div>
-            </div>
-          </div>
-        </div>
+        <!-- VISITORS -->
+        <div id="page-visitors" class="page"><div class="card"><div class="page-title">My Visitors</div><div class="page-desc">Generate visitor pass.</div><input type="text" id="vis-name" class="input" placeholder="Visitor Name" /><button class="btn" style="margin-top:8px;" onclick="toast('Visitor pass generated!')">Generate Pass</button></div></div>
 
-        <!-- MY VISITORS -->
-        <div id="page-visitors" class="page">
-          <div class="card">
-            <div class="page-title">My Visitors & Passes</div>
-            <div class="page-desc">Generate secure QR access passes for guests.</div>
-            <div class="field"><label>Visitor / Guest Full Name</label><input type="text" id="visitor-name" class="input" placeholder="Emmanuel Chukwu" /></div>
-            <div class="field"><label>Expected Number of Guests</label><input type="number" id="visitor-count" class="input" min="1" value="1" /></div>
-            <button class="btn" onclick="generateVisitorPass()">Authorize Cloud Permit 🚀</button>
-            <div id="visitor-pass-result" style="display:none; margin-top:14px; padding:12px; background:#f8fafc; border:1px solid var(--border); border-radius:12px; text-align:center; font-size:12px; font-weight:700;">
-              <div id="pass-text-output" style="color:var(--green); margin-bottom:8px;"></div>
-              <div id="visitor-qr-box" class="qr-container"></div>
-            </div>
-          </div>
-        </div>
+        <!-- WORKERS -->
+        <div id="page-workers" class="page"><div class="card"><div class="page-title">My Workers</div><div class="page-desc">Request worker access.</div></div></div>
 
-        <!-- MY WORKERS -->
-        <div id="page-workers" class="page">
-          <div class="card">
-            <div class="page-title">My Workers & Contractors</div>
-            <div class="page-desc">Request access for labourers while estate is under development.</div>
-            <div class="field"><label>Worker / Contractor Full Name</label><input type="text" id="worker-name" class="input" placeholder="Musa Builder" /></div>
-            <div class="field"><label>Phone Number</label><input type="tel" id="worker-phone" class="input" placeholder="08030000000" /></div>
-            <div class="field"><label>Work Description / Purpose</label><input type="text" id="worker-desc" class="input" placeholder="Tiling / Plumbing" /></div>
-            <button class="btn" onclick="submitWorkerRequest()">Submit Worker Access Request 📋</button>
-            <div id="workers-feed" style="margin-top:12px;"><small>Loading worker records...</small></div>
-          </div>
-        </div>
+        <!-- HOUSEHOLD -->
+        <div id="page-household" class="page"><div class="card"><div class="page-title">My Household</div><div class="page-desc">Manage family members.</div></div></div>
 
-        <!-- MY HOUSEHOLD -->
-        <div id="page-household" class="page">
-          <div class="card">
-            <div class="page-title">My Household Members</div>
-            <div class="page-desc">Manage family dependents and household occupants.</div>
-            <div class="field"><label>Dependent / Family Full Name</label><input type="text" id="house-member-name" class="input" placeholder="Kemi Adebanjo" /></div>
-            <div class="field"><label>Relationship</label><input type="text" id="house-member-rel" class="input" placeholder="Spouse / Child" /></div>
-            <button class="btn" onclick="submitHouseholdMember()">Add Household Member 👨‍👩‍👧‍👦</button>
-            <div id="household-feed" style="margin-top:12px;"><small>Loading household members...</small></div>
-          </div>
-        </div>
+        <!-- TENANTS -->
+        <div id="page-tenants" class="page"><div class="card"><div class="page-title">My Tenants</div><div class="page-desc">Manage registered tenants.</div></div></div>
 
-        <!-- MY TENANTS -->
-        <div id="page-tenants" class="page">
-          <div class="card">
-            <div class="page-title">My Tenants & Lease Registry</div>
-            <div class="page-desc">Register tenants occupying your property.</div>
-            <div class="field"><label>Tenant Full Name</label><input type="text" id="tenant-name" class="input" placeholder="Mr. James Okafor" /></div>
-            <div class="field"><label>Tenant Phone Number</label><input type="tel" id="tenant-phone" class="input" placeholder="08020000000" /></div>
-            <div class="field"><label>Lease Expiry Date</label><input type="date" id="tenant-expiry" class="input" /></div>
-            <button class="btn" onclick="submitTenantRecord()">Register Tenant Lease 📝</button>
-            <div id="tenants-feed" style="margin-top:12px;"><small>Loading tenant records...</small></div>
-          </div>
-        </div>
+        <!-- HOUSEHOLD APPROVALS -->
+        <div id="page-household-approvals" class="page"><div class="card"><div class="page-title">Household Approvals</div><div class="page-desc">Approve household passes.</div></div></div>
 
-        <!-- MY VEHICLES -->
-        <div id="page-vehicles" class="page">
-          <div class="card">
-            <div class="page-title">My Vehicles & RFID Plates</div>
-            <div class="page-desc">Register cars for automated gate scanner recognition.</div>
-            <div class="field"><label>Vehicle Make & Model</label><input type="text" id="vehicle-model" class="input" placeholder="Toyota Camry (Black)" /></div>
-            <div class="field"><label>Plate Number</label><input type="text" id="vehicle-plate" class="input" placeholder="KJA-502XY" /></div>
-            <button class="btn" onclick="submitVehicleRegistration()">Register Vehicle Plate 🚗</button>
-            <div id="vehicles-feed" style="margin-top:12px;"><small>Loading registered vehicles...</small></div>
-          </div>
-        </div>
+        <!-- VEHICLES -->
+        <div id="page-vehicles" class="page"><div class="card"><div class="page-title">My Vehicles</div><div class="page-desc">Register vehicles.</div></div></div>
 
-        <!-- MY PAYMENTS -->
-        <div id="page-payments" class="page">
-          <div class="card">
-            <div class="page-title">My Payments & Levies</div>
-            <div class="page-desc">View levies, service charges and clearance status assigned by management.</div>
-            <div style="padding:12px; background:#FEF2F2; border:1px solid #FEE2E2; border-radius:8px; margin-bottom:14px;">
-              <div style="font-size:11px; color:#991B1B; font-weight:700;">OUTSTANDING BALANCE / STATUS ASSIGNED BY ADMIN</div>
-              <div style="font-size:18px; font-weight:800; color:#DC2626; margin-top:2px;" id="resident-balance-display">₦0 (PENDING)</div>
-            </div>
-            <button class="btn" onclick="simulatePaymentGateway()">Pay Assigned Balance via Gateway 💳</button>
-          </div>
-        </div>
+        <!-- VEHICLE APPROVALS -->
+        <div id="page-vehicle-approvals" class="page"><div class="card"><div class="page-title">Vehicle Approvals</div><div class="page-desc">Tenant vehicle approvals.</div></div></div>
 
-        <!-- MY COMPLAINTS -->
-        <div id="page-complaints" class="page">
-          <div class="card">
-            <div class="page-title">My Complaints & Ticketing</div>
-            <div class="page-desc">Report estate facility issues or security concerns.</div>
-            <div class="field"><textarea id="complaint-msg" class="input" rows="3" placeholder="Describe the facility or security issue..." style="height:auto; padding:10px;"></textarea></div>
-            <button class="btn" onclick="submitComplaintTicket()">Submit Complaint Ticket 🎫</button>
-            <div id="complaints-feed" style="margin-top:12px;"><small>Loading complaint tickets...</small></div>
-          </div>
-        </div>
+        <!-- PAYMENTS -->
+        <div id="page-payments" class="page"><div class="card"><div class="page-title">My Payments</div><div class="page-desc">View levies & payment history.</div></div></div>
 
-        <!-- ADMIN PORTAL (DEBT & AMOUNT OWED CONTROL) -->
-        <div id="page-admin" class="page">
+        <!-- COMPLAINTS -->
+        <div id="page-complaints" class="page"><div class="card"><div class="page-title">My Complaints</div><div class="page-desc">File a complaint.</div></div></div>
+
+        <!-- 🛵 ORDER ESTATE BIKER (RANDOM DISPATCH FOR RESIDENTS) -->
+        <div id="page-biker-order" class="page">
           <div class="card" style="border-color:var(--primary);">
-            <div class="page-title" style="color:var(--primary);">🛡️ Admin Portal: Landlord Debt & Levy Control</div>
-            <div class="page-desc">Select a resident/landlord and assign the exact amount they are owing.</div>
-            
-            <div class="field">
-              <label>Select Resident / Landlord</label>
-              <select id="admin-resident-select" class="input" style="background:#fff;">
-                <option value="">-- Loading residents --</option>
-              </select>
+            <div class="page-title" style="color:var(--primary);">🛵 Order Estate Delivery Biker</div>
+            <div class="page-desc">Request an estate-approved biker. The system will randomly assign an available biker to you instantly.</div>
+            <div class="field"><label>Destination / Package Drop-off Point</label><input type="text" id="biker-dest" class="input" placeholder="Block A, House 12 / Gate 2" /></div>
+            <button class="btn" onclick="orderRandomBiker()">Dispatch Random Biker Now 🚀</button>
+            <div id="assigned-biker-box" style="display:none; margin-top:14px; background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:14px;">
+              <div style="font-weight:900; color:#15803d; font-size:14px; margin-bottom:6px;">🎉 Biker Dispatched Successfully!</div>
+              <div id="biker-details-text" style="font-size:12px; line-height:1.6;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHANGE PASSWORD -->
+        <div id="page-password" class="page"><div class="card"><div class="page-title">Change Password</div><div class="page-desc">Update credentials.</div></div></div>
+
+        <!-- 🛡️ SUPER ADMIN & BIKER REGISTRATION PORTAL -->
+        <div id="page-admin" class="page">
+          <div class="card" style="border-color:var(--red);">
+            <div class="page-title" style="color:var(--red);">🛡️ Super Admin Portal</div>
+            <div class="page-desc">Manage Admin privileges and register estate delivery bikers.</div>
+
+            <!-- Manage Admin Roles -->
+            <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:12px; border-radius:10px; margin-bottom:14px;">
+              <div style="font-weight:800; font-size:13px; margin-bottom:6px;">👑 Promote / Demote Admins</div>
+              <div class="field"><label>User Email</label><input type="email" id="target-admin-email" class="input" placeholder="user@gmail.com" /></div>
+              <div class="field">
+                <label>Assign Role</label>
+                <select id="target-admin-role" class="input" style="background:#fff;">
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="RESIDENT">RESIDENT (Remove Admin)</option>
+                </select>
+              </div>
+              <button class="btn" style="background:#0284c7;" onclick="updateUserAdminRole()">Update User Role ⚡</button>
             </div>
 
-            <div class="field">
-              <label>Amount Owed / Status (e.g., ₦45,000 PENDING)</label>
-              <input type="text" id="admin-debt-amount" class="input" placeholder="₦45,000 (PENDING)" />
+            <!-- Register Biker for Residents to Order -->
+            <div style="background:#f0fdf4; border:1.5px solid #86efac; padding:12px; border-radius:10px;">
+              <div style="font-weight:800; font-size:13px; color:#065f46; margin-bottom:6px;">🛵 Register Estate Biker</div>
+              <div class="field"><label>Biker Full Name</label><input type="text" id="reg-biker-name" class="input" placeholder="John Rider" /></div>
+              <div class="field"><label>Address / Zone</label><input type="text" id="reg-biker-addr" class="input" placeholder="Zone 4" /></div>
+              <div class="field"><label>Bike Number / Phone</label><input type="text" id="reg-biker-num" class="input" placeholder="08030000000" /></div>
+              <div class="field"><label>Bike Plate Number</label><input type="text" id="reg-biker-plate" class="input" placeholder="KJA-992-XY" /></div>
+              <div class="field"><label>Biker Photo URL</label><input type="url" id="reg-biker-photo" class="input" placeholder="https://images.unsplash.com/..." /></div>
+              <button class="btn" style="background:#059669;" onclick="registerNewBiker()">Save Biker to Fleet 🚀</button>
             </div>
 
-            <button class="btn" onclick="adminAssignDebt()">Save & Update Resident Debt 📊</button>
           </div>
         </div>
 
@@ -325,28 +253,20 @@
   <script>
     var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
     var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
-    var supabaseClient;
-
-    try {
-      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } catch (e) {
-      document.getElementById("network-indicator").innerText = "🔴 Cloud Offline";
-    }
+    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     var isSignup = false;
     var currentUserId = null;
+    var currentUserEmail = null;
 
     window.addEventListener('DOMContentLoaded', async function() {
-      if (!supabaseClient) return;
-      try {
-        var sessionRes = await supabaseClient.auth.getSession();
-        if (sessionRes.data && sessionRes.data.session) {
-          currentUserId = sessionRes.data.session.user.id;
-          await loadResidentDashboardData(currentUserId);
-          await checkAdminRole(currentUserId);
-          launchApp();
-        }
-      } catch (err) {}
+      var sessionRes = await supabaseClient.auth.getSession();
+      if (sessionRes.data && sessionRes.data.session) {
+        currentUserId = sessionRes.data.session.user.id;
+        currentUserEmail = sessionRes.data.session.user.email;
+        await checkSuperAdminAndPermissions(currentUserId, currentUserEmail);
+        launchApp();
+      }
     });
 
     function toggleAuthMode(){
@@ -370,20 +290,22 @@
           if (authErr) throw authErr;
           var userId = authData.user.id;
           
-          // Insert real name into resident_profiles
-          var { error: profileErr } = await supabaseClient.from('resident_profiles').upsert([{
-            user_id: userId, full_name: name, phone: email, address: 'Block A, House 12', access_status: 'PENDING', account_status: 'PENDING', levy_status: '₦45,000 (PENDING)'
+          await supabaseClient.from('resident_profiles').upsert([{
+            user_id: userId, full_name: name, phone: email, address: 'Block A, House 12', levy_status: '₦45,000 (PENDING)'
           }], { onConflict: 'user_id' });
-          if (profileErr) throw profileErr;
 
-          alert("Account created successfully with your real name! You can now sign in.");
+          // Hardcode ezekielayoola234@gmail.com as SUPER_ADMIN automatically
+          var roleToAssign = (email.toLowerCase() === 'ezekielayoola234@gmail.com') ? 'SUPER_ADMIN' : 'RESIDENT';
+          await supabaseClient.from('user_roles').upsert([{ user_id: userId, role: roleToAssign }], { onConflict: 'user_id' });
+
+          alert("Account created! You can now sign in.");
           toggleAuthMode();
         } else {
           var { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
           if (error) throw error;
           currentUserId = data.user.id;
-          await loadResidentDashboardData(currentUserId);
-          await checkAdminRole(currentUserId);
+          currentUserEmail = data.user.email;
+          await checkSuperAdminAndPermissions(currentUserId, currentUserEmail);
           launchApp();
         }
       } catch (e) {
@@ -391,37 +313,27 @@
       }
     }
 
-    async function loadResidentDashboardData(userId) {
-      if (!supabaseClient || !userId) return;
-      try {
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).maybeSingle();
-        if (profile) {
-          document.getElementById("dashName").textContent = profile.full_name;
-          document.getElementById("dashAddress").textContent = profile.address + " · " + profile.access_status;
-          document.getElementById("profName").textContent = profile.full_name;
-          document.getElementById("profEmail").textContent = profile.phone;
-          document.getElementById("profAddress").textContent = profile.address;
-          document.getElementById("residentTitleTag").textContent = profile.full_name + " · RESIDENT";
-          if (profile.levy_status) {
-            document.getElementById("resident-balance-display").textContent = profile.levy_status;
-          }
-        }
-      } catch(e) {}
+    async function checkSuperAdminAndPermissions(userId, email) {
+      if (email && email.toLowerCase() === 'ezekielayoola234@gmail.com') {
+        await supabaseClient.from('user_roles').upsert([{ user_id: userId, role: 'SUPER_ADMIN' }], { onConflict: 'user_id' });
+        document.getElementById("adminMenuBtn").style.display = "flex";
+        return;
+      }
+      var { data } = await supabaseClient.from('user_roles').select('role').eq('user_id', userId).maybeSingle();
+      if (data && (data.role === 'ADMIN' || data.role === 'SUPER_ADMIN')) {
+        document.getElementById("adminMenuBtn").style.display = "flex";
+      }
     }
 
-    async function checkAdminRole(userId) {
-      if (!supabaseClient || !userId) return;
-      try {
-        var { data } = await supabaseClient.from('user_roles').select('role').eq('user_id', userId).maybeSingle();
-        if (data && (data.role === 'ADMIN' || data.role === 'SUPER_ADMIN')) {
-          document.getElementById("adminMenuBtn").style.display = "flex";
-        }
-      } catch(e) {}
-    }
-
-    function launchApp(){
+    async function launchApp(){
       document.getElementById("auth").classList.add("hidden");
       document.getElementById("main").style.display = "flex";
+      var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', currentUserId).maybeSingle();
+      if (profile) {
+        document.getElementById("dashName").textContent = profile.full_name;
+        document.getElementById("residentTitleTag").textContent = profile.full_name + " · RESIDENT";
+        document.getElementById("profDetails").innerHTML = `<b>Name:</b> ${profile.full_name}<br><b>Phone:</b> ${profile.phone}<br><b>Address:</b> ${profile.address}`;
+      }
       toast("Welcome to Nitel Estate");
     }
 
@@ -432,184 +344,98 @@
       overlay.classList.toggle("show");
     }
 
-    async function navigate(pageId, el){
+    function navigate(pageId, el){
       document.querySelectorAll(".page").forEach(function(p) { p.classList.remove("active"); });
       var targetPage = document.getElementById("page-" + pageId);
       if (targetPage) targetPage.classList.add("active");
-      
       document.querySelectorAll(".sidebar-menu .menu-item").forEach(function(i) { i.classList.remove("active"); });
       if (el) el.classList.add("active");
-      
       toggleSidebar();
-
-      if (pageId === 'workers') loadWorkersFeed();
-      if (pageId === 'household') loadHouseholdFeed();
-      if (pageId === 'tenants') loadTenantsFeed();
-      if (pageId === 'vehicles') loadVehiclesFeed();
-      if (pageId === 'complaints') loadComplaintsFeed();
-      if (pageId === 'admin') loadAdminResidentsDropdown();
     }
 
-    // --- ADMIN PORTAL: DEBT ASSIGNMENT ---
-    async function loadAdminResidentsDropdown() {
-      var select = document.getElementById("admin-resident-select");
-      if (!select) return;
-      var { data: residents } = await supabaseClient.from('resident_profiles').select('user_id, full_name, address');
-      if (residents && residents.length > 0) {
-        select.innerHTML = residents.map(r => `<option value="${r.user_id}">${escapeHtml(r.full_name)} (${escapeHtml(r.address)})</option>`).join('');
-      } else {
-        select.innerHTML = '<option value="">No residents found</option>';
-      }
-    }
-
-    async function adminAssignDebt() {
-      var residentId = document.getElementById("admin-resident-select").value;
-      var debtAmount = document.getElementById("admin-debt-amount").value.trim();
-
-      if (!residentId || !debtAmount) {
-        alert("Please select a resident and enter the amount/status.");
-        return;
-      }
+    // --- SUPER ADMIN: PROMOTE/DEMOTE ADMINS & REGISTER BIKERS ---
+    async function updateUserAdminRole() {
+      var email = document.getElementById("target-admin-email").value.trim();
+      var role = document.getElementById("target-admin-role").value;
+      if (!email) { alert("Enter user email."); return; }
 
       try {
-        var { error } = await supabaseClient
-          .from('resident_profiles')
-          .update({ levy_status: debtAmount })
-          .eq('user_id', residentId);
-
-        if (error) throw error;
-        alert("🟢 Debt amount successfully updated for the resident/landlord!");
-        document.getElementById("admin-debt-amount").value = "";
-      } catch (err) {
-        alert("Error assigning debt: " + err.message);
-      }
+        var { data: usersList } = await supabaseClient.from('resident_profiles').select('user_id').eq('phone', email).maybeSingle();
+        if (!usersList) { alert("User not found by email/phone."); return; }
+        
+        await supabaseClient.from('user_roles').upsert([{ user_id: usersList.user_id, role: role }], { onConflict: 'user_id' });
+        alert("🟢 User role successfully updated to " + role);
+        document.getElementById("target-admin-email").value = "";
+      } catch (err) { alert("Error: " + err.message); }
     }
 
-    // --- MODULES ---
-    async function generateVisitorPass() {
-      var vName = document.getElementById("visitor-name").value.trim();
-      var count = parseInt(document.getElementById("visitor-count").value) || 1;
-      if (!vName) { alert("Enter visitor name."); return; }
+    async function registerNewBiker() {
+      var name = document.getElementById("reg-biker-name").value.trim();
+      var addr = document.getElementById("reg-biker-addr").value.trim();
+      var num = document.getElementById("reg-biker-num").value.trim();
+      var plate = document.getElementById("reg-biker-plate").value.trim();
+      var photo = document.getElementById("reg-biker-photo").value.trim();
+
+      if (!name || !plate) { alert("Enter biker name and plate number."); return; }
+
       try {
-        var pin = Math.floor(100000 + Math.random() * 900000);
-        var token = "NITEL-PASS-" + crypto.randomUUID();
-        await supabaseClient.from('estate_passes').insert([{
-          pin: String(pin), secure_qr_token: token, secure_token: token, visitor_name: vName, host_id: currentUserId, host_name: "Resident", host_address: "Block A, House 12", pass_type: "RESIDENTIAL", expected_guests: count, status: "VALID", expires_at: new Date(Date.now() + 86400000).toISOString()
+        var { error } = await supabaseClient.from('estate_bikers').insert([{
+          full_name: name, address: addr, bike_number: num, bike_plate: plate, photo_url: photo, status: 'AVAILABLE'
         }]);
-        document.getElementById("visitor-pass-result").style.display = "block";
-        document.getElementById("pass-text-output").innerHTML = `Permit Authorized! PIN: <b>${pin}</b>`;
-        var qrBox = document.querySelector("#visitor-pass-result #visitor-qr-box");
-        qrBox.innerHTML = "";
-        new QRCode(qrBox, { text: token, width: 110, height: 110 });
-        toast("Visitor pass generated!");
-      } catch (e) { alert("Error: " + e.message); }
+        if (error) throw error;
+        alert("🟢 Biker registered successfully into the estate fleet!");
+        document.getElementById("reg-biker-name").value = "";
+        document.getElementById("reg-biker-addr").value = "";
+        document.getElementById("reg-biker-num").value = "";
+        document.getElementById("reg-biker-plate").value = "";
+        document.getElementById("reg-biker-photo").value = "";
+      } catch (err) { alert("Error registering biker: " + err.message); }
     }
 
-    async function submitWorkerRequest() {
-      var name = document.getElementById("worker-name").value.trim();
-      var phone = document.getElementById("worker-phone").value.trim();
-      var desc = document.getElementById("worker-desc").value.trim();
-      if (!name) { alert("Enter worker name."); return; }
+    // --- RANDOM BIKER DISPATCH FOR RESIDENTS ---
+    async function orderRandomBiker() {
+      var dest = document.getElementById("biker-dest").value.trim();
+      if (!dest) { alert("Enter destination drop-off point."); return; }
+
       try {
-        await supabaseClient.from('estate_workers').insert([{ resident_id: currentUserId, worker_name: name, phone: phone, work_description: desc, status: 'PENDING' }]);
-        document.getElementById("worker-name").value = "";
-        document.getElementById("worker-phone").value = "";
-        document.getElementById("worker-desc").value = "";
-        loadWorkersFeed();
-        toast("Worker access request submitted!");
-      } catch (e) { alert("Error: " + e.message); }
-    }
-    async function loadWorkersFeed() {
-      var feed = document.getElementById("workers-feed");
-      var { data } = await supabaseClient.from('estate_workers').select('*').eq('resident_id', currentUserId);
-      feed.innerHTML = data && data.length ? data.map(w => `<div style="background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:8px; margin-bottom:6px; font-size:11px;"><b>${escapeHtml(w.worker_name)}</b> (${escapeHtml(w.phone || 'No phone')})<br>Desc: ${escapeHtml(w.work_description)} | Status: <b>${w.status}</b></div>`).join('') : '<small>No worker requests submitted.</small>';
-    }
+        var { data: bikers, error } = await supabaseClient.from('estate_bikers').select('*').eq('status', 'AVAILABLE');
+        if (error || !bikers || bikers.length === 0) {
+          alert("❌ No available bikers online at the moment. Please try again later.");
+          return;
+        }
 
-    async function submitHouseholdMember() {
-      var name = document.getElementById("house-member-name").value.trim();
-      var rel = document.getElementById("house-member-rel").value.trim();
-      if (!name) { alert("Enter member name."); return; }
-      try {
-        await supabaseClient.from('household_members').insert([{ resident_id: currentUserId, full_name: name, relationship: rel, status: 'ACTIVE' }]);
-        document.getElementById("house-member-name").value = "";
-        document.getElementById("house-member-rel").value = "";
-        loadHouseholdFeed();
-        toast("Household member added!");
-      } catch (e) { alert("Error: " + e.message); }
-    }
-    async function loadHouseholdFeed() {
-      var feed = document.getElementById("household-feed");
-      var { data } = await supabaseClient.from('household_members').select('*').eq('resident_id', currentUserId);
-      feed.innerHTML = data && data.length ? data.map(h => `<div style="background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:8px; margin-bottom:6px; font-size:11px;"><b>${escapeHtml(h.full_name)}</b> (${escapeHtml(h.relationship)})</div>`).join('') : '<small>No household members registered.</small>';
-    }
+        // Randomly pick a biker from the available fleet
+        var randomIndex = Math.floor(Math.random() * bikers.length);
+        var selectedBiker = bikers[randomIndex];
 
-    async function submitTenantRecord() {
-      var name = document.getElementById("tenant-name").value.trim();
-      var phone = document.getElementById("tenant-phone").value.trim();
-      var expiry = document.getElementById("tenant-expiry").value;
-      if (!name) { alert("Enter tenant name."); return; }
-      try {
-        await supabaseClient.from('estate_tenants').insert([{ landlord_id: currentUserId, tenant_name: name, phone: phone, lease_expiry: expiry, status: 'ACTIVE' }]);
-        document.getElementById("tenant-name").value = "";
-        document.getElementById("tenant-phone").value = "";
-        loadTenantsFeed();
-        toast("Tenant lease registered!");
-      } catch (e) { alert("Error: " + e.message); }
-    }
-    async function loadTenantsFeed() {
-      var feed = document.getElementById("tenants-feed");
-      var { data } = await supabaseClient.from('estate_tenants').select('*').eq('landlord_id', currentUserId);
-      feed.innerHTML = data && data.length ? data.map(t => `<div style="background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:8px; margin-bottom:6px; font-size:11px;"><b>${escapeHtml(t.tenant_name)}</b> (${escapeHtml(t.phone || 'N/A')})<br>Lease Expiry: ${t.lease_expiry || 'N/A'}</div>`).join('') : '<small>No tenant records registered.</small>';
-    }
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', currentUserId).maybeSingle();
+        var residentName = profile ? profile.full_name : "Resident";
 
-    async function submitVehicleRegistration() {
-      var model = document.getElementById("vehicle-model").value.trim();
-      var plate = document.getElementById("vehicle-plate").value.trim();
-      if (!model || !plate) { alert("Enter vehicle model and plate."); return; }
-      try {
-        await supabaseClient.from('estate_vehicles').insert([{ resident_id: currentUserId, vehicle_model: model, plate_number: plate, status: 'PENDING' }]);
-        document.getElementById("vehicle-model").value = "";
-        document.getElementById("vehicle-plate").value = "";
-        loadVehiclesFeed();
-        toast("Vehicle registered successfully!");
-      } catch (e) { alert("Error: " + e.message); }
-    }
-    async function loadVehiclesFeed() {
-      var feed = document.getElementById("vehicles-feed");
-      var { data } = await supabaseClient.from('estate_vehicles').select('*').eq('resident_id', currentUserId);
-      feed.innerHTML = data && data.length ? data.map(v => `<div style="background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:8px; margin-bottom:6px; font-size:11px;"><b>${escapeHtml(v.vehicle_model)}</b> — Plate: <b>${escapeHtml(v.plate_number)}</b> | Status: <b>${v.status}</b></div>`).join('') : '<small>No vehicles registered.</small>';
-    }
+        // Save dispatch order
+        await supabaseClient.from('biker_orders').insert([{
+          resident_id: currentUserId,
+          resident_name: residentName,
+          address: dest,
+          biker_id: selectedBiker.id,
+          biker_name: selectedBiker.full_name,
+          biker_phone: selectedBiker.bike_number,
+          bike_plate: selectedBiker.bike_plate,
+          biker_photo: selectedBiker.photo_url,
+          status: 'DISPATCHED'
+        }]);
 
-    function simulatePaymentGateway() {
-      alert("Redirecting to Paystack / Flutterwave secure gateway simulation... [PAID]");
-      supabaseClient.from('resident_profiles').update({ levy_status: 'PAID & CLEARED' }).eq('user_id', currentUserId).then(() => {
-        document.getElementById("resident-balance-display").textContent = "PAID & CLEARED";
-        toast("Payment recorded successfully!");
-      });
-    }
-
-    async function submitComplaintTicket() {
-      var msg = document.getElementById("complaint-msg").value.trim();
-      if (!msg) return;
-      try {
-        await supabaseClient.from('estate_complaints').insert([{ resident_id: currentUserId, message: msg, status: 'PENDING' }]);
-        document.getElementById("complaint-msg").value = "";
-        loadComplaintsFeed();
-        toast("Complaint ticket submitted!");
-      } catch (e) { alert("Error: " + e.message); }
-    }
-    async function loadComplaintsFeed() {
-      var feed = document.getElementById("complaints-feed");
-      var { data } = await supabaseClient.from('estate_complaints').select('*').eq('resident_id', currentUserId).order('created_at', { ascending: false });
-      feed.innerHTML = data && data.length ? data.map(c => `<div style="background:#f8fafc; border:1px solid #cbd5e1; padding:8px; border-radius:8px; margin-bottom:6px; font-size:11px;">${escapeHtml(c.message)}<br><small style="color:#64748b;">Status: ${c.status}</small></div>`).join('') : '<small>No complaints submitted yet.</small>';
-    }
-
-    async function triggerEmergencySOS() {
-      if (!confirm("🚨 BROADCAST EMERGENCY SOS PANIC ALERT?")) return;
-      try {
-        await supabaseClient.from('estate_sos_alerts').insert([{ user_id: currentUserId, resident_name: 'Resident', address: 'Block A, House 12', phone: 'N/A', status: "ACTIVE" }]);
-        alert("🚨 EMERGENCY SOS BROADCASTED TO ESTATE SECURITY!");
-      } catch (e) { alert("SOS Error: " + e.message); }
+        var box = document.getElementById("assigned-biker-box");
+        var details = document.getElementById("biker-details-text");
+        box.style.display = "block";
+        details.innerHTML = `
+          <b>Biker Name:</b> ${escapeHtml(selectedBiker.full_name)}<br>
+          <b>Phone / Bike No:</b> ${escapeHtml(selectedBiker.bike_number)}<br>
+          <b>Plate Number:</b> ${escapeHtml(selectedBiker.bike_plate)}<br>
+          <b>Destination:</b> ${escapeHtml(dest)}<br>
+          <span style="color:#0284c7; font-weight:700;">🚴‍♂️ Biker has been notified and is heading to your location!</span>
+        `;
+        toast("Biker dispatched successfully!");
+      } catch (err) { alert("Error ordering biker: " + err.message); }
     }
 
     function toast(msg){
@@ -621,8 +447,7 @@
     }
 
     async function signOut(){
-      if (supabaseClient) await supabaseClient.auth.signOut();
-      localStorage.removeItem("nitel_user");
+      await supabaseClient.auth.signOut();
       location.reload();
     }
 
