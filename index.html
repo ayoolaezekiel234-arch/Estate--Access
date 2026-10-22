@@ -583,6 +583,7 @@
       var emergency = document.getElementById("authEmergency").value.trim() || "08057270731";
       var resType = document.getElementById("authType").value || "OWNER";
       var err = document.getElementById("authError");
+      err.textContent = "";
 
       if(!email || !pass){ err.textContent = "Please enter email and password."; return; }
       if(isSignup && pass.length < 8){ err.textContent = "Security Notice: Password must be at least 8 characters long."; return; }
@@ -591,23 +592,40 @@
       try {
         if (isSignup) {
           var { data: authData, error: authErr } = await supabaseClient.auth.signUp({ email: email, password: pass });
-          if (authErr && !authErr.message.includes("already registered")) throw authErr;
+          if (authErr) {
+            throw new Error(authErr.message);
+          }
           
           var userId = authData.user ? authData.user.id : null;
           if (!userId) {
-            var { data: signInData } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
-            userId = signInData.user.id;
+            throw new Error("Could not retrieve user ID after sign up.");
           }
 
-          await supabaseClient.from('resident_profiles').delete().eq('user_id', userId);
-          await supabaseClient.from('user_roles').delete().eq('user_id', userId);
-          
-          await supabaseClient.from('resident_profiles').insert([{
-            user_id: userId, full_name: name, phone: phone, house_number: house, road: road, address: road + ', Nitel Estate', emergency_contact: emergency, resident_type: resType, outstanding_balance: 0, total_due: 0, total_paid: 0, account_status: 'PENDING'
-          }]);
+          var { error: profileErr } = await supabaseClient.from('resident_profiles').upsert([{
+            user_id: userId, 
+            full_name: name, 
+            phone: phone, 
+            house_number: house, 
+            road: road, 
+            address: road + ', Nitel Estate', 
+            emergency_contact: emergency, 
+            resident_type: resType, 
+            outstanding_balance: 0, 
+            total_due: 0, 
+            total_paid: 0, 
+            account_status: 'PENDING'
+          }], { onConflict: 'user_id' });
+
+          if (profileErr) {
+            throw new Error("Database profile error: " + profileErr.message);
+          }
 
           var roleToAssign = (email.toLowerCase() === 'ezekielayoola234@gmail.com' || email.toLowerCase() === 'ayoolaezekiel234@gmail.com') ? 'SUPER_ADMIN' : 'RESIDENT';
-          await supabaseClient.from('user_roles').insert([{ user_id: userId, role: roleToAssign }]);
+          var { error: roleErr } = await supabaseClient.from('user_roles').upsert([{ user_id: userId, role: roleToAssign }], { onConflict: 'user_id' });
+
+          if (roleErr) {
+            throw new Error("Database role error: " + roleErr.message);
+          }
 
           sendAccountCreationSMS(phone, name);
 
@@ -615,13 +633,15 @@
           toggleAuthMode();
         } else {
           var { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
-          if (error) throw error;
+          if (error) {
+            throw new Error(error.message);
+          }
           currentUserId = data.user.id;
           currentUserEmail = data.user.email;
           await checkPermissionsAndLaunch(currentUserId, currentUserEmail);
         }
       } catch (e) {
-        err.textContent = e.message || "Database error saving new user.";
+        err.textContent = e.message || "An unexpected error occurred.";
       }
     }
 
