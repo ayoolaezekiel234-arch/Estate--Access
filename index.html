@@ -78,11 +78,21 @@
     <div id="auth">
       <div class="auth-card">
         <div class="auth-title">Nitel Estate Management System</div>
-        <div class="auth-subtitle">Sign in to continue</div>
+        <div class="auth-subtitle" id="auth-subtitle-text">Sign in to continue</div>
 
         <div class="field" id="nameField" style="display:none;">
           <label>Full Name</label>
           <input type="text" id="authName" class="input" placeholder="Mr Ayoola Joshua Adekunle" />
+        </div>
+
+        <div class="field" id="houseField" style="display:none;">
+          <label>House Number</label>
+          <input type="text" id="authHouse" class="input" placeholder="ROAD M-027" />
+        </div>
+
+        <div class="field" id="roadField" style="display:none;">
+          <label>Road</label>
+          <input type="text" id="authRoad" class="input" placeholder="Road M" />
         </div>
 
         <div class="field">
@@ -157,23 +167,23 @@
 
           <div class="card" style="padding:16px;">
             <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Outstanding</div>
-            <div style="font-size:22px; font-weight:900; color:#DC2626; margin-top:2px;" id="dash-card-outstanding">₦1,500</div>
+            <div style="font-size:22px; font-weight:900; color:#DC2626; margin-top:2px;" id="dash-card-outstanding">₦0</div>
           </div>
 
           <div class="card" style="padding:16px;">
             <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Total Due</div>
-            <div style="font-size:22px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-total-due">₦636,500</div>
+            <div style="font-size:22px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-total-due">₦0</div>
           </div>
 
           <div class="card" style="padding:16px;">
             <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Total Paid</div>
-            <div style="font-size:22px; font-weight:900; color:#15803d; margin-top:2px;" id="dash-card-total-paid">₦635,000</div>
+            <div style="font-size:22px; font-weight:900; color:#15803d; margin-top:2px;" id="dash-card-total-paid">₦0</div>
           </div>
 
           <div class="card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
             <div>
               <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Vehicles</div>
-              <div style="font-size:20px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-vehicles-count">1</div>
+              <div style="font-size:20px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-vehicles-count">0</div>
             </div>
           </div>
 
@@ -192,7 +202,7 @@
           </div>
 
           <div class="card">
-            <div style="font-size:12px; color:var(--text); margin-bottom:10px;" id="dash-outstanding-text">You have an outstanding balance of ₦1,500.</div>
+            <div style="font-size:12px; color:var(--text); margin-bottom:10px;" id="dash-outstanding-text">You have an outstanding balance of ₦0.</div>
             <button class="btn" style="margin:0;" onclick="navigate('payments', document.querySelectorAll('.sidebar-menu .menu-item')[10])">Submit payment receipt</button>
           </div>
         </div>
@@ -319,6 +329,12 @@
             <div class="page-title" style="color:var(--red);">Admin Management Portal</div>
             <div class="page-desc">Professional administrative console for estate oversight.</div>
 
+            <!-- 1. Review & Approve Pending Resident Profiles -->
+            <div style="background:#EFF6FF; border:1px solid #BFDBFE; padding:12px; border-radius:10px; margin-bottom:12px;">
+              <div style="font-weight:800; font-size:13px; color:#1E40AF; margin-bottom:6px;">Pending Resident Approvals (<24hrs)</div>
+              <div id="admin-pending-users-feed"><small>Loading pending accounts...</small></div>
+            </div>
+
             <div style="background:#F8FAFC; border:1px solid var(--border); padding:12px; border-radius:10px; margin-bottom:12px;">
               <div style="font-weight:800; font-size:13px; margin-bottom:6px;">Post Official Announcement</div>
               <div class="field"><label>Title</label><input type="text" id="ann-title" class="input" placeholder="Notice Title" /></div>
@@ -343,9 +359,9 @@
             <div style="background:#FEF2F2; border:1px solid #FEE2E2; padding:12px; border-radius:10px;">
               <div style="font-weight:800; font-size:13px; color:#991B1B; margin-bottom:6px;">Resident Financial & Account Control</div>
               <div class="field"><label>Select Resident</label><select id="admin-user-select" class="input" style="background:#fff;"><option value="">-- Select Resident --</option></select></div>
-              <div class="field"><label>Outstanding Balance (e.g. 1500)</label><input type="number" id="admin-set-outstanding" class="input" placeholder="1500" /></div>
-              <div class="field"><label>Total Due (e.g. 636500)</label><input type="number" id="admin-set-totaldue" class="input" placeholder="636500" /></div>
-              <div class="field"><label>Total Paid (e.g. 635000)</label><input type="number" id="admin-set-totalpaid" class="input" placeholder="635000" /></div>
+              <div class="field"><label>Outstanding Balance (e.g. 1500)</label><input type="number" id="admin-set-outstanding" class="input" placeholder="0" /></div>
+              <div class="field"><label>Total Due (e.g. 636500)</label><input type="number" id="admin-set-totaldue" class="input" placeholder="0" /></div>
+              <div class="field"><label>Total Paid (e.g. 635000)</label><input type="number" id="admin-set-totalpaid" class="input" placeholder="0" /></div>
               <button class="btn" style="background:#DC2626;" onclick="adminUpdateResidentFinancials()">Save Financial Balances</button>
             </div>
 
@@ -443,6 +459,9 @@
     function toggleAuthMode(){
       isSignup = !isSignup;
       document.getElementById("nameField").style.display = isSignup ? "block" : "none";
+      document.getElementById("houseField").style.display = isSignup ? "block" : "none";
+      document.getElementById("roadField").style.display = isSignup ? "block" : "none";
+      document.getElementById("auth-subtitle-text").textContent = isSignup ? "Register property & profile" : "Sign in to continue";
       document.getElementById("authBtn").textContent = isSignup ? "Create account" : "Sign in";
     }
 
@@ -450,6 +469,8 @@
       var email = document.getElementById("authEmail").value.trim();
       var pass = document.getElementById("authPassword").value;
       var name = document.getElementById("authName").value.trim();
+      var house = document.getElementById("authHouse").value.trim() || "ROAD M-027";
+      var road = document.getElementById("authRoad").value.trim() || "Road M";
       var err = document.getElementById("authError");
 
       if(!email || !pass){ err.textContent = "Please enter email and password."; return; }
@@ -462,13 +483,13 @@
           var userId = authData.user.id;
           
           await supabaseClient.from('resident_profiles').upsert([{
-            user_id: userId, full_name: name, phone: email, house_number: 'ROAD M-027', road: 'Road M', address: 'Road M, Nitel Estate', outstanding_balance: 1500, total_due: 636500, total_paid: 635000, account_status: 'ACTIVE'
+            user_id: userId, full_name: name, phone: email, house_number: house, road: road, address: road + ', Nitel Estate', outstanding_balance: 0, total_due: 0, total_paid: 0, account_status: 'PENDING'
           }], { onConflict: 'user_id' });
 
           var roleToAssign = (email.toLowerCase() === 'ezekielayoola234@gmail.com') ? 'SUPER_ADMIN' : 'RESIDENT';
           await supabaseClient.from('user_roles').upsert([{ user_id: userId, role: roleToAssign }], { onConflict: 'user_id' });
 
-          alert("Account created successfully! You can now sign in.");
+          alert("Account creation should be approved under 24hrs if profile is proven valid.");
           toggleAuthMode();
         } else {
           var { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
@@ -497,6 +518,11 @@
 
       var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).maybeSingle();
       if (profile) {
+        if (profile.account_status === 'PENDING' && !isAdmin) {
+          alert("Notice: Account creation should be approved under 24hrs if profile is proven valid. Please wait for admin approval.");
+          await supabaseClient.auth.signOut();
+          return;
+        }
         if (profile.account_status === 'BLOCKED') {
           alert("Access Denied: Your account has been suspended by management.");
           await supabaseClient.auth.signOut();
@@ -544,7 +570,7 @@
       if (pageId === 'vehicles') loadVehiclesList();
       if (pageId === 'payments') loadPaymentHistory();
       if (pageId === 'announcements') loadAnnouncementsFeed();
-      if (pageId === 'admin') { loadAdminComplaints(); loadAdminUsersDropdown(); }
+      if (pageId === 'admin') { loadAdminComplaints(); loadAdminUsersDropdown(); loadAdminPendingUsers(); }
     }
 
     function openAccessPassQR() {
@@ -786,7 +812,8 @@
       if (!title || !content) { alert("Enter title and content."); return; }
 
       try {
-        await supabaseClient.from('estate_announcements').insert([{ title: title, content: content }]);
+        var { error } = await supabaseClient.from('estate_announcements').insert([{ title: title, content: content }]);
+        if (error) throw error;
         document.getElementById("ann-title").value = "";
         document.getElementById("ann-content").value = "";
         alert("Announcement published successfully.");
@@ -802,14 +829,49 @@
       if (!name || !plate) { alert("Enter biker name and plate number."); return; }
 
       try {
-        await supabaseClient.from('estate_bikers').insert([{
+        var { error } = await supabaseClient.from('estate_bikers').insert([{
           full_name: name, address: addr, bike_number: phone, bike_plate: plate, status: 'AVAILABLE'
         }]);
+        if (error) throw error;
         alert("Biker registered successfully.");
         document.getElementById("biker-reg-name").value = "";
         document.getElementById("biker-reg-addr").value = "";
         document.getElementById("biker-reg-phone").value = "";
         document.getElementById("biker-reg-plate").value = "";
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function loadAdminPendingUsers() {
+      var feed = document.getElementById("admin-pending-users-feed");
+      var { data } = await supabaseClient.from('resident_profiles').select('*').eq('account_status', 'PENDING');
+      if (!data || data.length === 0) { feed.innerHTML = "<small>No pending user profiles awaiting approval.</small>"; return; }
+      feed.innerHTML = data.map(u => `
+        <div style="background:#fff; border:1px solid #BFDBFE; padding:10px; border-radius:8px; margin-bottom:6px; font-size:12px;">
+          <b>${escapeHtml(u.full_name)}</b> (${escapeHtml(u.phone)})<br>
+          Property: ${escapeHtml(u.house_number)} - ${escapeHtml(u.road)}<br>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="btn" style="background:#16A34A; height:32px; font-size:11px; margin:0;" onclick="adminApproveUser('${u.user_id}')">Accept Account</button>
+            <button class="btn" style="background:#DC2626; height:32px; font-size:11px; margin:0;" onclick="adminDeleteUser('${u.user_id}')">Delete Profile</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function adminApproveUser(userId) {
+      try {
+        await supabaseClient.from('resident_profiles').update({ account_status: 'ACTIVE' }).eq('user_id', userId);
+        alert("User account approved and activated.");
+        loadAdminPendingUsers();
+        loadAdminUsersDropdown();
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function adminDeleteUser(userId) {
+      if (!confirm("Permanently delete this user profile?")) return;
+      try {
+        await supabaseClient.from('resident_profiles').delete().eq('user_id', userId);
+        alert("User profile deleted.");
+        loadAdminPendingUsers();
       } catch (err) { alert("Error: " + err.message); }
     }
 
