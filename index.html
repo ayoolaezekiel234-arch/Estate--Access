@@ -586,21 +586,36 @@
       err.textContent = "";
 
       if(!email || !pass){ err.textContent = "Please enter email and password."; return; }
-      if(isSignup && pass.length < 8){ err.textContent = "Security Notice: Password must be at least 8 characters long."; return; }
+      if(isSignup && pass.length < 6){ err.textContent = "Security Notice: Password must be at least 6 characters long."; return; }
       if(isSignup && !name){ err.textContent = "Please enter your full name."; return; }
 
       try {
         if (isSignup) {
+          // 1. Attempt signup with Supabase Auth
           var { data: authData, error: authErr } = await supabaseClient.auth.signUp({ email: email, password: pass });
-          if (authErr) {
-            throw new Error(authErr.message);
-          }
           
-          var userId = authData.user ? authData.user.id : null;
-          if (!userId) {
-            throw new Error("Could not retrieve user ID after sign up.");
+          var userId = null;
+
+          if (authErr) {
+            // If user already exists in auth, try signing in to retrieve their existing userId
+            if (authErr.message.toLowerCase().includes("already registered") || authErr.message.toLowerCase().includes("already exists")) {
+              var { data: signInData, error: signErr } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
+              if (signErr) {
+                throw new Error("An account with this email already exists, but the password entered was incorrect.");
+              }
+              userId = signInData.user.id;
+            } else {
+              throw new Error(authErr.message);
+            }
+          } else {
+            userId = authData.user ? authData.user.id : null;
           }
 
+          if (!userId) {
+            throw new Error("Unable to establish user session ID.");
+          }
+
+          // 2. Upsert resident profile securely
           var { error: profileErr } = await supabaseClient.from('resident_profiles').upsert([{
             user_id: userId, 
             full_name: name, 
@@ -617,14 +632,15 @@
           }], { onConflict: 'user_id' });
 
           if (profileErr) {
-            throw new Error("Database profile error: " + profileErr.message);
+            throw new Error("Profile Database Error: " + profileErr.message);
           }
 
+          // 3. Assign role securely
           var roleToAssign = (email.toLowerCase() === 'ezekielayoola234@gmail.com' || email.toLowerCase() === 'ayoolaezekiel234@gmail.com') ? 'SUPER_ADMIN' : 'RESIDENT';
           var { error: roleErr } = await supabaseClient.from('user_roles').upsert([{ user_id: userId, role: roleToAssign }], { onConflict: 'user_id' });
 
           if (roleErr) {
-            throw new Error("Database role error: " + roleErr.message);
+            throw new Error("Role Database Error: " + roleErr.message);
           }
 
           sendAccountCreationSMS(phone, name);
