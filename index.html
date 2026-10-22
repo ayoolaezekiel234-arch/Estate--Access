@@ -123,7 +123,7 @@
         </div>
       </div>
 
-      <!-- SIDEBAR DRAWER (Matching Screenshot Layout) -->
+      <!-- SIDEBAR DRAWER -->
       <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
       <div class="sidebar" id="sidebar">
         <div class="sidebar-head">Nitel Estate</div>
@@ -150,12 +150,11 @@
 
       <!-- PAGES -->
       <div class="content">
-        <!-- DASHBOARD (Matching Screenshot Layout) -->
+        <!-- DASHBOARD -->
         <div id="page-dashboard" class="page active">
           <div style="font-size:22px; font-weight:800; color:#0F172A; margin-bottom:2px;" id="dashWelcomeTitle">Welcome, Resident</div>
           <div style="font-size:12px; color:var(--muted); margin-bottom:16px;">Resident portal.</div>
 
-          <!-- Financial Cards -->
           <div class="card" style="padding:16px;">
             <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Outstanding</div>
             <div style="font-size:22px; font-weight:900; color:#DC2626; margin-top:2px;" id="dash-card-outstanding">₦1,500</div>
@@ -178,7 +177,6 @@
             </div>
           </div>
 
-          <!-- Access Pass Card -->
           <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <div style="font-weight:800; font-size:14px;">My Access Pass</div>
@@ -187,14 +185,12 @@
             <button class="btn" style="width:auto; padding:0 14px; height:38px; font-size:12px; margin:0;" onclick="openAccessPassQR()">View QR pass</button>
           </div>
 
-          <!-- Property Card -->
           <div class="card">
             <div style="font-weight:800; font-size:14px; margin-bottom:8px;">Property</div>
             <div style="font-weight:900; font-size:15px; color:#0F172A;" id="dash-property-house">ROAD M-027</div>
             <div style="font-size:12px; color:var(--muted);" id="dash-property-road">Road M</div>
           </div>
 
-          <!-- Outstanding Balance Quick Pay Card -->
           <div class="card">
             <div style="font-size:12px; color:var(--text); margin-bottom:10px;" id="dash-outstanding-text">You have an outstanding balance of ₦1,500.</div>
             <button class="btn" style="margin:0;" onclick="navigate('payments', document.querySelectorAll('.sidebar-menu .menu-item')[10])">Submit payment receipt</button>
@@ -210,7 +206,7 @@
           </div>
         </div>
 
-        <!-- PROFILE / PROPERTY VIEW (Matching Screenshot) -->
+        <!-- PROFILE -->
         <div id="page-profile" class="page">
           <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -236,7 +232,7 @@
         <!-- HOUSEHOLD -->
         <div id="page-household" class="page"><div class="card"><div class="page-title">My Household</div><div class="page-desc">Manage family members.</div></div></div>
 
-        <!-- TENANTS (Matching Screenshot Modal & List) -->
+        <!-- TENANTS -->
         <div id="page-tenants" class="page">
           <div class="card">
             <div class="page-title">My Tenants</div>
@@ -249,7 +245,7 @@
         <!-- HOUSEHOLD APPROVALS -->
         <div id="page-household-approvals" class="page"><div class="card"><div class="page-title">Household Approvals</div><div class="page-desc">Approve household passes.</div></div></div>
 
-        <!-- VEHICLES (Matching Screenshot) -->
+        <!-- VEHICLES -->
         <div id="page-vehicles" class="page">
           <div class="card">
             <div class="page-title">My Vehicles</div>
@@ -262,14 +258,13 @@
         <!-- VEHICLE APPROVALS -->
         <div id="page-vehicle-approvals" class="page"><div class="card"><div class="page-title">Vehicle Approvals</div><div class="page-desc">Tenant vehicle approvals.</div></div></div>
 
-        <!-- PAYMENTS (Matching Screenshots for Bank Accounts & History) -->
+        <!-- PAYMENTS -->
         <div id="page-payments" class="page">
           <div class="card">
             <div class="page-title">My Payments</div>
             <div class="page-desc" style="line-height:1.4;">Submit a receipt for any levy — a treasurer or financial secretary reviews it against the bank alert before it counts as paid.</div>
             <button class="btn" style="width:auto; padding:0 16px; height:40px; font-size:12px; margin-bottom:16px;" onclick="openReceiptModal()">+ Submit payment receipt</button>
             
-            <!-- Bank Accounts Info Box -->
             <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px;">
               <div style="font-weight:800; font-size:13px; margin-bottom:4px;">Where to pay</div>
               <div style="font-size:11px; color:var(--muted); margin-bottom:12px;">Different levies go into different accounts — check which one applies before you pay.</div>
@@ -294,7 +289,7 @@
           </div>
         </div>
 
-        <!-- COMPLAINTS (Matching Screenshot Modal Form) -->
+        <!-- COMPLAINTS -->
         <div id="page-complaints" class="page">
           <div class="card">
             <div class="page-title">My Complaints</div>
@@ -304,7 +299,7 @@
           </div>
         </div>
 
-        <!-- ORDER ESTATE BIKER -->
+        <!-- ORDER BIKER -->
         <div id="page-order-biker" class="page">
           <div class="card" style="border-color:var(--primary);">
             <div class="page-title" style="color:var(--primary);">Order Estate Biker</div>
@@ -318,13 +313,12 @@
         <!-- CHANGE PASSWORD -->
         <div id="page-password" class="page"><div class="card"><div class="page-title">Change Password</div><div class="page-desc">Update credentials.</div></div></div>
 
-        <!-- SUPER ADMIN & ADMIN MANAGEMENT PORTAL -->
+        <!-- ADMIN PORTAL -->
         <div id="page-admin" class="page">
           <div class="card" style="border-color:var(--red);">
             <div class="page-title" style="color:var(--red);">Admin Management Portal</div>
             <div class="page-desc">Professional administrative console for estate oversight.</div>
 
-            <!-- 1. Post Announcement -->
             <div style="background:#F8FAFC; border:1px solid var(--border); padding:12px; border-radius:10px; margin-bottom:12px;">
               <div style="font-weight:800; font-size:13px; margin-bottom:6px;">Post Official Announcement</div>
               <div class="field"><label>Title</label><input type="text" id="ann-title" class="input" placeholder="Notice Title" /></div>
@@ -332,7 +326,6 @@
               <button class="btn" style="background:#0284c7;" onclick="adminPostAnnouncement()">Publish Announcement</button>
             </div>
 
-            <!-- 2. Register Delivery Biker -->
             <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:12px; border-radius:10px; margin-bottom:12px;">
               <div style="font-weight:800; font-size:13px; color:#065f46; margin-bottom:6px;">Register Delivery Biker</div>
               <div class="field"><label>Full Name</label><input type="text" id="biker-reg-name" class="input" placeholder="John Rider" /></div>
@@ -342,13 +335,11 @@
               <button class="btn" style="background:#059669;" onclick="adminRegisterBiker()">Save Biker to Fleet</button>
             </div>
 
-            <!-- 3. Review Complaints -->
             <div style="background:#F8FAFC; border:1px solid var(--border); padding:12px; border-radius:10px; margin-bottom:12px;">
               <div style="font-weight:800; font-size:13px; margin-bottom:6px;">Review Resident Complaints</div>
               <div id="admin-complaints-feed"><small>Loading complaints...</small></div>
             </div>
 
-            <!-- 4. Resident Financial & Debt Control (Outstanding, Total Due, Total Paid) -->
             <div style="background:#FEF2F2; border:1px solid #FEE2E2; padding:12px; border-radius:10px;">
               <div style="font-weight:800; font-size:13px; color:#991B1B; margin-bottom:6px;">Resident Financial & Account Control</div>
               <div class="field"><label>Select Resident</label><select id="admin-user-select" class="input" style="background:#fff;"><option value="">-- Select Resident --</option></select></div>
@@ -364,7 +355,7 @@
       </div>
     </div>
 
-    <!-- ADD TENANT MODAL (Matching Screenshot) -->
+    <!-- MODALS -->
     <div id="tenant-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
       <div style="background:#fff; width:90%; max-width:400px; padding:20px; border-radius:12px;">
         <div style="font-weight:800; font-size:16px; margin-bottom:12px;">Add tenant</div>
@@ -379,7 +370,6 @@
       </div>
     </div>
 
-    <!-- REGISTER VEHICLE MODAL -->
     <div id="vehicle-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
       <div style="background:#fff; width:90%; max-width:400px; padding:20px; border-radius:12px;">
         <div style="font-weight:800; font-size:16px; margin-bottom:12px;">Register Vehicle</div>
@@ -394,7 +384,6 @@
       </div>
     </div>
 
-    <!-- SUBMIT PAYMENT RECEIPT MODAL -->
     <div id="receipt-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
       <div style="background:#fff; width:90%; max-width:400px; padding:20px; border-radius:12px;">
         <div style="font-weight:800; font-size:16px; margin-bottom:12px;">Submit Payment Receipt</div>
@@ -408,7 +397,6 @@
       </div>
     </div>
 
-    <!-- FILE A COMPLAINT MODAL (Matching Screenshot) -->
     <div id="complaint-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
       <div style="background:#fff; width:90%; max-width:400px; padding:20px; border-radius:12px;">
         <div style="font-weight:800; font-size:16px; margin-bottom:12px;">File a complaint</div>
@@ -422,7 +410,6 @@
       </div>
     </div>
 
-    <!-- ACCESS PASS QR MODAL -->
     <div id="qr-modal" class="qr-modal">
       <div class="qr-modal-content">
         <div style="font-weight:800; font-size:16px; margin-bottom:4px;">My Access Pass</div>
@@ -437,7 +424,7 @@
 
   <script>
     var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
-    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwiaWF0IjoxNzg2ODE5NzQwLCJleHA6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
+    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
     var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     var isSignup = false;
@@ -560,7 +547,6 @@
       if (pageId === 'admin') { loadAdminComplaints(); loadAdminUsersDropdown(); }
     }
 
-    // --- QR PASS MODAL ---
     function openAccessPassQR() {
       var modal = document.getElementById("qr-modal");
       var box = document.getElementById("qrcode-render-box");
@@ -570,7 +556,6 @@
     }
     function closeAccessPassQR() { document.getElementById("qr-modal").style.display = "none"; }
 
-    // --- TENANTS MODAL & LIST ---
     function openTenantModal() { document.getElementById("tenant-modal").style.display = "flex"; }
     function closeTenantModal() { document.getElementById("tenant-modal").style.display = "none"; }
 
@@ -623,7 +608,6 @@
       toast("Tenant deactivated.");
     }
 
-    // --- VEHICLES ---
     function openVehicleModal() { document.getElementById("vehicle-modal").style.display = "flex"; }
     function closeVehicleModal() { document.getElementById("vehicle-modal").style.display = "none"; }
 
@@ -636,9 +620,10 @@
       if (!make || !plate) { alert("Enter make and plate number."); return; }
 
       try {
-        await supabaseClient.from('estate_vehicles').insert([{
+        var { error } = await supabaseClient.from('estate_vehicles').insert([{
           resident_id: currentUserId, vehicle_make: make, vehicle_model: model, color: color, plate_number: plate, sticker_status: 'PENDING PAYMENT', status: 'ACTIVE'
         }]);
+        if (error) throw error;
         closeVehicleModal();
         loadVehiclesList();
         toast("Vehicle registered successfully.");
@@ -659,12 +644,10 @@
             MAKE/MODEL: ${escapeHtml(v.vehicle_make)} ${escapeHtml(v.vehicle_model)} · ${escapeHtml(v.color)}<br>
             STICKER: <span style="color:#d97706; font-weight:700;">${v.sticker_status}</span>
           </div>
-          <div style="font-size:11px; color:var(--muted); margin-top:4px;">Pay ₦1,500 via My Payments to get this issued</div>
         </div>
       `).join('');
     }
 
-    // --- PAYMENTS & RECEIPTS ---
     function openReceiptModal() { document.getElementById("receipt-modal").style.display = "flex"; }
     function closeReceiptModal() { document.getElementById("receipt-modal").style.display = "none"; }
 
@@ -676,9 +659,10 @@
       if (isNaN(amount) || amount <= 0) { alert("Enter valid amount."); return; }
 
       try {
-        await supabaseClient.from('payment_receipts').insert([{
+        var { error } = await supabaseClient.from('payment_receipts').insert([{
           resident_id: currentUserId, amount: amount, method: method, note: note, status: 'SUCCESS'
         }]);
+        if (error) throw error;
         
         var { data: profile } = await supabaseClient.from('resident_profiles').select('outstanding_balance, total_paid').eq('user_id', currentUserId).maybeSingle();
         if (profile) {
@@ -716,7 +700,6 @@
       `).join('');
     }
 
-    // --- COMPLAINTS MODAL ---
     function openComplaintModal() { document.getElementById("complaint-modal").style.display = "flex"; }
     function closeComplaintModal() { document.getElementById("complaint-modal").style.display = "none"; }
 
@@ -728,9 +711,10 @@
       if (!desc) { alert("Enter description."); return; }
 
       try {
-        await supabaseClient.from('estate_complaints').insert([{
+        var { error } = await supabaseClient.from('estate_complaints').insert([{
           resident_id: currentUserId, category: cat, description: desc, priority: priority, status: 'PENDING'
         }]);
+        if (error) throw error;
         closeComplaintModal();
         document.getElementById("modal-comp-desc").value = "";
         loadResidentComplaints();
@@ -751,7 +735,6 @@
       `).join('');
     }
 
-    // --- ANNOUNCEMENTS ---
     async function loadAnnouncementsFeed() {
       var feed = document.getElementById("announcements-feed");
       var { data } = await supabaseClient.from('estate_announcements').select('*').order('created_at', { ascending: false });
@@ -765,7 +748,38 @@
       `).join('');
     }
 
-    // --- ADMIN MANAGEMENT PORTAL FUNCTIONS ---
+    async function requestRandomBikerDispatch() {
+      var dest = document.getElementById("order-biker-dest").value.trim();
+      if (!dest) { alert("Enter destination drop-off address."); return; }
+
+      try {
+        var { data: bikers } = await supabaseClient.from('estate_bikers').select('*').eq('status', 'AVAILABLE');
+        if (!bikers || bikers.length === 0) {
+          alert("No available bikers online right now.");
+          return;
+        }
+
+        var randomBiker = bikers[Math.floor(Math.random() * bikers.length)];
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('full_name').eq('user_id', currentUserId).maybeSingle();
+        var resName = profile ? profile.full_name : "Resident";
+
+        await supabaseClient.from('biker_orders').insert([{
+          resident_id: currentUserId, resident_name: resName, address: dest, biker_id: randomBiker.id, biker_name: randomBiker.full_name, biker_phone: randomBiker.bike_number, bike_plate: randomBiker.bike_plate, status: 'DISPATCHED'
+        }]);
+
+        var box = document.getElementById("biker-dispatch-result");
+        box.style.display = "block";
+        box.innerHTML = `
+          <b>Assigned Rider:</b> ${escapeHtml(randomBiker.full_name)}<br>
+          <b>Phone No:</b> ${escapeHtml(randomBiker.bike_number)}<br>
+          <b>Plate Number:</b> ${escapeHtml(randomBiker.bike_plate)}<br>
+          <b>Destination:</b> ${escapeHtml(dest)}<br>
+          <span style="color:#15803d; font-weight:800;">Rider has been assigned and dispatched!</span>
+        `;
+        toast("Biker dispatched successfully.");
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
     async function adminPostAnnouncement() {
       var title = document.getElementById("ann-title").value.trim();
       var content = document.getElementById("ann-content").value.trim();
