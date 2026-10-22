@@ -3,355 +3,320 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#050807">
-<title>NITEL Estate — Secure Living. Smarter Community.</title>
+<meta name="theme-color" content="#1B66FF">
+<title>Nitel Estate Management System</title>
 <style>
 :root{
- --bg:#050807; --bg2:#08100D; --panel:#0B1511; --panel2:#0E1B16;
- --green:#19E6A0; --green2:#52FFC5; --green3:#0FCB8A;
- --white:#F5FFFB; --text:#E9FFF6; --muted:#81978E;
- --red:#FF5F6D; --yellow:#FFD166; --blue:#2682FF;
- --border:rgba(25,230,160,.14); --border2:rgba(255,255,255,.07);
- --shadow:0 20px 60px rgba(0,0,0,.55);
- --glow:0 0 25px rgba(25,230,160,.22);
- --radius:22px; --nav-height:76px;
+ --primary:#1B66FF; --primary-dark:#0e4ccb;
+ --bg:#F4F6F9; --card:#FFFFFF; --text:#1E293B; --muted:#64748B;
+ --border:#E2E8F0; --red:#EF4444; --green:#10B981; --radius:12px;
 }
 *{box-sizing:border-box; margin:0; padding:0; font-family:Inter, system-ui, -apple-system, sans-serif;}
 html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text);}
-#app{width:100%; height:100%; position:relative; overflow:hidden;}
+#app{width:100%; height:100%; position:relative; overflow:hidden; display:flex; flex-direction:column;}
 
 /* SVG ICON HELPER */
-.svg-icon { width: 18px; height: 18px; fill: currentColor; display: inline-block; vertical-align: middle; flex-shrink: 0; }
-.svg-icon-lg { width: 24px; height: 24px; fill: currentColor; }
+.ico { width: 20px; height: 20px; fill: currentColor; display: inline-block; vertical-align: middle; flex-shrink: 0; }
 
-/* SPLASH SCREEN */
-#splash{
- position:absolute; inset:0; z-index:9999; display:flex; flex-direction:column; justify-content:flex-end; padding:35px 24px;
- background: linear-gradient(180deg, rgba(5,8,7,0.1) 0%, rgba(5,8,7,0.8) 55%, #050807 100%), 
-             url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900') center/cover no-repeat;
- transition: opacity .4s ease, visibility .4s ease;
-}
-#splash.hide{opacity:0; visibility:hidden; pointer-events:none;}
-.splash-logo-box{
- width:64px; height:64px; border-radius:20px; background:rgba(25,230,160,.15); border:1px solid var(--border);
- display:flex; align-items:center; justify-content:center; margin-bottom:16px; box-shadow:var(--glow); color:var(--green);
-}
-.splash-title{font-size:28px; font-weight:900; letter-spacing:1px; color:#fff;}
-.splash-title span{color:var(--green);}
-.splash-tagline{margin-top:6px; color:#9DB3AA; font-size:12px; letter-spacing:0.5px; margin-bottom:28px;}
-
-/* AUTH SCREEN */
+/* 1. AUTH SCREEN (Matching Screenshot) */
 #auth{
- position:absolute; inset:0; z-index:50; display:none; overflow:auto; padding:24px 18px;
- background: radial-gradient(circle at 50% 0%, rgba(25,230,160,.12), transparent 40%), var(--bg);
+ position:absolute; inset:0; z-index:999; display:flex; flex-direction:column; justify-content:center; align-items:center;
+ background: linear-gradient(135deg, #1B66FF 0%, #0D47A1 100%); padding:20px; overflow-y:auto;
 }
 #auth.hidden{display:none !important;}
-.auth-wrap{width:100%; max-width:420px; margin:0 auto; min-height:100%; display:flex; flex-direction:column; justify-content:center;}
-.auth-card{padding:26px; border-radius:28px; background:rgba(11,21,17,0.95); border:1px solid var(--border); box-shadow:var(--shadow); backdrop-filter:blur(20px);}
-.auth-tabs{display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:4px; background:rgba(255,255,255,.03); border-radius:14px; margin-bottom:20px;}
-.auth-tabs button{border:0; background:transparent; color:var(--muted); padding:10px; border-radius:10px; font-weight:700; cursor:pointer; font-size:12px;}
-.auth-tabs button.active{background:rgba(25,230,160,.15); color:var(--green);}
-
-.field{margin-top:14px;}
-.field.hidden{display:none !important;}
-.field label{display:block; color:#9DB3AA; font-size:11px; margin-bottom:6px; font-weight:700; text-transform:uppercase;}
-.input{width:100%; height:48px; border-radius:14px; border:1px solid var(--border2); outline:none; background:rgba(255,255,255,.03); color:white; padding:0 14px; font-size:13px;}
-.input:focus{border-color:rgba(25,230,160,.5); box-shadow:0 0 0 3px rgba(25,230,160,.06);}
-
-.btn{width:100%; min-height:48px; border:0; border-radius:14px; font-size:14px; font-weight:900; cursor:pointer; text-align:center; transition:.2s;}
-.btn-emerald{background:linear-gradient(135deg, var(--green2), var(--green3)); color:#03110B; box-shadow:0 6px 25px rgba(25,230,160,.25);}
-.btn-outline{background:transparent; border:1px solid var(--border); color:var(--green);}
-
-/* MAIN APP & NAV */
-#main{position:absolute; inset:0; display:none; flex-direction:column; z-index:10;}
-#main.hidden{display:none !important;}
-.topbar{height:68px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 18px; border-bottom:1px solid rgba(255,255,255,.04); background:rgba(5,8,7,.85); backdrop-filter:blur(20px);}
-.brand-mini{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:1px; font-size:15px;}
-.brand-mini-icon{width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(25,230,160,.15); border:1px solid var(--border); color:var(--green);}
-.brand-mini span{color:var(--green);}
-
-.content{flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; padding:16px 16px 90px;}
-.page{display:none; animation:pageIn .2s ease;}
-.page.active{display:block;}
-@keyframes pageIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
-
-.nav{
- position:absolute; bottom:0; left:0; right:0; height:var(--nav-height);
- background:rgba(5,8,7,.95); backdrop-filter:blur(25px); border-top:1px solid rgba(255,255,255,.04);
- display:grid; grid-template-columns:repeat(5, 1fr); align-items:center; padding:0 4px; z-index:100;
+.auth-card{
+ width:100%; max-width:400px; background:var(--card); border-radius:16px; padding:32px 24px; box-shadow:0 15px 35px rgba(0,0,0,0.15);
 }
-.nav button{background:0; border:0; color:var(--muted); font-size:10px; font-weight:700; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; cursor:pointer; height:100%;}
-.nav button.active{color:var(--green);}
-.nav button .ico-svg{width:20px; height:20px; fill:currentColor;}
+.auth-title{font-size:22px; font-weight:800; color:#0F172A; letter-spacing:-0.5px;}
+.auth-subtitle{font-size:13px; color:var(--muted); margin-top:4px; margin-bottom:24px;}
+.field{margin-bottom:16px;}
+.field label{display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;}
+.input{
+ width:100%; height:46px; border-radius:10px; border:1px solid var(--border); outline:none; padding:0 14px; font-size:14px; color:var(--text); background:#F8FAFC; transition:.2s;
+}
+.input:focus{border-color:var(--primary); background:#fff; box-shadow:0 0 0 3px rgba(27,102,255,0.1);}
+.btn{
+ width:100%; height:48px; border:0; border-radius:10px; background:var(--primary); color:#fff; font-size:14px; font-weight:700; cursor:pointer; transition:.2s; margin-top:8px;
+}
+.btn:hover{background:var(--primary-dark);}
+.auth-footer{margin-top:24px; text-align:center; font-size:11px; color:rgba(255,255,255,0.8); line-height:1.4;}
 
-/* COMPONENTS */
-.hero{padding:20px; border-radius:24px; background:linear-gradient(135deg, #0D2119, #07100D); border:1px solid var(--border); margin-bottom:14px; position:relative; overflow:hidden;}
-.hero h2{font-size:20px; font-weight:900; margin-top:4px;}
-.hero p{color:var(--muted); font-size:12px; margin-top:4px;}
+/* 2. MAIN APP & SIDEBAR DRAWER */
+#main{display:none; flex-direction:column; width:100%; height:100%; position:relative;}
+#main.hidden{display:none !important;}
 
-.grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
-.stat-box{padding:14px; border-radius:18px; background:rgba(15,26,22,.9); border:1px solid var(--border2);}
-.stat-num{font-size:18px; font-weight:900; color:var(--green); margin-top:6px;}
-.stat-lbl{font-size:11px; color:var(--muted); margin-top:2px;}
+.topbar{
+ height:60px; background:var(--card); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 16px; flex-shrink:0; z-index:50;
+}
+.topbar-left{display:flex; align-items:center; gap:12px;}
+.menu-btn{background:0; border:0; cursor:pointer; color:#0F172A; display:flex; align-items:center;}
+.brand-name{font-size:16px; font-weight:800; color:var(--primary);}
+.topbar-right{display:flex; align-items:center; gap:12px;}
+.resident-tag{font-size:11px; color:var(--muted); font-weight:600;}
 
-.action-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:16px;}
-.action-item{background:rgba(15,26,22,.9); border:1px solid var(--border2); border-radius:16px; padding:12px 4px; text-align:center; cursor:pointer;}
-.action-item .ico-box{width:36px; height:36px; margin:0 auto 6px; border-radius:10px; background:rgba(25,230,160,.1); display:flex; align-items:center; justify-content:center; color:var(--green);}
-.action-item b{font-size:10px; color:var(--text); font-weight:700; display:block;}
+/* SIDEBAR DRAWER */
+.sidebar-overlay{
+ position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90; opacity:0; visibility:hidden; transition:.25s; backdrop-filter:blur(2px);
+}
+.sidebar-overlay.show{opacity:1; visibility:visible;}
+.sidebar{
+ position:fixed; top:0; left:0; bottom:0; width:280px; background:var(--card); z-index:100; transform:translateX(-100%); transition:.25s cubic-bezier(0.4, 0, 0.2, 1); display:flex; flex-direction:column; box-shadow:5px 0 25px rgba(0,0,0,0.1);
+}
+.sidebar.open{transform:translateX(0);}
+.sidebar-head{padding:20px; border-bottom:1px solid var(--border); font-weight:800; color:var(--primary); font-size:16px;}
+.sidebar-menu{flex:1; overflow-y:auto; padding:10px 0;}
+.menu-item{
+ display:flex; align-items:center; gap:14px; padding:12px 20px; color:#334155; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; transition:.15s; border-left:3px solid transparent;
+}
+.menu-item:hover, .menu-item.active{background:#F1F5F9; color:var(--primary); border-left-color:var(--primary);}
+.menu-item svg { color: var(--muted); }
+.menu-item.active svg, .menu-item:hover svg { color: var(--primary); }
+.sidebar-divider{height:1px; background:var(--border); margin:8px 0;}
 
-.card{padding:16px; border-radius:20px; background:rgba(15,26,22,.9); border:1px solid var(--border2); margin-bottom:12px;}
-.section-title{display:flex; justify-content:space-between; align-items:center; margin:16px 2px 10px;}
-.section-title h3{font-size:14px; font-weight:800;}
-.section-title span{color:var(--green); font-size:11px; cursor:pointer;}
+/* CONTENT AREA */
+.content{flex:1; overflow-y:auto; padding:20px 16px; background:var(--bg);}
+.page{display:none;}
+.page.active{display:block;}
 
-.badge{display:inline-block; padding:3px 8px; border-radius:8px; font-size:10px; font-weight:700;}
-.badge-orange{background:rgba(255,165,0,.15); color:#ffa500;}
-.badge-green{background:rgba(25,230,160,.15); color:var(--green);}
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; box-shadow:0 2px 4px rgba(0,0,0,0.02);}
+.page-title{font-size:18px; font-weight:800; color:#0F172A; margin-bottom:4px;}
+.page-desc{font-size:12px; color:var(--muted); margin-bottom:16px;}
 
-#toast{position:fixed; bottom:85px; left:50%; transform:translateX(-50%) translateY(15px); background:#0E2119; border:1px solid var(--green); color:var(--white); padding:8px 16px; border-radius:12px; font-size:11px; font-weight:700; opacity:0; visibility:hidden; transition:.2s; z-index:9999; box-shadow:var(--glow);}
+#toast{
+ position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px); background:#0F172A; color:#fff; padding:10px 20px; border-radius:8px; font-size:12px; font-weight:600; opacity:0; visibility:hidden; transition:.2s; z-index:9999; box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
 #toast.show{opacity:1; visibility:visible; transform:translateX(-50%) translateY(0);}
-.hidden{display:none !important;}
 </style>
 </head>
 <body>
 
-<!-- SVG ICON REPOSITORY (Zero Emojis Guarantee) -->
+<!-- SVG REPOSITORY (Zero Emojis) -->
 <svg style="display:none;">
-  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
-  <symbol id="icon-pass" viewBox="0 0 24 24"><path d="M22 10V6c0-1.1-.9-2-2-2H4c-1.1 0-1.99.9-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-9 7.5h-2v-2h2v2zm0-4.5h-2v-6h2v6z"/></symbol>
-  <symbol id="icon-map" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></symbol>
-  <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></symbol>
-  <symbol id="icon-user" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
-  <symbol id="icon-qr" viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></symbol>
-  <symbol id="icon-card" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></symbol>
-  <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></symbol>
-  <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></symbol>
-  <symbol id="icon-gear" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.03 2.18 13.84 2 13.6 2h-4c-.24 0-.43.18-.47.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.23.42.47.42h4c.24 0 .43-.18.47-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></symbol>
+  <symbol id="i-dash" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></symbol>
+  <symbol id="i-ann" viewBox="0 0 24 24"><path d="M18 16v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-6 6c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+  <symbol id="i-visitors" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
+  <symbol id="i-workers" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z"/></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+  <symbol id="i-tenants" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
+  <symbol id="i-vehicles" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.76l.12.34V17z"/></symbol>
+  <symbol id="i-payments" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></symbol>
+  <symbol id="i-complaints" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></symbol>
 </svg>
 
 <div id="app">
-  <!-- SPLASH SCREEN -->
-  <div id="splash">
-    <div class="splash-logo-box">
-      <svg class="svg-icon-lg" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h14v-8h3L12 3z"/></svg>
-    </div>
-    <div class="splash-title">NITEL <span>ESTATE</span></div>
-    <div class="splash-tagline">Secure Living. Smarter Community.</div>
-    <button class="btn btn-emerald" onclick="showAuth()">Get Started</button>
-  </div>
+  <!-- 1. AUTH LOGIN SCREEN -->
+  <div id="auth">
+    <div class="auth-card">
+      <div class="auth-title">Nitel Estate Management System</div>
+      <div class="auth-subtitle">Sign in to continue</div>
 
-  <!-- AUTH SCREEN -->
-  <div id="auth" class="hidden">
-    <div class="auth-wrap">
-      <div class="auth-card">
-        <div style="text-align:center; margin-bottom:20px;">
-          <div style="font-size:22px; font-weight:900;">NITEL <span>ESTATE</span></div>
-          <p style="color:var(--muted); font-size:12px; margin-top:4px;">Secure resident portal access</p>
-        </div>
+      <div class="field" id="nameField" style="display:none;">
+        <label>Full Name</label>
+        <input type="text" id="authName" class="input" placeholder="Tunde Adebanjo">
+      </div>
 
-        <div class="auth-tabs">
-          <button id="loginTab" onclick="setAuthMode('login')">Sign In</button>
-          <button id="signupTab" onclick="setAuthMode('signup')">Claim Account</button>
-        </div>
+      <div class="field">
+        <label>Email or phone number</label>
+        <input type="text" id="authEmail" class="input" placeholder="resident@nitelestate.com">
+      </div>
 
-        <div class="field hidden" id="nameField">
-          <label>Full Name</label>
-          <input type="text" id="authName" class="input" placeholder="Tunde Adebanjo">
-        </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="authPassword" class="input" placeholder="••••••••">
+      </div>
 
-        <div class="field">
-          <label>Email or Phone Number</label>
-          <input type="text" id="authEmail" class="input" placeholder="tunde@nitelestate.com">
-        </div>
+      <div id="authError" style="color:var(--red); font-size:12px; margin-bottom:12px;"></div>
 
-        <div class="field">
-          <label>Password</label>
-          <input type="password" id="authPassword" class="input" placeholder="••••••••">
-        </div>
+      <button class="btn" onclick="submitAuth()" id="authBtn">Sign in</button>
 
-        <div id="authError" style="color:var(--red); font-size:11px; margin-top:10px; text-align:center;"></div>
-
-        <button class="btn btn-emerald" style="margin-top:20px;" onclick="submitAuth()" id="authBtn">Sign In</button>
+      <div style="margin-top:16px; text-align:center;">
+        <span style="font-size:12px; color:var(--muted);" id="toggleAuthText">Already a resident but don't have a login?</span>
+        <a href="javascript:void(0);" onclick="toggleAuthMode()" style="font-size:12px; color:var(--primary); font-weight:700; text-decoration:none; display:block; margin-top:4px;" id="toggleAuthBtn">Claim your account</a>
       </div>
     </div>
+    <div class="auth-footer">
+      Nitel Estate Management System<br>for Nitel Estate, Off Obafemi Awolowo Road, Ikorodu Lagos.
+    </div>
   </div>
 
-  <!-- MAIN APP -->
+  <!-- 2. MAIN APP DASHBOARD & DRAWER -->
   <div id="main" class="hidden">
     <div class="topbar">
-      <div class="brand-mini">
-        <div class="brand-mini-icon">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h14v-8h3L12 3z"/></svg>
-        </div>
-        NITEL <span>ESTATE</span>
+      <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()">
+          <svg class="ico" viewBox="0 0 24 24"><use href="#i-menu"/></svg>
+        </button>
+        <div class="brand-name">Nitel Estate</div>
       </div>
-      <button style="background:0; border:0; color:#fff; cursor:pointer;" onclick="go('profile')">
-        <svg class="svg-icon-lg" viewBox="0 0 24 24"><use href="#icon-gear"/></svg>
-      </button>
+      <div class="topbar-right">
+        <span class="resident-tag" id="residentTitleTag">Mr Tunde Adebanjo · RESIDENT</span>
+      </div>
     </div>
 
+    <!-- SIDEBAR DRAWER OVERLAY & MENU -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-head">Nitel Estate Menu</div>
+      <div class="sidebar-menu">
+        <a class="menu-item active" onclick="navigate('dashboard', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-dash"/></svg> Dashboard</a>
+        <a class="menu-item" onclick="navigate('announcements', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-ann"/></svg> Announcements</a>
+        <a class="menu-item" onclick="navigate('profile', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-user"/></svg> My Profile</a>
+        <a class="menu-item" onclick="navigate('visitors', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-visitors"/></svg> My Visitors</a>
+        <a class="menu-item" onclick="navigate('workers', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-workers"/></svg> My Workers</a>
+        <a class="menu-item" onclick="navigate('household', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-house"/></svg> My Household</a>
+        <a class="menu-item" onclick="navigate('tenants', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-tenants"/></svg> My Tenants</a>
+        <a class="menu-item" onclick="navigate('vehicles', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-vehicles"/></svg> My Vehicles</a>
+        <a class="menu-item" onclick="navigate('payments', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-payments"/></svg> My Payments</a>
+        <a class="menu-item" onclick="navigate('complaints', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-complaints"/></svg> My Complaints</a>
+        <div class="sidebar-divider"></div>
+        <a class="menu-item" onclick="navigate('password', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-lock"/></svg> Change password</a>
+        <a class="menu-item" onclick="signOut()" style="color:var(--red);"><svg class="ico" viewBox="0 0 24 24" style="color:var(--red);"><use href="#i-logout"/></svg> Log out</a>
+      </div>
+    </div>
+
+    <!-- CONTENT VIEWS -->
     <div class="content">
-      <!-- 1. HOME / DASHBOARD -->
-      <div id="home" class="page active">
-        <div class="hero">
-          <div style="font-size:11px; color:var(--green); font-weight:800;">TUE, 21 OCT 2025</div>
-          <h2 id="greetingName">Good morning, Tunde</h2>
-          <p>Welcome back to your estate portal.</p>
-        </div>
-
-        <!-- Outstanding Balance Card -->
-        <div class="card" style="background:linear-gradient(135deg, rgba(255,95,109,0.1), rgba(15,26,22,0.9)); border-color:rgba(255,95,109,0.3);">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase;">Outstanding Payments</div>
-              <div style="font-size:22px; font-weight:900; color:#FF5F6D; margin-top:4px;">₦45,000</div>
-            </div>
-            <button class="btn btn-emerald" style="width:auto; padding:8px 14px; font-size:11px;" onclick="toast('Redirecting to secure gateway...')">Pay Now</button>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="section-title"><h3>Quick Actions</h3></div>
-        <div class="action-grid">
-          <div class="action-item" onclick="go('access')">
-            <div class="action-box"><svg class="svg-icon" viewBox="0 0 24 24"><use href="#icon-pass"/></svg></div>
-            <b>Visitor Pass</b>
-          </div>
-          <div class="action-item" onclick="toast('Complaint form opened')">
-            <div class="action-box"><svg class="svg-icon" viewBox="0 0 24 24"><use href="#icon-alert"/></svg></div>
-            <b>Report Issue</b>
-          </div>
-          <div class="action-item" onclick="toast('Payment history loaded')">
-            <div class="action-box"><svg class="svg-icon" viewBox="0 0 24 24"><use href="#icon-card"/></svg></div>
-            <b>Payments</b>
-          </div>
-          <div class="action-item" onclick="toast('Emergency contacts directory')">
-            <div class="action-box"><svg class="svg-icon" viewBox="0 0 24 24"><use href="#icon-phone"/></svg></div>
-            <b>Services</b>
-          </div>
-        </div>
-
-        <!-- Stats Overview -->
-        <div class="grid2">
-          <div class="stat-box">
-            <div class="stat-lbl">Visitors Today</div>
-            <div class="stat-num">3 <span style="font-size:10px; color:var(--muted); font-weight:400;">Active</span></div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-lbl">Estate Alerts</div>
-            <div class="stat-num" style="color:#FF5F6D;">1 <span style="font-size:10px; color:var(--muted); font-weight:400;">Water Off</span></div>
-          </div>
-        </div>
-
-        <!-- Recent Announcements -->
-        <div class="section-title"><h3>Recent Announcements</h3></div>
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page active">
         <div class="card">
-          <div style="font-weight:800; font-size:12px;">Water supply will be off from 10am</div>
-          <div class="muted" style="margin-top:4px;">Oct 21, 2025 • General Estate Maintenance</div>
-        </div>
-      </div>
-
-      <!-- 2. DIGITAL ACCESS / QR PASS -->
-      <div id="access" class="page">
-        <div class="card" style="text-align:center; padding:24px;">
-          <h3 style="margin-bottom:6px;">Visitor Pass Generation</h3>
-          <div class="muted" style="margin-bottom:16px;">Valid for: 1 hour (Oct 21, 2025 - 10:42 AM)</div>
-          
-          <!-- Vector QR Code Box -->
-          <div style="width:160px; height:160px; background:#fff; margin:0 auto 16px; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:10px;">
-            <svg style="width:100%; height:100%; fill:#050807;" viewBox="0 0 24 24"><use href="#icon-qr"/></svg>
-          </div>
-          <div style="font-weight:800; font-size:12px; margin-bottom:14px;">Visitor ID: VST-7842</div>
-          <button class="btn btn-emerald" onclick="toast('QR Code Copied to Clipboard!')">Share QR Code</button>
-        </div>
-      </div>
-
-      <!-- 3. ESTATE MAP -->
-      <div id="map" class="page">
-        <div class="card" style="height:380px; position:relative; background:#071019; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-          <div style="width:48px; height:48px; border-radius:14px; background:rgba(25,230,160,.1); display:flex; align-items:center; justify-content:center; color:var(--green); margin-bottom:12px;">
-            <svg class="svg-icon-lg" viewBox="0 0 24 24"><use href="#icon-map"/></svg>
-          </div>
-          <h3 style="font-size:15px;">NITEL Estate Satellite Map</h3>
-          <p class="muted" style="margin-top:6px; max-width:250px;">67 Hectares • 5 Avenues • 500+ Homes</p>
-          <button class="btn btn-emerald" style="width:auto; padding:8px 16px; font-size:11px; margin-top:16px;" onclick="toast('Centering map on your property...')">Center on My Location</button>
-        </div>
-      </div>
-
-      <!-- 4. MESSAGES -->
-      <div id="messages" class="page">
-        <div class="section-title"><h3>Estate Broadcasts & Chats</h3></div>
-        <div class="card" onclick="toast('Opening Estate Management Chat...')">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <div style="width:40px; height:40px; border-radius:50%; background:rgba(25,230,160,.2); display:flex; align-items:center; justify-content:center; color:var(--green); font-weight:900;">EM</div>
-            <div style="flex:1;">
-              <div style="font-weight:800; font-size:13px;">Estate Management</div>
-              <div class="muted" style="margin-top:2px;">Welcome to NITEL Estate...</div>
-            </div>
-            <span class="badge badge-green">Active</span>
-          </div>
-        </div>
-        <div class="card" onclick="toast('Opening Security Team Chat...')">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <div style="width:40px; height:40px; border-radius:50%; background:rgba(38,130,255,.2); display:flex; align-items:center; justify-content:center; color:var(--blue); font-weight:900;">SEC</div>
-            <div style="flex:1;">
-              <div style="font-weight:800; font-size:13px;">Security Gate Post</div>
-              <div class="muted" style="margin-top:2px;">All clear at the main gate.</div>
-            </div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-desc">Overview of your estate activities and status.</div>
+          <div style="padding:16px; background:#F8FAFC; border-radius:8px; border:1px solid var(--border);">
+            <div style="font-weight:700; font-size:14px;">Welcome back, <span id="dashName">Tunde</span></div>
+            <div style="font-size:12px; color:var(--muted); margin-top:4px;">Block A, House 12 · Verified Resident</div>
           </div>
         </div>
       </div>
 
-      <!-- 5. PROFILE -->
-      <div id="profile" class="page">
-        <div class="card" style="text-align:center;">
-          <div style="width:72px; height:72px; border-radius:50%; background:rgba(25,230,160,.2); border:2px solid var(--green); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; color:var(--green);" id="profileInitials">TA</div>
-          <h3 id="profileName">Tunde Adebanjo</h3>
-          <p class="muted" style="margin-top:2px;">Block A, House 12</p>
-          <p style="color:var(--green); font-size:11px; font-weight:700; margin-top:4px;">Resident (Verified)</p>
+      <!-- ANNOUNCEMENTS -->
+      <div id="page-announcements" class="page">
+        <div class="card">
+          <div class="page-title">Announcements</div>
+          <div class="page-desc">Latest estate notices and broadcast memos.</div>
+          <div style="padding:12px 0; border-bottom:1px solid var(--border);">
+            <div style="font-weight:700; font-size:13px;">Water supply maintenance</div>
+            <div style="font-size:11px; color:var(--muted);">Water supply will be off from 10am - 2pm today.</div>
+          </div>
         </div>
-        <div style="margin-top:14px;">
-          <button class="btn btn-outline" style="color:var(--red); border-color:rgba(255,95,109,.3);" onclick="signOut()">Sign Out</button>
+      </div>
+
+      <!-- MY PROFILE -->
+      <div id="page-profile" class="page">
+        <div class="card">
+          <div class="page-title">My Profile</div>
+          <div class="page-desc">Resident personal verification details.</div>
+          <div style="font-size:13px; line-height:1.8;">
+            <div><b>Name:</b> <span id="profName">Tunde Adebanjo</span></div>
+            <div><b>Email:</b> <span id="profEmail">resident@nitelestate.com</span></div>
+            <div><b>Property:</b> Block A, House 12</div>
+            <div><b>Status:</b> Resident (Verified)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MY VISITORS -->
+      <div id="page-visitors" class="page">
+        <div class="card">
+          <div class="page-title">My Visitors</div>
+          <div class="page-desc">Generate gate access passes for guests.</div>
+          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Visitor pass generated successfully!')">+ Request visitor pass</button>
+          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No active visitor passes.</div>
+        </div>
+      </div>
+
+      <!-- MY WORKERS -->
+      <div id="page-workers" class="page">
+        <div class="card">
+          <div class="page-title">My Workers</div>
+          <div class="page-desc">Request access for contractors/labourers while the estate is under development.</div>
+          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Worker access request submitted!')">+ Request worker access</button>
+          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No worker access requests yet.</div>
+        </div>
+      </div>
+
+      <!-- MY HOUSEHOLD -->
+      <div id="page-household" class="page">
+        <div class="card">
+          <div class="page-title">My Household</div>
+          <div class="page-desc">Manage family members and household dependents.</div>
+          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Household member added')">+ Add member</button>
+          <div style="font-size:12px; color:var(--muted);">Adebanjo Family (3 Members registered)</div>
+        </div>
+      </div>
+
+      <!-- MY TENANTS -->
+      <div id="page-tenants" class="page">
+        <div class="card">
+          <div class="page-title">My Tenants</div>
+          <div class="page-desc">Manage registered tenants for your property.</div>
+          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No active tenants registered.</div>
+        </div>
+      </div>
+
+      <!-- MY VEHICLES -->
+      <div id="page-vehicles" class="page">
+        <div class="card">
+          <div class="page-title">My Vehicles</div>
+          <div class="page-desc">Register cars for automated gate RFID recognition.</div>
+          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Vehicle registration submitted')">+ Register vehicle</button>
+          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No vehicles registered.</div>
+        </div>
+      </div>
+
+      <!-- MY PAYMENTS -->
+      <div id="page-payments" class="page">
+        <div class="card">
+          <div class="page-title">My Payments</div>
+          <div class="page-desc">View levies, service charges and receipts.</div>
+          <div style="padding:12px; background:#FEF2F2; border:1px solid #FEE2E2; border-radius:8px; margin-bottom:14px;">
+            <div style="font-size:11px; color:#991B1B; font-weight:700;">OUTSTANDING BALANCE</div>
+            <div style="font-size:18px; font-weight:800; color:#DC2626; margin-top:2px;">₦45,000</div>
+          </div>
+          <button class="btn" style="height:40px; font-size:13px;" onclick="toast('Connecting to secure payment gateway...')">Pay Outstanding Balance</button>
+        </div>
+      </div>
+
+      <!-- MY COMPLAINTS -->
+      <div id="page-complaints" class="page">
+        <div class="card">
+          <div class="page-title">My Complaints</div>
+          <div class="page-desc">Report estate facility issues or security concerns.</div>
+          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Complaint ticket opened')">+ New Complaint</button>
+          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No complaints submitted.</div>
+        </div>
+      </div>
+
+      <!-- CHANGE PASSWORD -->
+      <div id="page-password" class="page">
+        <div class="card">
+          <div class="page-title">Change Password</div>
+          <div class="page-desc">Update your account security credentials.</div>
+          <div class="field"><label>Current Password</label><input type="password" class="input"></div>
+          <div class="field"><label>New Password</label><input type="password" class="input"></div>
+          <button class="btn" style="height:40px; font-size:13px;" onclick="toast('Password updated successfully!')">Update Password</button>
         </div>
       </div>
     </div>
-
-    <!-- BOTTOM NAVIGATION (5 TABS MATCHING MOCKUP) -->
-    <nav class="nav">
-      <button data-page="home" class="active" onclick="go('home')">
-        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-home"/></svg><span>Home</span>
-      </button>
-      <button data-page="access" onclick="go('access')">
-        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-pass"/></svg><span>Pass</span>
-      </button>
-      <button data-page="map" onclick="go('map')">
-        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-map"/></svg><span>Map</span>
-      </button>
-      <button data-page="messages" onclick="go('messages')">
-        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-chat"/></svg><span>Chats</span>
-      </button>
-      <button data-page="profile" onclick="go('profile')">
-        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-user"/></svg><span>Profile</span>
-      </button>
-    </nav>
   </div>
+
   <div id="toast"></div>
 </div>
 
 <script>
+let isSignup = false;
 let currentUser = null;
 
-function showAuth(){
- document.getElementById("splash").classList.add("hide");
- document.getElementById("auth").classList.remove("hidden");
- document.getElementById("auth").style.display="block";
-}
-
-function setAuthMode(mode){
- document.getElementById("loginTab").classList.toggle("active", mode==="login");
- document.getElementById("signupTab").classList.toggle("active", mode==="signup");
- document.getElementById("nameField").classList.toggle("hidden", mode==="login");
- document.getElementById("authBtn").textContent = mode==="signup" ? "Claim Account" : "Sign In";
+function toggleAuthMode(){
+ isSignup = !isSignup;
+ document.getElementById("nameField").style.display = isSignup ? "block" : "none";
+ document.getElementById("authBtn").textContent = isSignup ? "Create account" : "Sign in";
+ document.getElementById("toggleAuthText").textContent = isSignup ? "Already have a login?" : "Already a resident but don't have a login?";
+ document.getElementById("toggleAuthBtn").textContent = isSignup ? "Sign in here" : "Claim your account";
 }
 
 function submitAuth(){
@@ -359,25 +324,45 @@ function submitAuth(){
  const pass = document.getElementById("authPassword").value;
  const name = document.getElementById("authName").value.trim();
  const err = document.getElementById("authError");
- 
- if(!email || !pass){ err.textContent="Please enter your email/phone and password."; return; }
- 
+
+ if(!email || !pass){ err.textContent = "Please enter your email/phone and password."; return; }
+ if(isSignup && !name){ err.textContent = "Please enter your full name."; return; }
+
  currentUser = { name: name || "Tunde Adebanjo", email };
  localStorage.setItem("nitel_user", JSON.stringify(currentUser));
  
+ launchApp();
+}
+
+function launchApp(){
  document.getElementById("auth").classList.add("hidden");
  document.getElementById("main").classList.remove("hidden");
  document.getElementById("main").style.display="flex";
- updateProfileUI();
- toast("Welcome to NITEL Estate!");
+ 
+ if(currentUser){
+  document.getElementById("dashName").textContent = currentUser.name.split(" ")[0];
+  document.getElementById("profName").textContent = currentUser.name;
+  document.getElementById("profEmail").textContent = currentUser.email;
+  document.getElementById("residentTitleTag").textContent = currentUser.name + " · RESIDENT";
+ }
+ toast("Welcome to Nitel Estate");
 }
 
-function go(page){
- document.querySelectorAll(".page").forEach(s=>s.classList.remove("active"));
- document.getElementById(page)?.classList.add("active");
- document.querySelectorAll(".nav button").forEach(b=>{
-  b.classList.toggle("active", b.getAttribute("data-page")===page);
- });
+function toggleSidebar(){
+ const sidebar = document.getElementById("sidebar");
+ const overlay = document.getElementById("sidebarOverlay");
+ sidebar.classList.toggle("open");
+ overlay.classList.toggle("show");
+}
+
+function navigate(pageId, el){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById("page-" + pageId).classList.add("active");
+ 
+ document.querySelectorAll(".sidebar-menu .menu-item").forEach(i=>i.classList.remove("active"));
+ el.classList.add("active");
+ 
+ toggleSidebar();
 }
 
 function toast(msg){
@@ -386,14 +371,6 @@ function toast(msg){
  el.textContent = msg;
  el.classList.add("show");
  setTimeout(()=>el.classList.remove("show"), 2500);
-}
-
-function updateProfileUI(){
- if(!currentUser) return;
- document.getElementById("profileName").textContent = currentUser.name;
- document.getElementById("greetingName").textContent = "Good morning, " + currentUser.name.split(" ")[0];
- const initials = currentUser.name.split(" ").map(n=>n[0]).join("").toUpperCase();
- document.getElementById("profileInitials").textContent = initials;
 }
 
 function signOut(){
@@ -405,10 +382,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
  const saved = localStorage.getItem("nitel_user");
  if(saved){
   currentUser = JSON.parse(saved);
-  document.getElementById("splash").classList.add("hide");
-  document.getElementById("main").classList.remove("hidden");
-  document.getElementById("main").style.display="flex";
-  updateProfileUI();
+  launchApp();
  }
 });
 </script>
