@@ -31,7 +31,7 @@
     .menu-btn { background: 0; border: 0; cursor: pointer; color: #0F172A; display: flex; align-items: center; }
     .brand-name { font-size: 16px; font-weight: 800; color: var(--primary); }
     .topbar-right { display: flex; align-items: center; gap: 12px; }
-    .resident-tag { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .resident-tag { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
 
     .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; opacity: 0; visibility: hidden; transition: .25s; backdrop-filter: blur(2px); }
     .sidebar-overlay.show { opacity: 1; visibility: visible; }
@@ -437,7 +437,7 @@
 
   <script>
     var SUPABASE_URL = "https://ebnqjrywiozamdnxwzhk.supabase.co";
-    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MTk3NDAsImV4cCI6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
+    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwicm9sZSI6ImVibnFqcnl3aW96YW1kbnh3emhrIiwiaWF0IjoxNzg2ODE5NzQwLCJleHA6MjEwMjM5NTc0MH0.ani_b6Yfa-gwxnFPFt9YGNGTeYaq5-al-Q1s37uUK8I";
     var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     var isSignup = false;
@@ -529,7 +529,6 @@
         document.getElementById("prof-road").textContent = profile.road || "Road M";
         document.getElementById("prof-full-address").textContent = profile.address || "Road M, Nitel Estate";
 
-        // Count vehicles
         var { count } = await supabaseClient.from('estate_vehicles').select('*', { count: 'exact', head: true }).eq('resident_id', userId);
         document.getElementById("dash-card-vehicles-count").textContent = count || 0;
       }
@@ -681,12 +680,14 @@
           resident_id: currentUserId, amount: amount, method: method, note: note, status: 'SUCCESS'
         }]);
         
-        // Automatically deduct from outstanding balance
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('outstanding_balance').eq('user_id', currentUserId).maybeSingle();
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('outstanding_balance, total_paid').eq('user_id', currentUserId).maybeSingle();
         if (profile) {
           var newOut = Math.max(0, (profile.outstanding_balance || 0) - amount);
-          await supabaseClient.from('resident_profiles').update({ outstanding_balance: newOut }).eq('user_id', currentUserId);
+          var newPaid = (profile.total_paid || 0) + amount;
+          await supabaseClient.from('resident_profiles').update({ outstanding_balance: newOut, total_paid: newPaid }).eq('user_id', currentUserId);
+          
           document.getElementById("dash-card-outstanding").textContent = "₦" + newOut.toLocaleString();
+          document.getElementById("dash-card-total-paid").textContent = "₦" + newPaid.toLocaleString();
           document.getElementById("dash-outstanding-text").textContent = "You have an outstanding balance of ₦" + newOut.toLocaleString() + ".";
         }
 
@@ -764,39 +765,6 @@
       `).join('');
     }
 
-    // --- RANDOM BIKER DISPATCH ---
-    async function requestRandomBikerDispatch() {
-      var dest = document.getElementById("order-biker-dest").value.trim();
-      if (!dest) { alert("Enter destination drop-off address."); return; }
-
-      try {
-        var { data: bikers } = await supabaseClient.from('estate_bikers').select('*').eq('status', 'AVAILABLE');
-        if (!bikers || bikers.length === 0) {
-          alert("No available bikers online right now.");
-          return;
-        }
-
-        var randomBiker = bikers[Math.floor(Math.random() * bikers.length)];
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('full_name').eq('user_id', currentUserId).maybeSingle();
-        var resName = profile ? profile.full_name : "Resident";
-
-        await supabaseClient.from('biker_orders').insert([{
-          resident_id: currentUserId, resident_name: resName, address: dest, biker_id: randomBiker.id, biker_name: randomBiker.full_name, biker_phone: randomBiker.bike_number, bike_plate: randomBiker.bike_plate, status: 'DISPATCHED'
-        }]);
-
-        var box = document.getElementById("biker-dispatch-result");
-        box.style.display = "block";
-        box.innerHTML = `
-          <b>Assigned Rider:</b> ${escapeHtml(randomBiker.full_name)}<br>
-          <b>Phone No:</b> ${escapeHtml(randomBiker.bike_number)}<br>
-          <b>Plate Number:</b> ${escapeHtml(randomBiker.bike_plate)}<br>
-          <b>Destination:</b> ${escapeHtml(dest)}<br>
-          <span style="color:#15803d; font-weight:800;">Rider has been assigned and dispatched!</span>
-        `;
-        toast("Biker dispatched successfully.");
-      } catch (err) { alert("Error: " + err.message); }
-    }
-
     // --- ADMIN MANAGEMENT PORTAL FUNCTIONS ---
     async function adminPostAnnouncement() {
       var title = document.getElementById("ann-title").value.trim();
@@ -829,19 +797,6 @@
         document.getElementById("biker-reg-phone").value = "";
         document.getElementById("biker-reg-plate").value = "";
       } catch (err) { alert("Error: " + err.message); }
-    }
-
-    async function loadAdminComplaints() {
-      var feed = document.getElementById("admin-complaints-feed");
-      var { data } = await supabaseClient.from('estate_complaints').select('*').order('created_at', { ascending: false });
-      if (!data || data.length === 0) { feed.innerHTML = "<small>No complaints received.</small>"; return; }
-      feed.innerHTML = data.map(c => `
-        <div style="background:#fff; border:1px solid var(--border); padding:8px; border-radius:6px; margin-bottom:6px; font-size:11px;">
-          <b>[${escapeHtml(c.category)}] Priority: ${escapeHtml(c.priority)}</b><br>
-          ${escapeHtml(c.description)}<br>
-          <small style="color:var(--muted);">Status: ${c.status}</small>
-        </div>
-      `).join('');
     }
 
     async function loadAdminUsersDropdown() {
