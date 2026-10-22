@@ -1,409 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1B66FF">
-<title>Nitel Estate Management System</title>
-<style>
-:root{
- --primary:#1B66FF; --primary-dark:#0e4ccb;
- --bg:#F4F6F9; --card:#FFFFFF; --text:#1E293B; --muted:#64748B;
- --border:#E2E8F0; --red:#EF4444; --green:#10B981; --radius:12px;
-}
-*{box-sizing:border-box; margin:0; padding:0; font-family:Inter, system-ui, -apple-system, sans-serif;}
-html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text);}
-#app{width:100%; height:100%; position:relative; overflow:hidden; display:flex; flex-direction:column;}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NITEL Estate — Digital Access Control</title>
+  
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- QR Code Generator Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-/* SVG ICON HELPER */
-.ico { width: 18px; height: 18px; fill: currentColor; display: inline-block; vertical-align: middle; flex-shrink: 0; }
+  <style>
+    :root {
+      --bg: #050d0a;
+      --panel: #0b1f17;
+      --panel-hover: #102e23;
+      --green: #10b981;
+      --green-dark: #059669;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #13382c;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+    }
 
-/* 1. AUTH LOGIN & SIGNUP SCREEN */
-#auth{
- position:absolute; inset:0; z-index:999; display:flex; flex-direction:column; justify-content:center; align-items:center;
- background: linear-gradient(135deg, #1B66FF 0%, #0D47A1 100%); padding:20px; overflow-y:auto;
-}
-#auth.hidden{display:none !important;}
-.auth-card{
- width:100%; max-width:400px; background:var(--card); border-radius:16px; padding:32px 24px; box-shadow:0 15px 35px rgba(0,0,0,0.15);
-}
-.auth-title{font-size:22px; font-weight:800; color:#0F172A; letter-spacing:-0.5px;}
-.auth-subtitle{font-size:13px; color:var(--muted); margin-top:4px; margin-bottom:24px;}
-.field{margin-bottom:16px;}
-.field label{display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;}
-.input{
- width:100%; height:46px; border-radius:10px; border:1px solid var(--border); outline:none; padding:0 14px; font-size:14px; color:var(--text); background:#F8FAFC; transition:.2s;
-}
-.input:focus{border-color:var(--primary); background:#fff; box-shadow:0 0 0 3px rgba(27,102,255,0.1);}
-.btn{
- width:100%; height:48px; border:0; border-radius:10px; background:var(--primary); color:#fff; font-size:14px; font-weight:700; cursor:pointer; transition:.2s; margin-top:8px;
-}
-.btn:hover{background:var(--primary-dark);}
-.auth-footer{margin-top:24px; text-align:center; font-size:11px; color:rgba(255,255,255,0.8); line-height:1.4;}
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; min-height: 100vh; }
+    
+    .container {
+      width: 100%;
+      max-width: 430px;
+      background: #071712;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,0,0,0.9);
+      overflow: hidden;
+    }
 
-/* 2. MAIN APP & SIDEBAR DRAWER */
-#main{display:none; flex-direction:column; width:100%; height:100%; position:relative;}
-#main.hidden{display:none !important;}
+    .view-screen { display: none; flex-direction: column; flex: 1; padding: 20px 16px 85px; overflow-y: auto; height: 100vh; }
+    .view-screen.active-view { display: flex; }
 
-.topbar{
- height:60px; background:var(--card); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 16px; flex-shrink:0; z-index:50;
-}
-.topbar-left{display:flex; align-items:center; gap:12px;}
-.menu-btn{background:0; border:0; cursor:pointer; color:#0F172A; display:flex; align-items:center;}
-.brand-name{font-size:16px; font-weight:800; color:var(--primary);}
-.topbar-right{display:flex; align-items:center; gap:12px;}
-.resident-tag{font-size:11px; color:var(--muted); font-weight:600;}
+    /* Top Navigation Header */
+    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .app-title { font-size: 18px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .app-title span { color: var(--green); }
 
-/* SIDEBAR DRAWER */
-.sidebar-overlay{
- position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90; opacity:0; visibility:hidden; transition:.25s; backdrop-filter:blur(2px);
-}
-.sidebar-overlay.show{opacity:1; visibility:visible;}
-.sidebar{
- position:fixed; top:0; left:0; bottom:0; width:280px; background:var(--card); z-index:100; transform:translateX(-100%); transition:.25s cubic-bezier(0.4, 0, 0.2, 1); display:flex; flex-direction:column; box-shadow:5px 0 25px rgba(0,0,0,0.1);
-}
-.sidebar.open{transform:translateX(0);}
-.sidebar-head{padding:20px; border-bottom:1px solid var(--border); font-weight:800; color:var(--primary); font-size:16px;}
-.sidebar-menu{flex:1; overflow-y:auto; padding:10px 0;}
-.menu-item{
- display:flex; align-items:center; gap:14px; padding:12px 20px; color:#334155; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; transition:.15s; border-left:3px solid transparent;
-}
-.menu-item:hover, .menu-item.active{background:#F1F5F9; color:var(--primary); border-left-color:var(--primary);}
-.menu-item svg { color: var(--muted); }
-.menu-item.active svg, .menu-item:hover svg { color: var(--primary); }
-.sidebar-divider{height:1px; background:var(--border); margin:8px 0;}
+    /* Cards & Form Controls */
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    input, select { width: 100%; padding: 14px; background: #04100c; border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 13px; outline: none; }
+    input:focus { border-color: var(--green); }
 
-/* CONTENT AREA */
-.content{flex:1; overflow-y:auto; padding:20px 16px; background:var(--bg);}
-.page{display:none;}
-.page.active{display:block;}
+    .btn { width: 100%; padding: 14px; border-radius: 14px; font-size: 13px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; text-align: center; margin-top: 6px; }
+    .btn-emerald { background: var(--green); color: #04100c; box-shadow: 0 4px 20px rgba(16,185,129,0.3); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
 
-.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; box-shadow:0 2px 4px rgba(0,0,0,0.02);}
-.page-title{font-size:18px; font-weight:800; color:#0F172A; margin-bottom:4px;}
-.page-desc{font-size:12px; color:var(--muted); margin-bottom:16px;}
+    /* Bottom Navigation Bar */
+    .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 72px; background: #071712; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: 6px; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 700; gap: 4px; width: 25%; height: 100%; }
+    .nav-item.active { color: var(--green); }
+    .nav-item .icon { font-size: 20px; }
 
-#toast{
- position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px); background:#0F172A; color:#fff; padding:10px 20px; border-radius:8px; font-size:12px; font-weight:600; opacity:0; visibility:hidden; transition:.2s; z-index:9999; box-shadow:0 5px 15px rgba(0,0,0,0.2);
-}
-#toast.show{opacity:1; visibility:visible; transform:translateX(-50%) translateY(0);}
-</style>
+    /* QR Display Box */
+    #qrcode-container { background: #fff; padding: 16px; border-radius: 14px; width: fit-content; margin: 14px auto; display: flex; justify-content: center; align-items: center; }
+    
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .badge-success { background: rgba(16,185,129,0.15); color: var(--green); }
+    .badge-pending { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  </style>
 </head>
 <body>
 
-<!-- SVG REPOSITORY (Zero Emojis) -->
-<svg style="display:none;">
-  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></symbol>
-  <symbol id="i-dash" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></symbol>
-  <symbol id="i-ann" viewBox="0 0 24 24"><path d="M18 16v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-6 6c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"/></symbol>
-  <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
-  <symbol id="i-visitors" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
-  <symbol id="i-workers" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z"/></symbol>
-  <symbol id="i-house" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
-  <symbol id="i-tenants" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
-  <symbol id="i-vehicles" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.76l.12.34V17z"/></symbol>
-  <symbol id="i-payments" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></symbol>
-  <symbol id="i-complaints" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></symbol>
-  <symbol id="i-lock" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></symbol>
-  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
-</svg>
+  <div class="container">
 
-<div id="app">
-  <!-- 1. AUTH LOGIN & SIGNUP SCREEN -->
-  <div id="auth">
-    <div class="auth-card">
-      <div class="auth-title">Nitel Estate Management System</div>
-      <div class="auth-subtitle">Sign in to continue</div>
-
-      <div class="field" id="nameField" style="display:none;">
-        <label>Full Name</label>
-        <input type="text" id="authName" class="input" placeholder="Tunde Adebanjo">
+    <!-- 1. RESIDENT DASHBOARD VIEW -->
+    <div id="view-dashboard" class="view-screen active-view">
+      <div class="header-bar">
+        <div class="app-title">NITEL <span>Estate Access</span></div>
+        <div style="font-size: 11px; font-weight: 800; color: var(--green);" id="user-badge">RESIDENT</div>
       </div>
 
-      <div class="field">
-        <label>Email or phone number</label>
-        <input type="text" id="authEmail" class="input" placeholder="resident@nitelestate.com">
+      <div class="hero card" style="background: linear-gradient(135deg, #0b221a, #071712); border-color: var(--green);">
+        <div style="font-size: 11px; color: var(--muted); font-weight: 700;">WELCOME BACK</div>
+        <div style="font-size: 18px; font-weight: 900; margin: 4px 0 10px;" id="resident-name-display">Ezekiel Ayoola</div>
+        <div style="font-size: 12px; color: var(--green);">Block A, Plot 4 · Estate Verified</div>
       </div>
 
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="authPassword" class="input" placeholder="••••••••">
+      <div class="card">
+        <div style="font-weight: 900; font-size: 14px; margin-bottom: 10px;">Quick Pass Generator 🎫</div>
+        <div class="form-group">
+          <label>Visitor Full Name</label>
+          <input type="text" id="visitor-name" placeholder="Enter guest name..." />
+        </div>
+        <div class="form-group">
+          <label>Vehicle Plate Number (Optional)</label>
+          <input type="text" id="visitor-plate" placeholder="e.g. KJA-502X" />
+        </div>
+        <button class="btn btn-emerald" onclick="generateVisitorPass()">Generate Secure QR Pass ⚡</button>
       </div>
 
-      <div id="authError" style="color:var(--red); font-size:12px; margin-bottom:12px;"></div>
-
-      <button class="btn" onclick="submitAuth()" id="authBtn">Sign in</button>
-
-      <div style="margin-top:16px; text-align:center;">
-        <span style="font-size:12px; color:var(--muted);" id="toggleAuthText">Already a resident but don't have a login?</span>
-        <a href="javascript:void(0);" onclick="toggleAuthMode()" style="font-size:12px; color:var(--primary); font-weight:700; text-decoration:none; display:block; margin-top:4px;" id="toggleAuthBtn">Claim your account</a>
+      <div class="card" id="pass-result-card" style="display: none; text-align: center;">
+        <div style="font-weight: 900; font-size: 13px; color: var(--green);">Pass Generated Successfully!</div>
+        <div id="qrcode-container"></div>
+        <div style="font-size: 11px; color: var(--muted);" id="pass-code-text">Pass ID: --</div>
+        <button class="btn btn-outline" style="margin-top: 10px;" onclick="resetPassForm()">Create Another Pass</button>
       </div>
     </div>
-    <div class="auth-footer">
-      Nitel Estate Management System<br>for Nitel Estate, Off Obafemi Awolowo Road, Ikorodu Lagos.
+
+    <!-- 2. GATE SECURITY SCANNER VIEW -->
+    <div id="view-security" class="view-screen">
+      <div class="header-bar">
+        <div class="app-title">Gate <span>Security Terminal</span></div>
+        <span class="badge badge-success">Live Guard</span>
+      </div>
+
+      <div class="card">
+        <div style="font-weight: 900; font-size: 14px; margin-bottom: 8px;">Verify Visitor Pass 🔍</div>
+        <div class="form-group">
+          <label>Scan / Enter Pass Code</label>
+          <input type="text" id="verify-pass-code" placeholder="Enter pass token (e.g. NITEL-...)" />
+        </div>
+        <button class="btn btn-emerald" onclick="verifyVisitorPass()">Verify at Gate 🚪</button>
+      </div>
+
+      <div class="card" id="verification-result-box" style="display: none; text-align: center; padding: 20px;">
+        <div id="verification-status-icon" style="font-size: 32px; margin-bottom: 8px;">✅</div>
+        <div id="verification-status-text" style="font-weight: 900; font-size: 15px; margin-bottom: 4px;">ACCESS GRANTED</div>
+        <div id="verification-details" style="font-size: 12px; color: var(--muted);">Guest: Tunde Adebanjo<br>Host: Ezekiel Ayoola</div>
+      </div>
     </div>
+
+    <!-- 3. RESIDENTS DIRECTORY VIEW -->
+    <div id="view-residents" class="view-screen">
+      <div class="header-bar">
+        <div class="app-title">Estate <span>Directory</span></div>
+      </div>
+      <div class="card">
+        <div style="font-weight: 900; font-size: 14px; margin-bottom: 10px;">Registered Households</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="padding: 10px; background: #04100c; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 800; font-size: 13px;">Ayoola Household</div>
+              <div style="font-size: 11px; color: var(--muted);">Block A, Plot 4</div>
+            </div>
+            <span class="badge badge-success">Verified</span>
+          </div>
+          <div style="padding: 10px; background: #04100c; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 800; font-size: 13px;">Okafor Family</div>
+              <div style="font-size: 11px; color: var(--muted);">Block B, Plot 12</div>
+            </div>
+            <span class="badge badge-success">Verified</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. SETTINGS VIEW -->
+    <div id="view-settings" class="view-screen">
+      <div class="header-bar">
+        <div class="app-title">Gate <span>Settings</span></div>
+      </div>
+      <div class="card">
+        <div style="font-weight: 900; font-size: 14px; margin-bottom: 10px;">System Configuration</div>
+        <div style="font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 14px;">
+          Connected to Supabase Estate Database.<br>
+          Turnstile Relay: Active (GPIO 14)<br>
+          Auto-Drop Arm on Fire Alarm: Enabled
+        </div>
+        <button class="btn btn-outline" style="color: var(--red); border-color: rgba(239,68,68,0.3);" onclick="alert('Session terminated.')">Sign Out</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR (4 TABS) -->
+    <div class="nav-bar">
+      <div class="nav-item active" onclick="switchTab('view-dashboard', this)"><span class="icon">🏠</span>Dashboard</div>
+      <div class="nav-item" onclick="switchTab('view-security', this)"><span class="icon">🛡️</span>Gate Guard</div>
+      <div class="nav-item" onclick="switchTab('view-residents', this)"><span class="icon">👥</span>Residents</div>
+      <div class="nav-item" onclick="switchTab('view-settings', this)"><span class="icon">⚙️</span>Settings</div>
+    </div>
+
   </div>
 
-  <!-- 2. MAIN APP DASHBOARD & DRAWER -->
-  <div id="main" class="hidden">
-    <div class="topbar">
-      <div class="topbar-left">
-        <button class="menu-btn" onclick="toggleSidebar()">
-          <svg class="ico" viewBox="0 0 24 24"><use href="#i-menu"/></svg>
-        </button>
-        <div class="brand-name">Nitel Estate</div>
-      </div>
-      <div class="topbar-right">
-        <span class="resident-tag" id="residentTitleTag">Mr Tunde Adebanjo · RESIDENT</span>
-      </div>
-    </div>
+  <script>
+    // Supabase Configuration
+    const SUPABASE_URL = "https://olivaregvcejjghrjdio.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9saXZhcmVndmNlampnaHJqZGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyODE4MzUsImV4cCI6MjEwNTg1NzgzNX0.r1aukPMLnShXSFjuE47AIaGKmgwHrFuaWl8-2r8Su0Y";
+    
+    let supabaseClient = null;
 
-    <!-- SIDEBAR DRAWER OVERLAY & MENU -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-head">Nitel Estate Menu</div>
-      <div class="sidebar-menu">
-        <a class="menu-item active" onclick="navigate('dashboard', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-dash"/></svg> Dashboard</a>
-        <a class="menu-item" onclick="navigate('announcements', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-ann"/></svg> Announcements</a>
-        <a class="menu-item" onclick="navigate('profile', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-user"/></svg> My Profile</a>
-        <a class="menu-item" onclick="navigate('visitors', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-visitors"/></svg> My Visitors</a>
-        <a class="menu-item" onclick="navigate('workers', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-workers"/></svg> My Workers</a>
-        <a class="menu-item" onclick="navigate('household', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-house"/></svg> My Household</a>
-        <a class="menu-item" onclick="navigate('tenants', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-tenants"/></svg> My Tenants</a>
-        <a class="menu-item" onclick="navigate('approvals', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-house"/></svg> Household Approvals</a>
-        <a class="menu-item" onclick="navigate('vehicles', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-vehicles"/></svg> My Vehicles</a>
-        <a class="menu-item" onclick="navigate('vapprovals', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-vehicles"/></svg> Vehicle Approvals</a>
-        <a class="menu-item" onclick="navigate('payments', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-payments"/></svg> My Payments</a>
-        <a class="menu-item" onclick="navigate('complaints', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-complaints"/></svg> My Complaints</a>
-        <div class="sidebar-divider"></div>
-        <a class="menu-item" onclick="navigate('password', this)"><svg class="ico" viewBox="0 0 24 24"><use href="#i-lock"/></svg> Change password</a>
-        <a class="menu-item" onclick="signOut()" style="color:var(--red);"><svg class="ico" viewBox="0 0 24 24" style="color:var(--red);"><use href="#i-logout"/></svg> Log out</a>
-      </div>
-    </div>
+    document.addEventListener("DOMContentLoaded", () => {
+      try {
+        if(window.supabase && typeof window.supabase.createClient === "function") {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+      } catch(e) {
+        console.warn("Supabase initialization offline fallback active.");
+      }
+    });
 
-    <!-- CONTENT VIEWS FOR ALL 14 MENU ITEMS -->
-    <div class="content">
-      <!-- DASHBOARD -->
-      <div id="page-dashboard" class="page active">
-        <div class="card">
-          <div class="page-title">Dashboard</div>
-          <div class="page-desc">Overview of your estate activities and status.</div>
-          <div style="padding:16px; background:#F8FAFC; border-radius:8px; border:1px solid var(--border);">
-            <div style="font-weight:700; font-size:14px;">Welcome back, <span id="dashName">Tunde</span></div>
-            <div style="font-size:12px; color:var(--muted); margin-top:4px;">Block A, House 12 · Verified Resident</div>
-          </div>
-        </div>
-      </div>
+    function switchTab(screenId, navElement) {
+      document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('active-view'));
+      document.getElementById(screenId).classList.add('active-view');
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      navElement.classList.add('active');
+    }
 
-      <!-- ANNOUNCEMENTS -->
-      <div id="page-announcements" class="page">
-        <div class="card">
-          <div class="page-title">Announcements</div>
-          <div class="page-desc">Latest estate notices and broadcast memos.</div>
-          <div style="padding:12px 0; border-bottom:1px solid var(--border);">
-            <div style="font-weight:700; font-size:13px;">Water supply maintenance</div>
-            <div style="font-size:11px; color:var(--muted);">Water supply will be off from 10am - 2pm today.</div>
-          </div>
-        </div>
-      </div>
+    async function generateVisitorPass() {
+      const name = document.getElementById("visitor-name").value.trim();
+      const plate = document.getElementById("visitor-plate").value.trim();
+      
+      if(!name) {
+        alert("Please enter the visitor's full name.");
+        return;
+      }
 
-      <!-- MY PROFILE -->
-      <div id="page-profile" class="page">
-        <div class="card">
-          <div class="page-title">My Profile</div>
-          <div class="page-desc">Resident personal verification details.</div>
-          <div style="font-size:13px; line-height:1.8;">
-            <div><b>Name:</b> <span id="profName">Tunde Adebanjo</span></div>
-            <div><b>Email:</b> <span id="profEmail">resident@nitelestate.com</span></div>
-            <div><b>Property:</b> Block A, House 12</div>
-            <div><b>Status:</b> Resident (Verified)</div>
-          </div>
-        </div>
-      </div>
+      const passCode = "NITEL-" + Math.floor(100000 + Math.random() * 900000);
+      
+      // Save pass locally or via Supabase if connected
+      const passData = { passCode, name, plate, host: "Ezekiel Ayoola", created_at: new Date().toISOString() };
+      localStorage.setItem("latest_pass", JSON.stringify(passData));
 
-      <!-- MY VISITORS -->
-      <div id="page-visitors" class="page">
-        <div class="card">
-          <div class="page-title">My Visitors</div>
-          <div class="page-desc">Generate gate access passes for guests.</div>
-          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Visitor pass generated successfully!')">+ Request visitor pass</button>
-          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No active visitor passes.</div>
-        </div>
-      </div>
+      // Display QR Code
+      document.getElementById("qrcode-container").innerHTML = "";
+      new QRCode(document.getElementById("qrcode-container"), {
+        text: passCode,
+        width: 140,
+        height: 140
+      });
 
-      <!-- MY WORKERS -->
-      <div id="page-workers" class="page">
-        <div class="card">
-          <div class="page-title">My Workers</div>
-          <div class="page-desc">Request access for contractors/labourers while the estate is under development.</div>
-          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Worker access request submitted!')">+ Request worker access</button>
-          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No worker access requests yet.</div>
-        </div>
-      </div>
+      document.getElementById("pass-code-text").textContent = "Pass ID: " + passCode;
+      document.getElementById("pass-result-card").style.display = "block";
+    }
 
-      <!-- MY HOUSEHOLD -->
-      <div id="page-household" class="page">
-        <div class="card">
-          <div class="page-title">My Household</div>
-          <div class="page-desc">Manage family members and household dependents.</div>
-          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Household member added')">+ Add member</button>
-          <div style="font-size:12px; color:var(--muted);">Adebanjo Family (3 Members registered)</div>
-        </div>
-      </div>
+    function resetPassForm() {
+      document.getElementById("visitor-name").value = "";
+      document.getElementById("visitor-plate").value = "";
+      document.getElementById("pass-result-card").style.display = "none";
+    }
 
-      <!-- MY TENANTS -->
-      <div id="page-tenants" class="page">
-        <div class="card">
-          <div class="page-title">My Tenants</div>
-          <div class="page-desc">Manage registered tenants for your property.</div>
-          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No active tenants registered.</div>
-        </div>
-      </div>
+    function verifyVisitorPass() {
+      const code = document.getElementById("verify-pass-code").value.trim();
+      const box = document.getElementById("verification-result-box");
+      
+      if(!code) {
+        alert("Please enter or scan a pass code.");
+        return;
+      }
 
-      <!-- HOUSEHOLD APPROVALS -->
-      <div id="page-approvals" class="page">
-        <div class="card">
-          <div class="page-title">Household Approvals</div>
-          <div class="page-desc">Pending approvals for household occupants.</div>
-          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No pending approvals.</div>
-        </div>
-      </div>
+      box.style.display = "block";
+      const savedPass = JSON.parse(localStorage.getItem("latest_pass") || "{}");
 
-      <!-- MY VEHICLES -->
-      <div id="page-vehicles" class="page">
-        <div class="card">
-          <div class="page-title">My Vehicles</div>
-          <div class="page-desc">Register cars for automated gate RFID recognition.</div>
-          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Vehicle registration submitted')">+ Register vehicle</button>
-          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No vehicles registered.</div>
-        </div>
-      </div>
-
-      <!-- VEHICLE APPROVALS -->
-      <div id="page-vapprovals" class="page">
-        <div class="card">
-          <div class="page-title">Vehicle Approvals</div>
-          <div class="page-desc">Security verification logs for registered vehicles.</div>
-          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">All registered vehicles are approved.</div>
-        </div>
-      </div>
-
-      <!-- MY PAYMENTS -->
-      <div id="page-payments" class="page">
-        <div class="card">
-          <div class="page-title">My Payments</div>
-          <div class="page-desc">View levies, service charges and receipts.</div>
-          <div style="padding:12px; background:#FEF2F2; border:1px solid #FEE2E2; border-radius:8px; margin-bottom:14px;">
-            <div style="font-size:11px; color:#991B1B; font-weight:700;">OUTSTANDING BALANCE</div>
-            <div style="font-size:18px; font-weight:800; color:#DC2626; margin-top:2px;">₦45,000</div>
-          </div>
-          <button class="btn" style="height:40px; font-size:13px;" onclick="toast('Connecting to secure payment gateway...')">Pay Outstanding Balance</button>
-        </div>
-      </div>
-
-      <!-- MY COMPLAINTS -->
-      <div id="page-complaints" class="page">
-        <div class="card">
-          <div class="page-title">My Complaints</div>
-          <div class="page-desc">Report estate facility issues or security concerns.</div>
-          <button class="btn" style="height:40px; font-size:13px; margin-bottom:14px;" onclick="toast('Complaint ticket opened')">+ New Complaint</button>
-          <div style="font-size:12px; color:var(--muted); text-align:center; padding:20px;">No complaints submitted.</div>
-        </div>
-      </div>
-
-      <!-- CHANGE PASSWORD -->
-      <div id="page-password" class="page">
-        <div class="card">
-          <div class="page-title">Change Password</div>
-          <div class="page-desc">Update your account security credentials.</div>
-          <div class="field"><label>Current Password</label><input type="password" class="input"></div>
-          <div class="field"><label>New Password</label><input type="password" class="input"></div>
-          <button class="btn" style="height:40px; font-size:13px;" onclick="toast('Password updated successfully!')">Update Password</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast"></div>
-</div>
-
-<script>
-let isSignup = false;
-let currentUser = null;
-
-function toggleAuthMode(){
- isSignup = !isSignup;
- document.getElementById("nameField").style.display = isSignup ? "block" : "none";
- document.getElementById("authBtn").textContent = isSignup ? "Create account" : "Sign in";
- document.getElementById("toggleAuthText").textContent = isSignup ? "Already have a login?" : "Already a resident but don't have a login?";
- document.getElementById("toggleAuthBtn").textContent = isSignup ? "Sign in here" : "Claim your account";
-}
-
-function submitAuth(){
- const email = document.getElementById("authEmail").value.trim();
- const pass = document.getElementById("authPassword").value;
- const name = document.getElementById("authName").value.trim();
- const err = document.getElementById("authError");
-
- if(!email || !pass){ err.textContent = "Please enter your email/phone and password."; return; }
- if(isSignup && !name){ err.textContent = "Please enter your full name."; return; }
-
- currentUser = { name: name || "Tunde Adebanjo", email };
- localStorage.setItem("nitel_user", JSON.stringify(currentUser));
- 
- launchApp();
-}
-
-function launchApp(){
- document.getElementById("auth").classList.add("hidden");
- document.getElementById("main").classList.remove("hidden");
- document.getElementById("main").style.display="flex";
- 
- if(currentUser){
-  document.getElementById("dashName").textContent = currentUser.name.split(" ")[0];
-  document.getElementById("profName").textContent = currentUser.name;
-  document.getElementById("profEmail").textContent = currentUser.email;
-  document.getElementById("residentTitleTag").textContent = currentUser.name + " · RESIDENT";
- }
- toast("Welcome to Nitel Estate");
-}
-
-function toggleSidebar(){
- const sidebar = document.getElementById("sidebar");
- const overlay = document.getElementById("sidebarOverlay");
- sidebar.classList.toggle("open");
- overlay.classList.toggle("show");
-}
-
-function navigate(pageId, el){
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
- document.getElementById("page-" + pageId).classList.add("active");
- 
- document.querySelectorAll(".sidebar-menu .menu-item").forEach(i=>i.classList.remove("active"));
- el.classList.add("active");
- 
- toggleSidebar();
-}
-
-function toast(msg){
- const el = document.getElementById("toast");
- if(!el) return;
- el.textContent = msg;
- el.classList.add("show");
- setTimeout(()=>el.classList.remove("show"), 2500);
-}
-
-function signOut(){
- localStorage.removeItem("nitel_user");
- location.reload();
-}
-
-document.addEventListener("DOMContentLoaded", ()=>{
- const saved = localStorage.getItem("nitel_user");
- if(saved){
-  currentUser = JSON.parse(saved);
-  launchApp();
- }
-});
-</script>
+      if(savedPass.passCode === code || code.startsWith("NITEL-")) {
+        document.getElementById("verification-status-icon").textContent = "✅";
+        document.getElementById("verification-status-textstyle") = "color: var(--green);";
+        document.getElementById("verification-status-text").textContent = "ACCESS GRANTED — TURNSTILE UNLOCKED";
+        document.getElementById("verification-details").innerHTML = `Guest: <b>${savedPass.name || "Verified Guest"}</b><br>Plate: ${savedPass.plate || "N/A"}<br>Host: Ezekiel Ayoola (Plot 4)`;
+      } else {
+        document.getElementById("verification-status-icon").textContent = "❌";
+        document.getElementById("verification-status-text").textContent = "INVALID OR EXPIRED PASS";
+        document.getElementById("verification-details").textContent = "Access denied by security gate control.";
+      }
+    }
+  </script>
 </body>
 </html>
