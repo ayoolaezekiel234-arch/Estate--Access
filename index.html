@@ -116,7 +116,7 @@
         </div>
 
         <div class="field">
-          <label>Password</label>
+          <label>Password (Minimum 8 Characters)</label>
           <input type="password" id="authPassword" class="input" placeholder="••••••••" />
         </div>
 
@@ -585,6 +585,7 @@
       var err = document.getElementById("authError");
 
       if(!email || !pass){ err.textContent = "Please enter email and password."; return; }
+      if(isSignup && pass.length < 8){ err.textContent = "Security Notice: Password must be at least 8 characters long."; return; }
       if(isSignup && !name){ err.textContent = "Please enter your full name."; return; }
 
       try {
@@ -613,7 +614,6 @@
           alert("Account creation should be approved under 24hrs if profile is proven valid.");
           toggleAuthMode();
         } else {
-          // Robust Sign In handler: if user exists in Auth, sign in. If password is wrong or invalid, catch error cleanly.
           var { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
           if (error) throw error;
           currentUserId = data.user.id;
@@ -621,7 +621,7 @@
           await checkPermissionsAndLaunch(currentUserId, currentUserEmail);
         }
       } catch (e) {
-        err.textContent = e.message || "Invalid login credentials.";
+        err.textContent = e.message || "Database error saving new user.";
       }
     }
 
@@ -1227,7 +1227,7 @@
         <div style="background:#fff; border:1px solid #E9D5FF; padding:8px; border-radius:6px; margin-bottom:4px; font-size:11px;">
           <b>${escapeHtml(l.admin_email)}</b>: ${escapeHtml(l.action_performed)}<br>
           <span style="color:var(--muted);">${escapeHtml(l.target_details || '')}</span>
-          <small style="display:block; color:var(--muted); font-size:9px;">${new Date(l.created_st || l.created_at).toLocaleString()}</small>
+          <small style="display:block; color:var(--muted); font-size:9px;">${new Date(l.created_at).toLocaleString()}</small>
         </div>
       `).join('');
     }
