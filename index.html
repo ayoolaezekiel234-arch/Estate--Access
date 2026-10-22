@@ -95,6 +95,21 @@
           <input type="text" id="authRoad" class="input" placeholder="Road M" />
         </div>
 
+        <div class="field" id="phoneField" style="display:none;">
+          <label>Phone Number</label>
+          <input type="tel" id="authPhone" class="input" placeholder="+14045639480" />
+        </div>
+
+        <div class="field" id="emergencyField" style="display:none;">
+          <label>Emergency Contact</label>
+          <input type="tel" id="authEmergency" class="input" placeholder="08057270731" />
+        </div>
+
+        <div class="field" id="typeField" style="display:none;">
+          <label>Resident Type</label>
+          <select id="authType" class="input" style="background:#fff;"><option value="OWNER">Owner</option><option value="TENANT">Tenant</option></select>
+        </div>
+
         <div class="field">
           <label>Email or phone number</label>
           <input type="text" id="authEmail" class="input" placeholder="resident@nitelestate.com" />
@@ -167,23 +182,23 @@
 
           <div class="card" style="padding:16px;">
             <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Outstanding</div>
-            <div style="font-size:22px; font-weight:900; color:#DC2626; margin-top:2px;" id="dash-card-outstanding">₦0</div>
+            <div style="font-size:22px; font-weight:900; color:#DC2626; margin-top:2px;" id="dash-card-outstanding">₦1,500</div>
           </div>
 
           <div class="card" style="padding:16px;">
             <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Total Due</div>
-            <div style="font-size:22px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-total-due">₦0</div>
+            <div style="font-size:22px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-total-due">₦636,500</div>
           </div>
 
           <div class="card" style="padding:16px;">
             <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Total Paid</div>
-            <div style="font-size:22px; font-weight:900; color:#15803d; margin-top:2px;" id="dash-card-total-paid">₦0</div>
+            <div style="font-size:22px; font-weight:900; color:#15803d; margin-top:2px;" id="dash-card-total-paid">₦635,000</div>
           </div>
 
           <div class="card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
             <div>
               <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Vehicles</div>
-              <div style="font-size:20px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-vehicles-count">0</div>
+              <div style="font-size:20px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-vehicles-count">1</div>
             </div>
           </div>
 
@@ -202,7 +217,7 @@
           </div>
 
           <div class="card">
-            <div style="font-size:12px; color:var(--text); margin-bottom:10px;" id="dash-outstanding-text">You have an outstanding balance of ₦0.</div>
+            <div style="font-size:12px; color:var(--text); margin-bottom:10px;" id="dash-outstanding-text">You have an outstanding balance of ₦1,500.</div>
             <button class="btn" style="margin:0;" onclick="navigate('payments', document.querySelectorAll('.sidebar-menu .menu-item')[10])">Submit payment receipt</button>
           </div>
         </div>
@@ -219,16 +234,24 @@
         <!-- PROFILE -->
         <div id="page-profile" class="page">
           <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <div class="page-title" style="margin:0;">Property</div>
-              <button class="btn" style="width:auto; padding:0 12px; height:32px; font-size:11px; margin:0;" onclick="toast('Property details locked by admin.')">Edit</button>
+            <div class="page-title" style="margin-bottom:12px;">Personal details</div>
+            <div style="font-size:12px; line-height:1.8; color:var(--text);">
+              <div><b>Full name:</b> <span id="prof-fullname">Mr Ayoola Joshua Adekunle</span></div>
+              <div><b>Phone:</b> <span id="prof-phone">+14045639480</span></div>
+              <div><b>Email:</b> <span id="prof-email">user@gmail.com</span></div>
+              <div><b>Emergency contact:</b> <span id="prof-emergency">08057270731</span></div>
+              <div><b>Resident type:</b> <span id="prof-type" style="background:#DBEAFE; color:#1D4ED8; padding:2px 6px; border-radius:4px; font-weight:700;">OWNER</span></div>
+              <div><b>Status:</b> <span style="background:#DCFCE7; color:#15803d; padding:2px 6px; border-radius:4px; font-weight:700;">ACTIVE</span></div>
+              <div><b>Registered:</b> 2026-01-01</div>
             </div>
+          </div>
+          <div class="card">
+            <div class="page-title" style="margin-bottom:8px;">Property</div>
             <div style="font-size:12px; line-height:1.8; color:var(--text);">
               <div><b>House number:</b> <span id="prof-house">ROAD M-027</span></div>
               <div><b>Road:</b> <span id="prof-road">Road M</span></div>
               <div><b>Address:</b> <span id="prof-full-address">Road M, Nitel Estate</span></div>
-              <div><b>Postcode:</b> Not set</div>
-              <div><b>Occupancy:</b> <span style="background:#DCFCE7; color:#15803d; padding:2px 6px; border-radius:4px; font-weight:700;">OCCUPIED</span></div>
+              <div><b>Occupancy:</b> OCCUPIED</div>
             </div>
           </div>
         </div>
@@ -329,10 +352,18 @@
             <div class="page-title" style="color:var(--red);">Admin Management Portal</div>
             <div class="page-desc">Professional administrative console for estate oversight.</div>
 
-            <!-- 1. Review & Approve Pending Resident Profiles -->
+            <!-- Pending Approvals -->
             <div style="background:#EFF6FF; border:1px solid #BFDBFE; padding:12px; border-radius:10px; margin-bottom:12px;">
               <div style="font-weight:800; font-size:13px; color:#1E40AF; margin-bottom:6px;">Pending Resident Approvals (<24hrs)</div>
               <div id="admin-pending-users-feed"><small>Loading pending accounts...</small></div>
+            </div>
+
+            <!-- Admin Privileges Management -->
+            <div style="background:#F8FAFC; border:1px solid var(--border); padding:12px; border-radius:10px; margin-bottom:12px;">
+              <div style="font-weight:800; font-size:13px; color:#0F172A; margin-bottom:6px;">Manage Admin Privileges (Super Admin Only)</div>
+              <div class="field"><label>Select Resident / User</label><select id="admin-priv-user-select" class="input" style="background:#fff;"><option value="">-- Select User --</option></select></div>
+              <div class="field"><label>Role</label><select id="admin-priv-role" class="input" style="background:#fff;"><option value="ADMIN">ADMIN</option><option value="RESIDENT">RESIDENT (Remove Admin)</option></select></div>
+              <button class="btn" style="background:#1D4ED8;" onclick="superAdminUpdateUserRole()">Update Admin Access</button>
             </div>
 
             <div style="background:#F8FAFC; border:1px solid var(--border); padding:12px; border-radius:10px; margin-bottom:12px;">
@@ -461,6 +492,9 @@
       document.getElementById("nameField").style.display = isSignup ? "block" : "none";
       document.getElementById("houseField").style.display = isSignup ? "block" : "none";
       document.getElementById("roadField").style.display = isSignup ? "block" : "none";
+      document.getElementById("phoneField").style.display = isSignup ? "block" : "none";
+      document.getElementById("emergencyField").style.display = isSignup ? "block" : "none";
+      document.getElementById("typeField").style.display = isSignup ? "block" : "none";
       document.getElementById("auth-subtitle-text").textContent = isSignup ? "Register property & profile" : "Sign in to continue";
       document.getElementById("authBtn").textContent = isSignup ? "Create account" : "Sign in";
     }
@@ -471,6 +505,9 @@
       var name = document.getElementById("authName").value.trim();
       var house = document.getElementById("authHouse").value.trim() || "ROAD M-027";
       var road = document.getElementById("authRoad").value.trim() || "Road M";
+      var phone = document.getElementById("authPhone").value.trim() || "+14045639480";
+      var emergency = document.getElementById("authEmergency").value.trim() || "08057270731";
+      var resType = document.getElementById("authType").value || "OWNER";
       var err = document.getElementById("authError");
 
       if(!email || !pass){ err.textContent = "Please enter email and password."; return; }
@@ -478,18 +515,28 @@
 
       try {
         if (isSignup) {
+          // Clear any existing database profile first if re-registering
           var { data: authData, error: authErr } = await supabaseClient.auth.signUp({ email: email, password: pass });
-          if (authErr) throw authErr;
-          var userId = authData.user.id;
+          if (authErr && !authErr.message.includes("already registered")) throw authErr;
           
-          await supabaseClient.from('resident_profiles').upsert([{
-            user_id: userId, full_name: name, phone: email, house_number: house, road: road, address: road + ', Nitel Estate', outstanding_balance: 0, total_due: 0, total_paid: 0, account_status: 'PENDING'
-          }], { onConflict: 'user_id' });
+          var userId = authData.user ? authData.user.id : null;
+          if (!userId) {
+            var { data: signInData } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
+            userId = signInData.user.id;
+          }
+
+          // Delete any existing profile/role to start fresh cleanly
+          await supabaseClient.from('resident_profiles').delete().eq('user_id', userId);
+          await supabaseClient.from('user_roles').delete().eq('user_id', userId);
+          
+          await supabaseClient.from('resident_profiles').insert([{
+            user_id: userId, full_name: name, phone: phone, house_number: house, road: road, address: road + ', Nitel Estate', emergency_contact: emergency, resident_type: resType, outstanding_balance: 0, total_due: 0, total_paid: 0, account_status: 'PENDING'
+          }]);
 
           var roleToAssign = (email.toLowerCase() === 'ezekielayoola234@gmail.com') ? 'SUPER_ADMIN' : 'RESIDENT';
-          await supabaseClient.from('user_roles').upsert([{ user_id: userId, role: roleToAssign }], { onConflict: 'user_id' });
+          await supabaseClient.from('user_roles').insert([{ user_id: userId, role: roleToAssign }]);
 
-          alert("Account creation should be approved under 24hrs if profile is proven valid.");
+          alert("Account creation successful! Account creation should be approved under 24hrs if profile is proven valid.");
           toggleAuthMode();
         } else {
           var { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
@@ -499,7 +546,7 @@
           await checkPermissionsAndLaunch(currentUserId, currentUserEmail);
         }
       } catch (e) {
-        err.textContent = e.message || "Authentication failed.";
+        err.textContent = e.message || "Database error saving new user.";
       }
     }
 
@@ -538,6 +585,13 @@
         
         document.getElementById("dash-property-house").textContent = profile.house_number || "ROAD M-027";
         document.getElementById("dash-property-road").textContent = profile.road || "Road M";
+        
+        // Profile view binding
+        document.getElementById("prof-fullname").textContent = profile.full_name;
+        document.getElementById("prof-phone").textContent = profile.phone || "+14045639480";
+        document.getElementById("prof-email").textContent = currentUserEmail;
+        document.getElementById("prof-emergency").textContent = profile.emergency_contact || "08057270731";
+        document.getElementById("prof-type").textContent = profile.resident_type || "OWNER";
         document.getElementById("prof-house").textContent = profile.house_number || "ROAD M-027";
         document.getElementById("prof-road").textContent = profile.road || "Road M";
         document.getElementById("prof-full-address").textContent = profile.address || "Road M, Nitel Estate";
@@ -570,7 +624,7 @@
       if (pageId === 'vehicles') loadVehiclesList();
       if (pageId === 'payments') loadPaymentHistory();
       if (pageId === 'announcements') loadAnnouncementsFeed();
-      if (pageId === 'admin') { loadAdminComplaints(); loadAdminUsersDropdown(); loadAdminPendingUsers(); }
+      if (pageId === 'admin') { loadAdminComplaints(); loadAdminUsersDropdown(); loadAdminPendingUsers(); loadAdminPrivilegeUsersDropdown(); }
     }
 
     function openAccessPassQR() {
@@ -885,6 +939,42 @@
       }
     }
 
+    async function loadAdminPrivilegeUsersDropdown() {
+      var select = document.getElementById("admin-priv-user-select");
+      var { data } = await supabaseClient.from('resident_profiles').select('user_id, full_name, phone');
+      if (data && data.length > 0) {
+        select.innerHTML = data.map(u => `<option value="${u.user_id}">${escapeHtml(u.full_name)} (${escapeHtml(u.phone)})</option>`).join('');
+      } else {
+        select.innerHTML = '<option value="">No users found</option>';
+      }
+    }
+
+    async function superAdminUpdateUserRole() {
+      var targetUserId = document.getElementById("admin-priv-user-select").value;
+      var newRole = document.getElementById("admin-priv-role").value;
+
+      if (!targetUserId) { alert("Select a user."); return; }
+
+      try {
+        // Check if target user is super admin
+        var { data: targetRole } = await supabaseClient.from('user_roles').select('role').eq('user_id', targetUserId).maybeSingle();
+        if (targetRole && targetRole.role === 'SUPER_ADMIN') {
+          alert("Error: Cannot modify Super Admin privileges.");
+          return;
+        }
+
+        // Verify current logged-in user is Super Admin
+        var { data: myRole } = await supabaseClient.from('user_roles').select('role').eq('user_id', currentUserId).maybeSingle();
+        if (!myRole || myRole.role !== 'SUPER_ADMIN') {
+          alert("Error: Only the Super Admin can promote or demote administrators.");
+          return;
+        }
+
+        await supabaseClient.from('user_roles').upsert([{ user_id: targetUserId, role: newRole }], { onConflict: 'user_id' });
+        alert("User role updated successfully.");
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
     async function adminUpdateResidentFinancials() {
       var userId = document.getElementById("admin-user-select").value;
       var out = parseFloat(document.getElementById("admin-set-outstanding").value);
@@ -909,7 +999,7 @@
       if(!el) return;
       el.textContent = msg;
       el.classList.add("show");
-      setTimeout(function() { el.classList.remove("show"); }, 2500);
+      setTimeout(function() { el.classList.remove("show"), 2500; });
     }
 
     async function signOut(){
