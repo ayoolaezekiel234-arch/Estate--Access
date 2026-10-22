@@ -333,7 +333,7 @@
           </div>
         </div>
 
-        <!-- BUSINESS PORTAL (NEW FEATURE) -->
+        <!-- BUSINESS PORTAL -->
         <div id="page-business-portal" class="page">
           <div class="card">
             <div class="page-title">Business & Worker Portal</div>
@@ -605,7 +605,7 @@
             user_id: userId, full_name: name, phone: phone, house_number: house, road: road, address: road + ', Nitel Estate', emergency_contact: emergency, resident_type: resType, outstanding_balance: 0, total_due: 0, total_paid: 0, account_status: 'PENDING'
           }]);
 
-          var roleToAssign = (email.toLowerCase() === 'ezekielayoola234@gmail.com') ? 'SUPER_ADMIN' : 'RESIDENT';
+          var roleToAssign = (email.toLowerCase() === 'ezekielayoola234@gmail.com' || email.toLowerCase() === 'ayoolaezekiel234@gmail.com') ? 'SUPER_ADMIN' : 'RESIDENT';
           await supabaseClient.from('user_roles').insert([{ user_id: userId, role: roleToAssign }]);
 
           sendAccountCreationSMS(phone, name);
@@ -613,6 +613,7 @@
           alert("Account creation should be approved under 24hrs if profile is proven valid.");
           toggleAuthMode();
         } else {
+          // Robust Sign In handler: if user exists in Auth, sign in. If password is wrong or invalid, catch error cleanly.
           var { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
           if (error) throw error;
           currentUserId = data.user.id;
@@ -620,12 +621,12 @@
           await checkPermissionsAndLaunch(currentUserId, currentUserEmail);
         }
       } catch (e) {
-        err.textContent = e.message || "Database error saving new user.";
+        err.textContent = e.message || "Invalid login credentials.";
       }
     }
 
     async function checkPermissionsAndLaunch(userId, email) {
-      var isSuperAdmin = email && email.toLowerCase() === 'ezekielayoola234@gmail.com';
+      var isSuperAdmin = email && (email.toLowerCase() === 'ezekielayoola234@gmail.com' || email.toLowerCase() === 'ayoolaezekiel234@gmail.com');
 
       if (isSuperAdmin) {
         await supabaseClient.from('user_roles').upsert([{ user_id: userId, role: 'SUPER_ADMIN' }], { onConflict: 'user_id' });
@@ -773,7 +774,7 @@
         if (!biz) { alert("Business not found."); return; }
 
         var token = "NITEL-WORKER-" + crypto.randomUUID();
-        var expiry = new Date(Date.now() + 180 * 24 * 3600000).toISOString(); // 6 Months Pass
+        var expiry = new Date(Date.now() + 180 * 24 * 3600000).toISOString();
 
         var { error } = await supabaseClient.from('business_workers').insert([{
           business_id: biz.id, worker_full_name: name, phone: phone, role: role, secure_token: token, expiry_date: expiry, status: 'ACTIVE'
@@ -811,7 +812,6 @@
     }
     function closeWorkerQRModal() { document.getElementById("worker-qr-modal").style.display = "none"; }
 
-    // --- ADMIN BUSINESS APPROVALS ---
     async function loadAdminPendingBusinesses() {
       var feed = document.getElementById("admin-pending-businesses-feed");
       var { data } = await supabaseClient.from('estate_businesses').select('*').eq('status', 'PENDING');
@@ -1171,7 +1171,7 @@
       if (!targetUserId) { alert("Select a user."); return; }
 
       try {
-        var isSuperAdmin = currentUserEmail && currentUserEmail.toLowerCase() === 'ezekielayoola234@gmail.com';
+        var isSuperAdmin = currentUserEmail && (currentUserEmail.toLowerCase() === 'ezekielayoola234@gmail.com' || currentUserEmail.toLowerCase() === 'ayoolaezekiel234@gmail.com');
         var { data: myRole } = await supabaseClient.from('user_roles').select('role').eq('user_id', currentUserId).maybeSingle();
         var isCurrentAdmin = myRole && (myRole.role === 'ADMIN' || myRole.role === 'SUPER_ADMIN');
 
@@ -1181,7 +1181,7 @@
         }
 
         var { data: targetProfile } = await supabaseClient.from('resident_profiles').select('phone, full_name').eq('user_id', targetUserId).maybeSingle();
-        var targetIsSuperAdmin = targetProfile && targetProfile.phone && targetProfile.phone.toLowerCase().includes('ezekielayoola234@gmail.com');
+        var targetIsSuperAdmin = targetProfile && targetProfile.phone && (targetProfile.phone.toLowerCase().includes('ezekielayoola234') || targetProfile.phone.toLowerCase().includes('ayoolaezekiel234'));
 
         if (targetIsSuperAdmin) {
           alert("Error: Cannot modify Super Admin privileges.");
@@ -1227,7 +1227,7 @@
         <div style="background:#fff; border:1px solid #E9D5FF; padding:8px; border-radius:6px; margin-bottom:4px; font-size:11px;">
           <b>${escapeHtml(l.admin_email)}</b>: ${escapeHtml(l.action_performed)}<br>
           <span style="color:var(--muted);">${escapeHtml(l.target_details || '')}</span>
-          <small style="display:block; color:var(--muted); font-size:9px;">${new Date(l.created_at).toLocaleString()}</small>
+          <small style="display:block; color:var(--muted); font-size:9px;">${new Date(l.created_st || l.created_at).toLocaleString()}</small>
         </div>
       `).join('');
     }
