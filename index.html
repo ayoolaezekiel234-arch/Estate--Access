@@ -26,8 +26,6 @@
     body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; min-height: 100vh; }
     .container { width: 100%; max-width: 430px; background: var(--bg); min-height: 100vh; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 25px rgba(0,0,0,0.06); }
 
-    .ico { width: 18px; height: 18px; fill: currentColor; display: inline-block; vertical-align: middle; flex-shrink: 0; }
-
     .topbar { height: 60px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; z-index: 50; }
     .topbar-left { display: flex; align-items: center; gap: 12px; }
     .menu-btn { background: 0; border: 0; cursor: pointer; color: #0F172A; display: flex; align-items: center; }
@@ -52,7 +50,8 @@
     .auth-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; margin-bottom: 24px; }
     .field { margin-bottom: 16px; }
     .field label { display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px; }
-    .input, select { width: 100%; height: 46px; border-radius: 10px; border: 1px solid var(--border); outline: none; padding: 0 14px; font-size: 14px; color: var(--text); background: #F8FAFC; }
+    .input, select, textarea { width: 100%; height: 46px; border-radius: 10px; border: 1px solid var(--border); outline: none; padding: 0 14px; font-size: 14px; color: var(--text); background: #F8FAFC; }
+    textarea.input { height: auto; padding: 10px; }
     .btn { width: 100%; height: 48px; border: 0; border-radius: 10px; background: var(--primary); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: .2s; margin-top: 8px; text-align: center; }
     .btn:hover { background: var(--primary-dark); }
     .auth-footer { margin-top: 24px; text-align: center; font-size: 11px; color: rgba(255,255,255,0.8); line-height: 1.4; }
@@ -64,6 +63,9 @@
     .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     .page-title { font-size: 18px; font-weight: 800; color: #0F172A; margin-bottom: 4px; }
     .page-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+
+    .qr-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; }
+    .qr-modal-content { background: #fff; width: 90%; max-width: 320px; padding: 24px; border-radius: 16px; text-align: center; }
 
     #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); background: #0F172A; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 12px; font-weight: 600; opacity: 0; visibility: hidden; transition: .2s; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
     #toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
@@ -80,7 +82,7 @@
 
         <div class="field" id="nameField" style="display:none;">
           <label>Full Name</label>
-          <input type="text" id="authName" class="input" placeholder="Tunde Adebanjo" />
+          <input type="text" id="authName" class="input" placeholder="Mr Ayoola Joshua Adekunle" />
         </div>
 
         <div class="field">
@@ -112,7 +114,7 @@
       <div class="topbar">
         <div class="topbar-left">
           <button class="menu-btn" onclick="toggleSidebar()">
-            <svg class="ico" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            <svg style="width:20px;height:20px;fill:currentColor;" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
           </button>
           <div class="brand-name">Nitel Estate</div>
         </div>
@@ -121,10 +123,10 @@
         </div>
       </div>
 
-      <!-- SIDEBAR DRAWER (Exact Screenshot Layout) -->
+      <!-- SIDEBAR DRAWER (Matching Screenshot Layout) -->
       <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
       <div class="sidebar" id="sidebar">
-        <div class="sidebar-head">Nitel Estate Menu</div>
+        <div class="sidebar-head">Nitel Estate</div>
         <div class="sidebar-menu">
           <a class="menu-item active" onclick="navigate('dashboard', this)">Dashboard</a>
           <a class="menu-item" onclick="navigate('announcements', this)">Announcements</a>
@@ -138,8 +140,8 @@
           <a class="menu-item" onclick="navigate('vehicle-approvals', this)">Vehicle Approvals</a>
           <a class="menu-item" onclick="navigate('payments', this)">My Payments</a>
           <a class="menu-item" onclick="navigate('complaints', this)">My Complaints</a>
-          <a class="menu-item" onclick="navigate('biker-order', this)" style="color:var(--primary); font-weight:800;">🛵 Order Estate Biker</a>
-          <a class="menu-item" id="adminMenuBtn" onclick="navigate('admin', this)" style="display:none; color:var(--red); font-weight:800;">🛡️ Super Admin & Bikers Portal</a>
+          <a class="menu-item" onclick="navigate('order-biker', this)" style="color:var(--primary); font-weight:700;">Order Estate Biker</a>
+          <a class="menu-item" id="adminMenuLink" onclick="navigate('admin', this)" style="display:none; color:var(--red); font-weight:800;">Admin Management Portal</a>
           <div class="sidebar-divider"></div>
           <a class="menu-item" onclick="navigate('password', this)">Change password</a>
           <a class="menu-item" onclick="signOut()" style="color:var(--red);">Log out</a>
@@ -148,26 +150,85 @@
 
       <!-- PAGES -->
       <div class="content">
-        <!-- DASHBOARD -->
+        <!-- DASHBOARD (Matching Screenshot Layout) -->
         <div id="page-dashboard" class="page active">
-          <div class="card">
-            <div class="page-title">Dashboard</div>
-            <div class="page-desc">Overview of your estate activities and status.</div>
-            <div style="padding:16px; background:#F8FAFC; border-radius:8px; border:1px solid var(--border);">
-              <div style="font-weight:700; font-size:14px;">Welcome, <span id="dashName">Resident</span></div>
-              <div style="font-size:12px; color:var(--muted); margin-top:4px;">Resident portal.</div>
+          <div style="font-size:22px; font-weight:800; color:#0F172A; margin-bottom:2px;" id="dashWelcomeTitle">Welcome, Resident</div>
+          <div style="font-size:12px; color:var(--muted); margin-bottom:16px;">Resident portal.</div>
+
+          <!-- Financial Cards -->
+          <div class="card" style="padding:16px;">
+            <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Outstanding</div>
+            <div style="font-size:22px; font-weight:900; color:#DC2626; margin-top:2px;" id="dash-card-outstanding">₦1,500</div>
+          </div>
+
+          <div class="card" style="padding:16px;">
+            <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Total Due</div>
+            <div style="font-size:22px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-total-due">₦636,500</div>
+          </div>
+
+          <div class="card" style="padding:16px;">
+            <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Total Paid</div>
+            <div style="font-size:22px; font-weight:900; color:#15803d; margin-top:2px;" id="dash-card-total-paid">₦635,000</div>
+          </div>
+
+          <div class="card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase;">Vehicles</div>
+              <div style="font-size:20px; font-weight:900; color:#0F172A; margin-top:2px;" id="dash-card-vehicles-count">1</div>
             </div>
+          </div>
+
+          <!-- Access Pass Card -->
+          <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:800; font-size:14px;">My Access Pass</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px; line-height:1.3;">Present this QR at the gate to be scanned as yourself.</div>
+            </div>
+            <button class="btn" style="width:auto; padding:0 14px; height:38px; font-size:12px; margin:0;" onclick="openAccessPassQR()">View QR pass</button>
+          </div>
+
+          <!-- Property Card -->
+          <div class="card">
+            <div style="font-weight:800; font-size:14px; margin-bottom:8px;">Property</div>
+            <div style="font-weight:900; font-size:15px; color:#0F172A;" id="dash-property-house">ROAD M-027</div>
+            <div style="font-size:12px; color:var(--muted);" id="dash-property-road">Road M</div>
+          </div>
+
+          <!-- Outstanding Balance Quick Pay Card -->
+          <div class="card">
+            <div style="font-size:12px; color:var(--text); margin-bottom:10px;" id="dash-outstanding-text">You have an outstanding balance of ₦1,500.</div>
+            <button class="btn" style="margin:0;" onclick="navigate('payments', document.querySelectorAll('.sidebar-menu .menu-item')[10])">Submit payment receipt</button>
           </div>
         </div>
 
         <!-- ANNOUNCEMENTS -->
-        <div id="page-announcements" class="page"><div class="card"><div class="page-title">Announcements</div><div class="page-desc">Latest estate notices.</div><p style="font-size:12px;">Water supply maintenance from 10am - 2pm today.</p></div></div>
-        
-        <!-- PROFILE -->
-        <div id="page-profile" class="page"><div class="card"><div class="page-title">My Profile</div><div class="page-desc">Resident details.</div><p style="font-size:13px;" id="profDetails">Loading profile...</p></div></div>
+        <div id="page-announcements" class="page">
+          <div class="card">
+            <div class="page-title">Announcements</div>
+            <div class="page-desc">Official memos and notices from estate administration.</div>
+            <div id="announcements-feed"><small>Loading announcements...</small></div>
+          </div>
+        </div>
+
+        <!-- PROFILE / PROPERTY VIEW (Matching Screenshot) -->
+        <div id="page-profile" class="page">
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div class="page-title" style="margin:0;">Property</div>
+              <button class="btn" style="width:auto; padding:0 12px; height:32px; font-size:11px; margin:0;" onclick="toast('Property details locked by admin.')">Edit</button>
+            </div>
+            <div style="font-size:12px; line-height:1.8; color:var(--text);">
+              <div><b>House number:</b> <span id="prof-house">ROAD M-027</span></div>
+              <div><b>Road:</b> <span id="prof-road">Road M</span></div>
+              <div><b>Address:</b> <span id="prof-full-address">Road M, Nitel Estate</span></div>
+              <div><b>Postcode:</b> Not set</div>
+              <div><b>Occupancy:</b> <span style="background:#DCFCE7; color:#15803d; padding:2px 6px; border-radius:4px; font-weight:700;">OCCUPIED</span></div>
+            </div>
+          </div>
+        </div>
 
         <!-- VISITORS -->
-        <div id="page-visitors" class="page"><div class="card"><div class="page-title">My Visitors</div><div class="page-desc">Generate visitor pass.</div><input type="text" id="vis-name" class="input" placeholder="Visitor Name" /><button class="btn" style="margin-top:8px;" onclick="toast('Visitor pass generated!')">Generate Pass</button></div></div>
+        <div id="page-visitors" class="page"><div class="card"><div class="page-title">My Visitors</div><div class="page-desc">Generate visitor pass.</div><input type="text" id="vis-name" class="input" placeholder="Visitor Name" /><button class="btn" style="margin-top:8px;" onclick="toast('Visitor pass generated successfully.')">Generate Pass</button></div></div>
 
         <!-- WORKERS -->
         <div id="page-workers" class="page"><div class="card"><div class="page-title">My Workers</div><div class="page-desc">Request worker access.</div></div></div>
@@ -175,75 +236,199 @@
         <!-- HOUSEHOLD -->
         <div id="page-household" class="page"><div class="card"><div class="page-title">My Household</div><div class="page-desc">Manage family members.</div></div></div>
 
-        <!-- TENANTS -->
-        <div id="page-tenants" class="page"><div class="card"><div class="page-title">My Tenants</div><div class="page-desc">Manage registered tenants.</div></div></div>
+        <!-- TENANTS (Matching Screenshot Modal & List) -->
+        <div id="page-tenants" class="page">
+          <div class="card">
+            <div class="page-title">My Tenants</div>
+            <div class="page-desc">Add or remove tenants living on your property.</div>
+            <button class="btn" style="width:auto; padding:0 16px; height:40px; font-size:12px; margin-bottom:12px;" onclick="openTenantModal()">+ Add tenant</button>
+            <div id="tenants-list-feed"><small>Loading tenants...</small></div>
+          </div>
+        </div>
 
         <!-- HOUSEHOLD APPROVALS -->
         <div id="page-household-approvals" class="page"><div class="card"><div class="page-title">Household Approvals</div><div class="page-desc">Approve household passes.</div></div></div>
 
-        <!-- VEHICLES -->
-        <div id="page-vehicles" class="page"><div class="card"><div class="page-title">My Vehicles</div><div class="page-desc">Register vehicles.</div></div></div>
+        <!-- VEHICLES (Matching Screenshot) -->
+        <div id="page-vehicles" class="page">
+          <div class="card">
+            <div class="page-title">My Vehicles</div>
+            <div class="page-desc">Register your vehicles and request window stickers for them.</div>
+            <button class="btn" style="width:auto; padding:0 16px; height:40px; font-size:12px; margin-bottom:12px;" onclick="openVehicleModal()">+ Register vehicle</button>
+            <div id="vehicles-list-feed"><small>Loading vehicles...</small></div>
+          </div>
+        </div>
 
         <!-- VEHICLE APPROVALS -->
         <div id="page-vehicle-approvals" class="page"><div class="card"><div class="page-title">Vehicle Approvals</div><div class="page-desc">Tenant vehicle approvals.</div></div></div>
 
-        <!-- PAYMENTS -->
-        <div id="page-payments" class="page"><div class="card"><div class="page-title">My Payments</div><div class="page-desc">View levies & payment history.</div></div></div>
+        <!-- PAYMENTS (Matching Screenshots for Bank Accounts & History) -->
+        <div id="page-payments" class="page">
+          <div class="card">
+            <div class="page-title">My Payments</div>
+            <div class="page-desc" style="line-height:1.4;">Submit a receipt for any levy — a treasurer or financial secretary reviews it against the bank alert before it counts as paid.</div>
+            <button class="btn" style="width:auto; padding:0 16px; height:40px; font-size:12px; margin-bottom:16px;" onclick="openReceiptModal()">+ Submit payment receipt</button>
+            
+            <!-- Bank Accounts Info Box -->
+            <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:16px;">
+              <div style="font-weight:800; font-size:13px; margin-bottom:4px;">Where to pay</div>
+              <div style="font-size:11px; color:var(--muted); margin-bottom:12px;">Different levies go into different accounts — check which one applies before you pay.</div>
+              
+              <div style="font-weight:800; font-size:12px; color:#0F172A; margin-bottom:6px;">Electricity</div>
+              <div style="font-size:11px; color:var(--muted); line-height:1.6; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:8px;">
+                Bank: <b>Access Bank</b><br>
+                Account number: <b>1727073159</b><br>
+                Account name: <b>NITEL MTEL LANDLORD ASSOCIATION ELECTRICITY PROJECT</b>
+              </div>
 
-        <!-- COMPLAINTS -->
-        <div id="page-complaints" class="page"><div class="card"><div class="page-title">My Complaints</div><div class="page-desc">File a complaint.</div></div></div>
-
-        <!-- 🛵 ORDER ESTATE BIKER (RANDOM DISPATCH FOR RESIDENTS) -->
-        <div id="page-biker-order" class="page">
-          <div class="card" style="border-color:var(--primary);">
-            <div class="page-title" style="color:var(--primary);">🛵 Order Estate Delivery Biker</div>
-            <div class="page-desc">Request an estate-approved biker. The system will randomly assign an available biker to you instantly.</div>
-            <div class="field"><label>Destination / Package Drop-off Point</label><input type="text" id="biker-dest" class="input" placeholder="Block A, House 12 / Gate 2" /></div>
-            <button class="btn" onclick="orderRandomBiker()">Dispatch Random Biker Now 🚀</button>
-            <div id="assigned-biker-box" style="display:none; margin-top:14px; background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:14px;">
-              <div style="font-weight:900; color:#15803d; font-size:14px; margin-bottom:6px;">🎉 Biker Dispatched Successfully!</div>
-              <div id="biker-details-text" style="font-size:12px; line-height:1.6;"></div>
+              <div style="font-weight:800; font-size:12px; color:#0F172A; margin-bottom:6px;">Development</div>
+              <div style="font-size:11px; color:var(--muted); line-height:1.6;">
+                Bank: <b>Access Bank</b><br>
+                Account number: <b>1494637273</b><br>
+                Account name: <b>NITEL MTEL LANDLORD ASSOCIATION OKE...</b>
+              </div>
             </div>
+
+            <div style="font-weight:800; font-size:14px; margin-bottom:10px;">Payment history</div>
+            <div id="payment-history-feed"><small>Loading history...</small></div>
+          </div>
+        </div>
+
+        <!-- COMPLAINTS (Matching Screenshot Modal Form) -->
+        <div id="page-complaints" class="page">
+          <div class="card">
+            <div class="page-title">My Complaints</div>
+            <div class="page-desc">Report estate facility issues or security concerns.</div>
+            <button class="btn" style="width:auto; padding:0 16px; height:40px; font-size:12px; margin-bottom:12px;" onclick="openComplaintModal()">+ File a complaint</button>
+            <div id="resident-complaints-feed" style="margin-top:10px;"><small>Loading complaints...</small></div>
+          </div>
+        </div>
+
+        <!-- ORDER ESTATE BIKER -->
+        <div id="page-order-biker" class="page">
+          <div class="card" style="border-color:var(--primary);">
+            <div class="page-title" style="color:var(--primary);">Order Estate Biker</div>
+            <div class="page-desc">Request an approved estate delivery rider. The system will randomly assign an available biker.</div>
+            <div class="field"><label>Destination / Drop-off Address</label><input type="text" id="order-biker-dest" class="input" placeholder="Road M-027" /></div>
+            <button class="btn" onclick="requestRandomBikerDispatch()">Dispatch Biker</button>
+            <div id="biker-dispatch-result" style="display:none; margin-top:12px; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:12px; font-size:12px;"></div>
           </div>
         </div>
 
         <!-- CHANGE PASSWORD -->
         <div id="page-password" class="page"><div class="card"><div class="page-title">Change Password</div><div class="page-desc">Update credentials.</div></div></div>
 
-        <!-- 🛡️ SUPER ADMIN & BIKER REGISTRATION PORTAL -->
+        <!-- SUPER ADMIN & ADMIN MANAGEMENT PORTAL -->
         <div id="page-admin" class="page">
           <div class="card" style="border-color:var(--red);">
-            <div class="page-title" style="color:var(--red);">🛡️ Super Admin Portal</div>
-            <div class="page-desc">Manage Admin privileges and register estate delivery bikers.</div>
+            <div class="page-title" style="color:var(--red);">Admin Management Portal</div>
+            <div class="page-desc">Professional administrative console for estate oversight.</div>
 
-            <!-- Manage Admin Roles -->
-            <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:12px; border-radius:10px; margin-bottom:14px;">
-              <div style="font-weight:800; font-size:13px; margin-bottom:6px;">👑 Promote / Demote Admins</div>
-              <div class="field"><label>User Email</label><input type="email" id="target-admin-email" class="input" placeholder="user@gmail.com" /></div>
-              <div class="field">
-                <label>Assign Role</label>
-                <select id="target-admin-role" class="input" style="background:#fff;">
-                  <option value="ADMIN">ADMIN</option>
-                  <option value="RESIDENT">RESIDENT (Remove Admin)</option>
-                </select>
-              </div>
-              <button class="btn" style="background:#0284c7;" onclick="updateUserAdminRole()">Update User Role ⚡</button>
+            <!-- 1. Post Announcement -->
+            <div style="background:#F8FAFC; border:1px solid var(--border); padding:12px; border-radius:10px; margin-bottom:12px;">
+              <div style="font-weight:800; font-size:13px; margin-bottom:6px;">Post Official Announcement</div>
+              <div class="field"><label>Title</label><input type="text" id="ann-title" class="input" placeholder="Notice Title" /></div>
+              <div class="field"><label>Content</label><textarea id="ann-content" class="input" rows="2" placeholder="Announcement details..."></textarea></div>
+              <button class="btn" style="background:#0284c7;" onclick="adminPostAnnouncement()">Publish Announcement</button>
             </div>
 
-            <!-- Register Biker for Residents to Order -->
-            <div style="background:#f0fdf4; border:1.5px solid #86efac; padding:12px; border-radius:10px;">
-              <div style="font-weight:800; font-size:13px; color:#065f46; margin-bottom:6px;">🛵 Register Estate Biker</div>
-              <div class="field"><label>Biker Full Name</label><input type="text" id="reg-biker-name" class="input" placeholder="John Rider" /></div>
-              <div class="field"><label>Address / Zone</label><input type="text" id="reg-biker-addr" class="input" placeholder="Zone 4" /></div>
-              <div class="field"><label>Bike Number / Phone</label><input type="text" id="reg-biker-num" class="input" placeholder="08030000000" /></div>
-              <div class="field"><label>Bike Plate Number</label><input type="text" id="reg-biker-plate" class="input" placeholder="KJA-992-XY" /></div>
-              <div class="field"><label>Biker Photo URL</label><input type="url" id="reg-biker-photo" class="input" placeholder="https://images.unsplash.com/..." /></div>
-              <button class="btn" style="background:#059669;" onclick="registerNewBiker()">Save Biker to Fleet 🚀</button>
+            <!-- 2. Register Delivery Biker -->
+            <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:12px; border-radius:10px; margin-bottom:12px;">
+              <div style="font-weight:800; font-size:13px; color:#065f46; margin-bottom:6px;">Register Delivery Biker</div>
+              <div class="field"><label>Full Name</label><input type="text" id="biker-reg-name" class="input" placeholder="John Rider" /></div>
+              <div class="field"><label>Address / Zone</label><input type="text" id="biker-reg-addr" class="input" placeholder="Zone 4" /></div>
+              <div class="field"><label>Phone Number</label><input type="text" id="biker-reg-phone" class="input" placeholder="08030000000" /></div>
+              <div class="field"><label>Bike Plate Number</label><input type="text" id="biker-reg-plate" class="input" placeholder="KJA-992-XY" /></div>
+              <button class="btn" style="background:#059669;" onclick="adminRegisterBiker()">Save Biker to Fleet</button>
+            </div>
+
+            <!-- 3. Review Complaints -->
+            <div style="background:#F8FAFC; border:1px solid var(--border); padding:12px; border-radius:10px; margin-bottom:12px;">
+              <div style="font-weight:800; font-size:13px; margin-bottom:6px;">Review Resident Complaints</div>
+              <div id="admin-complaints-feed"><small>Loading complaints...</small></div>
+            </div>
+
+            <!-- 4. Resident Financial & Debt Control (Outstanding, Total Due, Total Paid) -->
+            <div style="background:#FEF2F2; border:1px solid #FEE2E2; padding:12px; border-radius:10px;">
+              <div style="font-weight:800; font-size:13px; color:#991B1B; margin-bottom:6px;">Resident Financial & Account Control</div>
+              <div class="field"><label>Select Resident</label><select id="admin-user-select" class="input" style="background:#fff;"><option value="">-- Select Resident --</option></select></div>
+              <div class="field"><label>Outstanding Balance (e.g. 1500)</label><input type="number" id="admin-set-outstanding" class="input" placeholder="1500" /></div>
+              <div class="field"><label>Total Due (e.g. 636500)</label><input type="number" id="admin-set-totaldue" class="input" placeholder="636500" /></div>
+              <div class="field"><label>Total Paid (e.g. 635000)</label><input type="number" id="admin-set-totalpaid" class="input" placeholder="635000" /></div>
+              <button class="btn" style="background:#DC2626;" onclick="adminUpdateResidentFinancials()">Save Financial Balances</button>
             </div>
 
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- ADD TENANT MODAL (Matching Screenshot) -->
+    <div id="tenant-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
+      <div style="background:#fff; width:90%; max-width:400px; padding:20px; border-radius:12px;">
+        <div style="font-weight:800; font-size:16px; margin-bottom:12px;">Add tenant</div>
+        <div class="field"><label>Tenant full name</label><input type="text" id="ten-name" class="input" placeholder="Full Name" /></div>
+        <div class="field"><label>Phone</label><input type="tel" id="ten-phone" class="input" placeholder="07061784563" /></div>
+        <div class="field"><label>Email</label><input type="email" id="ten-email" class="input" placeholder="email@gmail.com" /></div>
+        <div class="field"><label>Emergency contact</label><input type="tel" id="ten-emergency" class="input" placeholder="Emergency contact" /></div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn" style="background:#fff; border:1px solid var(--border); color:var(--text);" onclick="closeTenantModal()">Cancel</button>
+          <button class="btn" onclick="saveNewTenant()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTER VEHICLE MODAL -->
+    <div id="vehicle-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
+      <div style="background:#fff; width:90%; max-width:400px; padding:20px; border-radius:12px;">
+        <div style="font-weight:800; font-size:16px; margin-bottom:12px;">Register Vehicle</div>
+        <div class="field"><label>Vehicle Make</label><input type="text" id="veh-make" class="input" placeholder="Toyota" /></div>
+        <div class="field"><label>Vehicle Model</label><input type="text" id="veh-model" class="input" placeholder="Rav4" /></div>
+        <div class="field"><label>Colour</label><input type="text" id="veh-color" class="input" placeholder="Black" /></div>
+        <div class="field"><label>Plate Number</label><input type="text" id="veh-plate" class="input" placeholder="KRD 731 KQ" /></div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn" style="background:#fff; border:1px solid var(--border); color:var(--text);" onclick="closeVehicleModal()">Cancel</button>
+          <button class="btn" onclick="saveNewVehicle()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT PAYMENT RECEIPT MODAL -->
+    <div id="receipt-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
+      <div style="background:#fff; width:90%; max-width:400px; padding:20px; border-radius:12px;">
+        <div style="font-weight:800; font-size:16px; margin-bottom:12px;">Submit Payment Receipt</div>
+        <div class="field"><label>Amount Paid (₦)</label><input type="number" id="rec-amount" class="input" placeholder="1500" /></div>
+        <div class="field"><label>Payment Method</label><select id="rec-method" class="input" style="background:#fff;"><option value="BANK TRANSFER">Bank Transfer</option><option value="POS">POS</option></select></div>
+        <div class="field"><label>Note / Teller Number</label><input type="text" id="rec-note" class="input" placeholder="Teller ref..." /></div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn" style="background:#fff; border:1px solid var(--border); color:var(--text);" onclick="closeReceiptModal()">Cancel</button>
+          <button class="btn" onclick="savePaymentReceipt()">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILE A COMPLAINT MODAL (Matching Screenshot) -->
+    <div id="complaint-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
+      <div style="background:#fff; width:90%; max-width:400px; padding:20px; border-radius:12px;">
+        <div style="font-weight:800; font-size:16px; margin-bottom:12px;">File a complaint</div>
+        <div class="field"><label>Category</label><select id="modal-comp-cat" class="input" style="background:#fff;"><option value="Security">Security</option><option value="Facility">Facility / Maintenance</option><option value="Water">Water Supply</option></select></div>
+        <div class="field"><label>Description</label><textarea id="modal-comp-desc" class="input" rows="3" placeholder="Describe issue..."></textarea></div>
+        <div class="field"><label>Priority</label><select id="modal-comp-priority" class="input" style="background:#fff;"><option value="Normal">Normal</option><option value="Urgent">Urgent</option></select></div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn" style="background:#fff; border:1px solid var(--border); color:var(--text);" onclick="closeComplaintModal()">Cancel</button>
+          <button class="btn" onclick="saveNewComplaint()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCESS PASS QR MODAL -->
+    <div id="qr-modal" class="qr-modal">
+      <div class="qr-modal-content">
+        <div style="font-weight:800; font-size:16px; margin-bottom:4px;">My Access Pass</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:14px;">Present this QR at the gate</div>
+        <div id="qrcode-render-box" style="display:flex; justify-content:center; margin-bottom:14px;"></div>
+        <button class="btn" onclick="closeAccessPassQR()">Close</button>
       </div>
     </div>
 
@@ -264,8 +449,7 @@
       if (sessionRes.data && sessionRes.data.session) {
         currentUserId = sessionRes.data.session.user.id;
         currentUserEmail = sessionRes.data.session.user.email;
-        await checkSuperAdminAndPermissions(currentUserId, currentUserEmail);
-        launchApp();
+        await checkPermissionsAndLaunch(currentUserId, currentUserEmail);
       }
     });
 
@@ -282,7 +466,7 @@
       var err = document.getElementById("authError");
 
       if(!email || !pass){ err.textContent = "Please enter email and password."; return; }
-      if(isSignup && !name){ err.textContent = "Please enter your real name."; return; }
+      if(isSignup && !name){ err.textContent = "Please enter your full name."; return; }
 
       try {
         if (isSignup) {
@@ -291,49 +475,67 @@
           var userId = authData.user.id;
           
           await supabaseClient.from('resident_profiles').upsert([{
-            user_id: userId, full_name: name, phone: email, address: 'Block A, House 12', levy_status: '₦45,000 (PENDING)'
+            user_id: userId, full_name: name, phone: email, house_number: 'ROAD M-027', road: 'Road M', address: 'Road M, Nitel Estate', outstanding_balance: 1500, total_due: 636500, total_paid: 635000, account_status: 'ACTIVE'
           }], { onConflict: 'user_id' });
 
-          // Hardcode ezekielayoola234@gmail.com as SUPER_ADMIN automatically
           var roleToAssign = (email.toLowerCase() === 'ezekielayoola234@gmail.com') ? 'SUPER_ADMIN' : 'RESIDENT';
           await supabaseClient.from('user_roles').upsert([{ user_id: userId, role: roleToAssign }], { onConflict: 'user_id' });
 
-          alert("Account created! You can now sign in.");
+          alert("Account created successfully! You can now sign in.");
           toggleAuthMode();
         } else {
           var { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
           if (error) throw error;
           currentUserId = data.user.id;
           currentUserEmail = data.user.email;
-          await checkSuperAdminAndPermissions(currentUserId, currentUserEmail);
-          launchApp();
+          await checkPermissionsAndLaunch(currentUserId, currentUserEmail);
         }
       } catch (e) {
         err.textContent = e.message || "Authentication failed.";
       }
     }
 
-    async function checkSuperAdminAndPermissions(userId, email) {
+    async function checkPermissionsAndLaunch(userId, email) {
       if (email && email.toLowerCase() === 'ezekielayoola234@gmail.com') {
         await supabaseClient.from('user_roles').upsert([{ user_id: userId, role: 'SUPER_ADMIN' }], { onConflict: 'user_id' });
-        document.getElementById("adminMenuBtn").style.display = "flex";
-        return;
       }
-      var { data } = await supabaseClient.from('user_roles').select('role').eq('user_id', userId).maybeSingle();
-      if (data && (data.role === 'ADMIN' || data.role === 'SUPER_ADMIN')) {
-        document.getElementById("adminMenuBtn").style.display = "flex";
-      }
-    }
 
-    async function launchApp(){
+      var { data: roleData } = await supabaseClient.from('user_roles').select('role').eq('user_id', userId).maybeSingle();
+      var isAdmin = roleData && (roleData.role === 'ADMIN' || roleData.role === 'SUPER_ADMIN');
+
+      if (isAdmin) {
+        var adminLink = document.getElementById("adminMenuLink");
+        if (adminLink) adminLink.style.display = "flex";
+      }
+
+      var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', userId).maybeSingle();
+      if (profile) {
+        if (profile.account_status === 'BLOCKED') {
+          alert("Access Denied: Your account has been suspended by management.");
+          await supabaseClient.auth.signOut();
+          return;
+        }
+
+        document.getElementById("dashWelcomeTitle").textContent = "Welcome, " + profile.full_name;
+        document.getElementById("residentTitleTag").textContent = profile.full_name + " · RESIDENT";
+        document.getElementById("dash-card-outstanding").textContent = "₦" + Number(profile.outstanding_balance || 0).toLocaleString();
+        document.getElementById("dash-card-total-due").textContent = "₦" + Number(profile.total_due || 0).toLocaleString();
+        document.getElementById("dash-card-total-paid").textContent = "₦" + Number(profile.total_paid || 0).toLocaleString();
+        document.getElementById("dash-outstanding-text").textContent = "You have an outstanding balance of ₦" + Number(profile.outstanding_balance || 0).toLocaleString() + ".";
+        
+        document.getElementById("dash-property-house").textContent = profile.house_number || "ROAD M-027";
+        document.getElementById("dash-property-road").textContent = profile.road || "Road M";
+        document.getElementById("prof-house").textContent = profile.house_number || "ROAD M-027";
+        document.getElementById("prof-road").textContent = profile.road || "Road M";
+        document.getElementById("prof-full-address").textContent = profile.address || "Road M, Nitel Estate";
+
+        // Count vehicles
+        var { count } = await supabaseClient.from('estate_vehicles').select('*', { count: 'exact', head: true }).eq('resident_id', userId);
+        document.getElementById("dash-card-vehicles-count").textContent = count || 0;
+      }
+
       document.getElementById("auth").classList.add("hidden");
       document.getElementById("main").style.display = "flex";
-      var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', currentUserId).maybeSingle();
-      if (profile) {
-        document.getElementById("dashName").textContent = profile.full_name;
-        document.getElementById("residentTitleTag").textContent = profile.full_name + " · RESIDENT";
-        document.getElementById("profDetails").innerHTML = `<b>Name:</b> ${profile.full_name}<br><b>Phone:</b> ${profile.phone}<br><b>Address:</b> ${profile.address}`;
-      }
       toast("Welcome to Nitel Estate");
     }
 
@@ -351,91 +553,324 @@
       document.querySelectorAll(".sidebar-menu .menu-item").forEach(function(i) { i.classList.remove("active"); });
       if (el) el.classList.add("active");
       toggleSidebar();
+
+      if (pageId === 'tenants') loadTenantsList();
+      if (pageId === 'vehicles') loadVehiclesList();
+      if (pageId === 'payments') loadPaymentHistory();
+      if (pageId === 'announcements') loadAnnouncementsFeed();
+      if (pageId === 'admin') { loadAdminComplaints(); loadAdminUsersDropdown(); }
     }
 
-    // --- SUPER ADMIN: PROMOTE/DEMOTE ADMINS & REGISTER BIKERS ---
-    async function updateUserAdminRole() {
-      var email = document.getElementById("target-admin-email").value.trim();
-      var role = document.getElementById("target-admin-role").value;
-      if (!email) { alert("Enter user email."); return; }
+    // --- QR PASS MODAL ---
+    function openAccessPassQR() {
+      var modal = document.getElementById("qr-modal");
+      var box = document.getElementById("qrcode-render-box");
+      box.innerHTML = "";
+      new QRCode(box, { text: "NITEL-RESIDENT-PASS-" + currentUserId, width: 140, height: 140 });
+      modal.style.display = "flex";
+    }
+    function closeAccessPassQR() { document.getElementById("qr-modal").style.display = "none"; }
+
+    // --- TENANTS MODAL & LIST ---
+    function openTenantModal() { document.getElementById("tenant-modal").style.display = "flex"; }
+    function closeTenantModal() { document.getElementById("tenant-modal").style.display = "none"; }
+
+    async function saveNewTenant() {
+      var name = document.getElementById("ten-name").value.trim();
+      var phone = document.getElementById("ten-phone").value.trim();
+      var email = document.getElementById("ten-email").value.trim();
+      var emergency = document.getElementById("ten-emergency").value.trim();
+
+      if (!name) { alert("Enter tenant full name."); return; }
 
       try {
-        var { data: usersList } = await supabaseClient.from('resident_profiles').select('user_id').eq('phone', email).maybeSingle();
-        if (!usersList) { alert("User not found by email/phone."); return; }
-        
-        await supabaseClient.from('user_roles').upsert([{ user_id: usersList.user_id, role: role }], { onConflict: 'user_id' });
-        alert("🟢 User role successfully updated to " + role);
-        document.getElementById("target-admin-email").value = "";
+        var { error } = await supabaseClient.from('estate_tenants').insert([{
+          landlord_id: currentUserId, tenant_name: name, phone: phone, email: email, emergency_contact: emergency, status: 'ACTIVE'
+        }]);
+        if (error) throw error;
+        closeTenantModal();
+        document.getElementById("ten-name").value = "";
+        document.getElementById("ten-phone").value = "";
+        document.getElementById("ten-email").value = "";
+        document.getElementById("ten-emergency").value = "";
+        loadTenantsList();
+        toast("Tenant added successfully.");
       } catch (err) { alert("Error: " + err.message); }
     }
 
-    async function registerNewBiker() {
-      var name = document.getElementById("reg-biker-name").value.trim();
-      var addr = document.getElementById("reg-biker-addr").value.trim();
-      var num = document.getElementById("reg-biker-num").value.trim();
-      var plate = document.getElementById("reg-biker-plate").value.trim();
-      var photo = document.getElementById("reg-biker-photo").value.trim();
+    async function loadTenantsList() {
+      var feed = document.getElementById("tenants-list-feed");
+      var { data } = await supabaseClient.from('estate_tenants').select('*').eq('landlord_id', currentUserId);
+      if (!data || data.length === 0) { feed.innerHTML = "<small>No tenants registered.</small>"; return; }
+      feed.innerHTML = data.map(t => `
+        <div style="background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; font-size:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b>${escapeHtml(t.tenant_name)}</b>
+            <span style="font-size:9px; font-weight:800; background:#DCFCE7; color:#15803d; padding:2px 6px; border-radius:4px;">${t.status}</span>
+          </div>
+          <div style="margin-top:6px; color:var(--muted); line-height:1.5;">
+            PHONE: ${escapeHtml(t.phone || 'N/A')}<br>
+            EMAIL: ${escapeHtml(t.email || 'N/A')}
+          </div>
+          <button class="btn" style="background:#fff; border:1px solid var(--border); color:var(--text); height:36px; font-size:11px; margin-top:8px;" onclick="deactivateTenant('${t.id}')">Deactivate</button>
+        </div>
+      `).join('');
+    }
+
+    async function deactivateTenant(tenantId) {
+      if (!confirm("Deactivate this tenant?")) return;
+      await supabaseClient.from('estate_tenants').update({ status: 'INACTIVE' }).eq('id', tenantId);
+      loadTenantsList();
+      toast("Tenant deactivated.");
+    }
+
+    // --- VEHICLES ---
+    function openVehicleModal() { document.getElementById("vehicle-modal").style.display = "flex"; }
+    function closeVehicleModal() { document.getElementById("vehicle-modal").style.display = "none"; }
+
+    async function saveNewVehicle() {
+      var make = document.getElementById("veh-make").value.trim();
+      var model = document.getElementById("veh-model").value.trim();
+      var color = document.getElementById("veh-color").value.trim();
+      var plate = document.getElementById("veh-plate").value.trim();
+
+      if (!make || !plate) { alert("Enter make and plate number."); return; }
+
+      try {
+        await supabaseClient.from('estate_vehicles').insert([{
+          resident_id: currentUserId, vehicle_make: make, vehicle_model: model, color: color, plate_number: plate, sticker_status: 'PENDING PAYMENT', status: 'ACTIVE'
+        }]);
+        closeVehicleModal();
+        loadVehiclesList();
+        toast("Vehicle registered successfully.");
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function loadVehiclesList() {
+      var feed = document.getElementById("vehicles-list-feed");
+      var { data } = await supabaseClient.from('estate_vehicles').select('*').eq('resident_id', currentUserId);
+      if (!data || data.length === 0) { feed.innerHTML = "<small>No vehicles registered.</small>"; return; }
+      feed.innerHTML = data.map(v => `
+        <div style="background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; font-size:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b>${escapeHtml(v.plate_number)}</b>
+            <span style="font-size:9px; font-weight:800; background:#DCFCE7; color:#15803d; padding:2px 6px; border-radius:4px;">ACTIVE</span>
+          </div>
+          <div style="margin-top:6px; color:var(--muted); line-height:1.5;">
+            MAKE/MODEL: ${escapeHtml(v.vehicle_make)} ${escapeHtml(v.vehicle_model)} · ${escapeHtml(v.color)}<br>
+            STICKER: <span style="color:#d97706; font-weight:700;">${v.sticker_status}</span>
+          </div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px;">Pay ₦1,500 via My Payments to get this issued</div>
+        </div>
+      `).join('');
+    }
+
+    // --- PAYMENTS & RECEIPTS ---
+    function openReceiptModal() { document.getElementById("receipt-modal").style.display = "flex"; }
+    function closeReceiptModal() { document.getElementById("receipt-modal").style.display = "none"; }
+
+    async function savePaymentReceipt() {
+      var amount = parseFloat(document.getElementById("rec-amount").value);
+      var method = document.getElementById("rec-method").value;
+      var note = document.getElementById("rec-note").value.trim();
+
+      if (isNaN(amount) || amount <= 0) { alert("Enter valid amount."); return; }
+
+      try {
+        await supabaseClient.from('payment_receipts').insert([{
+          resident_id: currentUserId, amount: amount, method: method, note: note, status: 'SUCCESS'
+        }]);
+        
+        // Automatically deduct from outstanding balance
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('outstanding_balance').eq('user_id', currentUserId).maybeSingle();
+        if (profile) {
+          var newOut = Math.max(0, (profile.outstanding_balance || 0) - amount);
+          await supabaseClient.from('resident_profiles').update({ outstanding_balance: newOut }).eq('user_id', currentUserId);
+          document.getElementById("dash-card-outstanding").textContent = "₦" + newOut.toLocaleString();
+          document.getElementById("dash-outstanding-text").textContent = "You have an outstanding balance of ₦" + newOut.toLocaleString() + ".";
+        }
+
+        closeReceiptModal();
+        loadPaymentHistory();
+        toast("Payment receipt submitted successfully.");
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function loadPaymentHistory() {
+      var feed = document.getElementById("payment-history-feed");
+      var { data } = await supabaseClient.from('payment_receipts').select('*').eq('resident_id', currentUserId).order('created_at', { ascending: false });
+      if (!data || data.length === 0) { feed.innerHTML = "<small>No payment history recorded.</small>"; return; }
+      feed.innerHTML = data.map(p => `
+        <div style="background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; font-size:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="font-size:15px; color:#0F172A;">₦${Number(p.amount).toLocaleString()}</b>
+            <span style="font-size:9px; font-weight:800; background:#DCFCE7; color:#15803d; padding:2px 6px; border-radius:4px;">${p.status}</span>
+          </div>
+          <div style="margin-top:6px; color:var(--muted); line-height:1.5;">
+            METHOD: ${escapeHtml(p.method)}<br>
+            SUBMITTED: ${new Date(p.created_at).toLocaleString()}<br>
+            NOTE: ${escapeHtml(p.note || '—')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- COMPLAINTS MODAL ---
+    function openComplaintModal() { document.getElementById("complaint-modal").style.display = "flex"; }
+    function closeComplaintModal() { document.getElementById("complaint-modal").style.display = "none"; }
+
+    async function saveNewComplaint() {
+      var cat = document.getElementById("modal-comp-cat").value;
+      var desc = document.getElementById("modal-comp-desc").value.trim();
+      var priority = document.getElementById("modal-comp-priority").value;
+
+      if (!desc) { alert("Enter description."); return; }
+
+      try {
+        await supabaseClient.from('estate_complaints').insert([{
+          resident_id: currentUserId, category: cat, description: desc, priority: priority, status: 'PENDING'
+        }]);
+        closeComplaintModal();
+        document.getElementById("modal-comp-desc").value = "";
+        loadResidentComplaints();
+        toast("Complaint filed successfully.");
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function loadResidentComplaints() {
+      var feed = document.getElementById("resident-complaints-feed");
+      var { data } = await supabaseClient.from('estate_complaints').select('*').eq('resident_id', currentUserId).order('created_at', { ascending: false });
+      if (!data || data.length === 0) { feed.innerHTML = "<small>No complaints filed.</small>"; return; }
+      feed.innerHTML = data.map(c => `
+        <div style="background:#fff; border:1px solid var(--border); padding:10px; border-radius:8px; margin-bottom:6px; font-size:11px;">
+          <b>[${escapeHtml(c.category)}] Priority: ${escapeHtml(c.priority)}</b><br>
+          ${escapeHtml(c.description)}<br>
+          <small style="color:var(--muted);">Status: ${c.status}</small>
+        </div>
+      `).join('');
+    }
+
+    // --- ANNOUNCEMENTS ---
+    async function loadAnnouncementsFeed() {
+      var feed = document.getElementById("announcements-feed");
+      var { data } = await supabaseClient.from('estate_announcements').select('*').order('created_at', { ascending: false });
+      if (!data || data.length === 0) { feed.innerHTML = "<small>No announcements posted yet.</small>"; return; }
+      feed.innerHTML = data.map(a => `
+        <div style="background:#fff; border:1px solid var(--border); padding:12px; border-radius:10px; margin-bottom:8px; font-size:12px;">
+          <b>${escapeHtml(a.title)}</b>
+          <p style="margin-top:4px; color:var(--muted);">${escapeHtml(a.content)}</p>
+          <small style="font-size:9px; color:var(--muted); display:block; margin-top:6px;">${new Date(a.created_at).toLocaleDateString()}</small>
+        </div>
+      `).join('');
+    }
+
+    // --- RANDOM BIKER DISPATCH ---
+    async function requestRandomBikerDispatch() {
+      var dest = document.getElementById("order-biker-dest").value.trim();
+      if (!dest) { alert("Enter destination drop-off address."); return; }
+
+      try {
+        var { data: bikers } = await supabaseClient.from('estate_bikers').select('*').eq('status', 'AVAILABLE');
+        if (!bikers || bikers.length === 0) {
+          alert("No available bikers online right now.");
+          return;
+        }
+
+        var randomBiker = bikers[Math.floor(Math.random() * bikers.length)];
+        var { data: profile } = await supabaseClient.from('resident_profiles').select('full_name').eq('user_id', currentUserId).maybeSingle();
+        var resName = profile ? profile.full_name : "Resident";
+
+        await supabaseClient.from('biker_orders').insert([{
+          resident_id: currentUserId, resident_name: resName, address: dest, biker_id: randomBiker.id, biker_name: randomBiker.full_name, biker_phone: randomBiker.bike_number, bike_plate: randomBiker.bike_plate, status: 'DISPATCHED'
+        }]);
+
+        var box = document.getElementById("biker-dispatch-result");
+        box.style.display = "block";
+        box.innerHTML = `
+          <b>Assigned Rider:</b> ${escapeHtml(randomBiker.full_name)}<br>
+          <b>Phone No:</b> ${escapeHtml(randomBiker.bike_number)}<br>
+          <b>Plate Number:</b> ${escapeHtml(randomBiker.bike_plate)}<br>
+          <b>Destination:</b> ${escapeHtml(dest)}<br>
+          <span style="color:#15803d; font-weight:800;">Rider has been assigned and dispatched!</span>
+        `;
+        toast("Biker dispatched successfully.");
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    // --- ADMIN MANAGEMENT PORTAL FUNCTIONS ---
+    async function adminPostAnnouncement() {
+      var title = document.getElementById("ann-title").value.trim();
+      var content = document.getElementById("ann-content").value.trim();
+      if (!title || !content) { alert("Enter title and content."); return; }
+
+      try {
+        await supabaseClient.from('estate_announcements').insert([{ title: title, content: content }]);
+        document.getElementById("ann-title").value = "";
+        document.getElementById("ann-content").value = "";
+        alert("Announcement published successfully.");
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    async function adminRegisterBiker() {
+      var name = document.getElementById("biker-reg-name").value.trim();
+      var addr = document.getElementById("biker-reg-addr").value.trim();
+      var phone = document.getElementById("biker-reg-phone").value.trim();
+      var plate = document.getElementById("biker-reg-plate").value.trim();
 
       if (!name || !plate) { alert("Enter biker name and plate number."); return; }
 
       try {
-        var { error } = await supabaseClient.from('estate_bikers').insert([{
-          full_name: name, address: addr, bike_number: num, bike_plate: plate, photo_url: photo, status: 'AVAILABLE'
+        await supabaseClient.from('estate_bikers').insert([{
+          full_name: name, address: addr, bike_number: phone, bike_plate: plate, status: 'AVAILABLE'
         }]);
-        if (error) throw error;
-        alert("🟢 Biker registered successfully into the estate fleet!");
-        document.getElementById("reg-biker-name").value = "";
-        document.getElementById("reg-biker-addr").value = "";
-        document.getElementById("reg-biker-num").value = "";
-        document.getElementById("reg-biker-plate").value = "";
-        document.getElementById("reg-biker-photo").value = "";
-      } catch (err) { alert("Error registering biker: " + err.message); }
+        alert("Biker registered successfully.");
+        document.getElementById("biker-reg-name").value = "";
+        document.getElementById("biker-reg-addr").value = "";
+        document.getElementById("biker-reg-phone").value = "";
+        document.getElementById("biker-reg-plate").value = "";
+      } catch (err) { alert("Error: " + err.message); }
     }
 
-    // --- RANDOM BIKER DISPATCH FOR RESIDENTS ---
-    async function orderRandomBiker() {
-      var dest = document.getElementById("biker-dest").value.trim();
-      if (!dest) { alert("Enter destination drop-off point."); return; }
+    async function loadAdminComplaints() {
+      var feed = document.getElementById("admin-complaints-feed");
+      var { data } = await supabaseClient.from('estate_complaints').select('*').order('created_at', { ascending: false });
+      if (!data || data.length === 0) { feed.innerHTML = "<small>No complaints received.</small>"; return; }
+      feed.innerHTML = data.map(c => `
+        <div style="background:#fff; border:1px solid var(--border); padding:8px; border-radius:6px; margin-bottom:6px; font-size:11px;">
+          <b>[${escapeHtml(c.category)}] Priority: ${escapeHtml(c.priority)}</b><br>
+          ${escapeHtml(c.description)}<br>
+          <small style="color:var(--muted);">Status: ${c.status}</small>
+        </div>
+      `).join('');
+    }
+
+    async function loadAdminUsersDropdown() {
+      var select = document.getElementById("admin-user-select");
+      var { data } = await supabaseClient.from('resident_profiles').select('user_id, full_name, address');
+      if (data && data.length > 0) {
+        select.innerHTML = data.map(u => `<option value="${u.user_id}">${escapeHtml(u.full_name)} (${escapeHtml(u.address)})</option>`).join('');
+      } else {
+        select.innerHTML = '<option value="">No residents found</option>';
+      }
+    }
+
+    async function adminUpdateResidentFinancials() {
+      var userId = document.getElementById("admin-user-select").value;
+      var out = parseFloat(document.getElementById("admin-set-outstanding").value);
+      var due = parseFloat(document.getElementById("admin-set-totaldue").value);
+      var paid = parseFloat(document.getElementById("admin-set-totalpaid").value);
+
+      if (!userId) { alert("Select a resident."); return; }
 
       try {
-        var { data: bikers, error } = await supabaseClient.from('estate_bikers').select('*').eq('status', 'AVAILABLE');
-        if (error || !bikers || bikers.length === 0) {
-          alert("❌ No available bikers online at the moment. Please try again later.");
-          return;
-        }
+        var updateObj = {};
+        if (!isNaN(out)) updateObj.outstanding_balance = out;
+        if (!isNaN(due)) updateObj.total_due = due;
+        if (!isNaN(paid)) updateObj.total_paid = paid;
 
-        // Randomly pick a biker from the available fleet
-        var randomIndex = Math.floor(Math.random() * bikers.length);
-        var selectedBiker = bikers[randomIndex];
-
-        var { data: profile } = await supabaseClient.from('resident_profiles').select('*').eq('user_id', currentUserId).maybeSingle();
-        var residentName = profile ? profile.full_name : "Resident";
-
-        // Save dispatch order
-        await supabaseClient.from('biker_orders').insert([{
-          resident_id: currentUserId,
-          resident_name: residentName,
-          address: dest,
-          biker_id: selectedBiker.id,
-          biker_name: selectedBiker.full_name,
-          biker_phone: selectedBiker.bike_number,
-          bike_plate: selectedBiker.bike_plate,
-          biker_photo: selectedBiker.photo_url,
-          status: 'DISPATCHED'
-        }]);
-
-        var box = document.getElementById("assigned-biker-box");
-        var details = document.getElementById("biker-details-text");
-        box.style.display = "block";
-        details.innerHTML = `
-          <b>Biker Name:</b> ${escapeHtml(selectedBiker.full_name)}<br>
-          <b>Phone / Bike No:</b> ${escapeHtml(selectedBiker.bike_number)}<br>
-          <b>Plate Number:</b> ${escapeHtml(selectedBiker.bike_plate)}<br>
-          <b>Destination:</b> ${escapeHtml(dest)}<br>
-          <span style="color:#0284c7; font-weight:700;">🚴‍♂️ Biker has been notified and is heading to your location!</span>
-        `;
-        toast("Biker dispatched successfully!");
-      } catch (err) { alert("Error ordering biker: " + err.message); }
+        await supabaseClient.from('resident_profiles').update(updateObj).eq('user_id', userId);
+        alert("Resident financial balances updated successfully.");
+      } catch (err) { alert("Error: " + err.message); }
     }
 
     function toast(msg){
