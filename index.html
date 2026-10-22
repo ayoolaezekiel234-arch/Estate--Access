@@ -20,22 +20,25 @@
 html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text);}
 #app{width:100%; height:100%; position:relative; overflow:hidden;}
 
+/* SVG ICON HELPER */
+.svg-icon { width: 18px; height: 18px; fill: currentColor; display: inline-block; vertical-align: middle; flex-shrink: 0; }
+.svg-icon-lg { width: 24px; height: 24px; fill: currentColor; }
+
 /* SPLASH SCREEN */
 #splash{
- position:absolute; inset:0; z-index:9999; display:flex; flex-direction:column; justify-content:flex-end; padding:30px 24px;
- background: linear-gradient(180deg, rgba(5,8,7,0.2) 0%, rgba(5,8,7,0.85) 60%, #050807 100%), 
+ position:absolute; inset:0; z-index:9999; display:flex; flex-direction:column; justify-content:flex-end; padding:35px 24px;
+ background: linear-gradient(180deg, rgba(5,8,7,0.1) 0%, rgba(5,8,7,0.8) 55%, #050807 100%), 
              url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900') center/cover no-repeat;
  transition: opacity .4s ease, visibility .4s ease;
 }
 #splash.hide{opacity:0; visibility:hidden; pointer-events:none;}
 .splash-logo-box{
- width:60px; height:60px; border-radius:18px; background:rgba(25,230,160,.15); border:1px solid var(--border);
- display:flex; align-items:center; justify-content:center; font-size:28px; color:var(--green); margin-bottom:16px;
- box-shadow:var(--glow);
+ width:64px; height:64px; border-radius:20px; background:rgba(25,230,160,.15); border:1px solid var(--border);
+ display:flex; align-items:center; justify-content:center; margin-bottom:16px; box-shadow:var(--glow); color:var(--green);
 }
-.splash-title{font-size:26px; font-weight:900; letter-spacing:1px; color:#fff;}
+.splash-title{font-size:28px; font-weight:900; letter-spacing:1px; color:#fff;}
 .splash-title span{color:var(--green);}
-.splash-tagline{margin-top:6px; color:#9DB3AA; font-size:12px; letter-spacing:0.5px; margin-bottom:24px;}
+.splash-tagline{margin-top:6px; color:#9DB3AA; font-size:12px; letter-spacing:0.5px; margin-bottom:28px;}
 
 /* AUTH SCREEN */
 #auth{
@@ -44,7 +47,7 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
 }
 #auth.hidden{display:none !important;}
 .auth-wrap{width:100%; max-width:420px; margin:0 auto; min-height:100%; display:flex; flex-direction:column; justify-content:center;}
-.auth-card{padding:24px; border-radius:28px; background:rgba(11,21,17,0.95); border:1px solid var(--border); box-shadow:var(--shadow); backdrop-filter:blur(20px);}
+.auth-card{padding:26px; border-radius:28px; background:rgba(11,21,17,0.95); border:1px solid var(--border); box-shadow:var(--shadow); backdrop-filter:blur(20px);}
 .auth-tabs{display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:4px; background:rgba(255,255,255,.03); border-radius:14px; margin-bottom:20px;}
 .auth-tabs button{border:0; background:transparent; color:var(--muted); padding:10px; border-radius:10px; font-weight:700; cursor:pointer; font-size:12px;}
 .auth-tabs button.active{background:rgba(25,230,160,.15); color:var(--green);}
@@ -62,12 +65,12 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
 /* MAIN APP & NAV */
 #main{position:absolute; inset:0; display:none; flex-direction:column; z-index:10;}
 #main.hidden{display:none !important;}
-.topbar{height:68px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 16px; border-bottom:1px solid rgba(255,255,255,.04); background:rgba(5,8,7,.85); backdrop-filter:blur(20px);}
-.brand-mini{display:flex; align-items:center; gap:8px; font-weight:900; letter-spacing:1px; font-size:14px;}
-.brand-mini-icon{width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(25,230,160,.15); border:1px solid var(--border); color:var(--green);}
+.topbar{height:68px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 18px; border-bottom:1px solid rgba(255,255,255,.04); background:rgba(5,8,7,.85); backdrop-filter:blur(20px);}
+.brand-mini{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:1px; font-size:15px;}
+.brand-mini-icon{width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(25,230,160,.15); border:1px solid var(--border); color:var(--green);}
 .brand-mini span{color:var(--green);}
 
-.content{flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; padding:16px 14px 90px;}
+.content{flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; padding:16px 16px 90px;}
 .page{display:none; animation:pageIn .2s ease;}
 .page.active{display:block;}
 @keyframes pageIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
@@ -77,11 +80,11 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
  background:rgba(5,8,7,.95); backdrop-filter:blur(25px); border-top:1px solid rgba(255,255,255,.04);
  display:grid; grid-template-columns:repeat(5, 1fr); align-items:center; padding:0 4px; z-index:100;
 }
-.nav button{background:0; border:0; color:var(--muted); font-size:10px; font-weight:700; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; height:100%;}
+.nav button{background:0; border:0; color:var(--muted); font-size:10px; font-weight:700; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; cursor:pointer; height:100%;}
 .nav button.active{color:var(--green);}
-.nav button span.ico{font-size:18px;}
+.nav button .ico-svg{width:20px; height:20px; fill:currentColor;}
 
-/* CARDS & MODULES */
+/* COMPONENTS */
 .hero{padding:20px; border-radius:24px; background:linear-gradient(135deg, #0D2119, #07100D); border:1px solid var(--border); margin-bottom:14px; position:relative; overflow:hidden;}
 .hero h2{font-size:20px; font-weight:900; margin-top:4px;}
 .hero p{color:var(--muted); font-size:12px; margin-top:4px;}
@@ -92,8 +95,8 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
 .stat-lbl{font-size:11px; color:var(--muted); margin-top:2px;}
 
 .action-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:16px;}
-.action-item{background:rgba(15,26,22,.9); border:1px solid var(--border2); border-radius:16px; padding:12px 6px; text-align:center; cursor:pointer;}
-.action-item span{font-size:20px; display:block; margin-bottom:4px;}
+.action-item{background:rgba(15,26,22,.9); border:1px solid var(--border2); border-radius:16px; padding:12px 4px; text-align:center; cursor:pointer;}
+.action-item .ico-box{width:36px; height:36px; margin:0 auto 6px; border-radius:10px; background:rgba(25,230,160,.1); display:flex; align-items:center; justify-content:center; color:var(--green);}
 .action-item b{font-size:10px; color:var(--text); font-weight:700; display:block;}
 
 .card{padding:16px; border-radius:20px; background:rgba(15,26,22,.9); border:1px solid var(--border2); margin-bottom:12px;}
@@ -112,13 +115,29 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
 </head>
 <body>
 
+<!-- SVG ICON REPOSITORY (Zero Emojis Guarantee) -->
+<svg style="display:none;">
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+  <symbol id="icon-pass" viewBox="0 0 24 24"><path d="M22 10V6c0-1.1-.9-2-2-2H4c-1.1 0-1.99.9-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-9 7.5h-2v-2h2v2zm0-4.5h-2v-6h2v6z"/></symbol>
+  <symbol id="icon-map" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></symbol>
+  <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></symbol>
+  <symbol id="icon-user" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+  <symbol id="icon-qr" viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM17 17h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2z"/></symbol>
+  <symbol id="icon-card" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></symbol>
+  <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></symbol>
+  <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></symbol>
+  <symbol id="icon-gear" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.03 2.18 13.84 2 13.6 2h-4c-.24 0-.43.18-.47.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.23.42.47.42h4c.24 0 .43-.18.47-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
+</svg>
+
 <div id="app">
   <!-- SPLASH SCREEN -->
   <div id="splash">
-    <div class="splash-logo-box">🏠</div>
+    <div class="splash-logo-box">
+      <svg class="svg-icon-lg" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h14v-8h3L12 3z"/></svg>
+    </div>
     <div class="splash-title">NITEL <span>ESTATE</span></div>
     <div class="splash-tagline">Secure Living. Smarter Community.</div>
-    <button class="btn btn-emerald" onclick="showAuth()">Get Started →</button>
+    <button class="btn btn-emerald" onclick="showAuth()">Get Started</button>
   </div>
 
   <!-- AUTH SCREEN -->
@@ -127,7 +146,7 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
       <div class="auth-card">
         <div style="text-align:center; margin-bottom:20px;">
           <div style="font-size:22px; font-weight:900;">NITEL <span>ESTATE</span></div>
-          <p style="color:var(--muted); font-size:12px; margin-top:4px;">Sign in to continue</p>
+          <p style="color:var(--muted); font-size:12px; margin-top:4px;">Secure resident portal access</p>
         </div>
 
         <div class="auth-tabs">
@@ -161,10 +180,14 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
   <div id="main" class="hidden">
     <div class="topbar">
       <div class="brand-mini">
-        <div class="brand-mini-icon">🏠</div>
+        <div class="brand-mini-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h14v-8h3L12 3z"/></svg>
+        </div>
         NITEL <span>ESTATE</span>
       </div>
-      <button style="background:0; border:0; color:#fff; font-size:18px;" onclick="go('profile')">⚙️</button>
+      <button style="background:0; border:0; color:#fff; cursor:pointer;" onclick="go('profile')">
+        <svg class="svg-icon-lg" viewBox="0 0 24 24"><use href="#icon-gear"/></svg>
+      </button>
     </div>
 
     <div class="content">
@@ -183,7 +206,7 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
               <div style="font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase;">Outstanding Payments</div>
               <div style="font-size:22px; font-weight:900; color:#FF5F6D; margin-top:4px;">₦45,000</div>
             </div>
-            <button class="btn btn-emerald" style="width:auto; padding:8px 14px; font-size:11px;" onclick="go('payments')">Pay Now</button>
+            <button class="btn btn-emerald" style="width:auto; padding:8px 14px; font-size:11px;" onclick="toast('Redirecting to secure gateway...')">Pay Now</button>
           </div>
         </div>
 
@@ -191,19 +214,19 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
         <div class="section-title"><h3>Quick Actions</h3></div>
         <div class="action-grid">
           <div class="action-item" onclick="go('access')">
-            <span>🎫</span>
+            <div class="action-box"><svg class="svg-icon" viewBox="0 0 24 24"><use href="#icon-pass"/></svg></div>
             <b>Visitor Pass</b>
           </div>
-          <div class="action-item" onclick="go('complaints')">
-            <span>⚠️</span>
+          <div class="action-item" onclick="toast('Complaint form opened')">
+            <div class="action-box"><svg class="svg-icon" viewBox="0 0 24 24"><use href="#icon-alert"/></svg></div>
             <b>Report Issue</b>
           </div>
-          <div class="action-item" onclick="go('payments')">
-            <span>💳</span>
+          <div class="action-item" onclick="toast('Payment history loaded')">
+            <div class="action-box"><svg class="svg-icon" viewBox="0 0 24 24"><use href="#icon-card"/></svg></div>
             <b>Payments</b>
           </div>
-          <div class="action-item" onclick="go('services')">
-            <span>📞</span>
+          <div class="action-item" onclick="toast('Emergency contacts directory')">
+            <div class="action-box"><svg class="svg-icon" viewBox="0 0 24 24"><use href="#icon-phone"/></svg></div>
             <b>Services</b>
           </div>
         </div>
@@ -223,7 +246,7 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
         <!-- Recent Announcements -->
         <div class="section-title"><h3>Recent Announcements</h3></div>
         <div class="card">
-          <div style="font-weight:800; font-size:12px;">💧 Water supply will be off from 10am</div>
+          <div style="font-weight:800; font-size:12px;">Water supply will be off from 10am</div>
           <div class="muted" style="margin-top:4px;">Oct 21, 2025 • General Estate Maintenance</div>
         </div>
       </div>
@@ -231,33 +254,33 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
       <!-- 2. DIGITAL ACCESS / QR PASS -->
       <div id="access" class="page">
         <div class="card" style="text-align:center; padding:24px;">
-          <h3 style="margin-bottom:6px;">Visitor Pass</h3>
+          <h3 style="margin-bottom:6px;">Visitor Pass Generation</h3>
           <div class="muted" style="margin-bottom:16px;">Valid for: 1 hour (Oct 21, 2025 - 10:42 AM)</div>
           
-          <!-- Mock QR Code Box -->
+          <!-- Vector QR Code Box -->
           <div style="width:160px; height:160px; background:#fff; margin:0 auto 16px; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:10px;">
-            <div style="width:100%; height:100%; background:#050807; display:flex; align-items:center; justify-content:center; color:var(--green); font-size:11px; font-weight:900; text-align:center;">
-              [ QR CODE VST-7842 ]
-            </div>
+            <svg style="width:100%; height:100%; fill:#050807;" viewBox="0 0 24 24"><use href="#icon-qr"/></svg>
           </div>
           <div style="font-weight:800; font-size:12px; margin-bottom:14px;">Visitor ID: VST-7842</div>
-          <button class="btn btn-emerald" onclick="toast('QR Code Copied / Shared!')">Share QR Code</button>
+          <button class="btn btn-emerald" onclick="toast('QR Code Copied to Clipboard!')">Share QR Code</button>
         </div>
       </div>
 
-      <!-- 3. SERVICES / ESTATE MAP -->
+      <!-- 3. ESTATE MAP -->
       <div id="map" class="page">
-        <div class="card" style="height:360px; position:relative; background:#071019; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-          <div style="font-size:32px; margin-bottom:8px;">🗺️</div>
+        <div class="card" style="height:380px; position:relative; background:#071019; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+          <div style="width:48px; height:48px; border-radius:14px; background:rgba(25,230,160,.1); display:flex; align-items:center; justify-content:center; color:var(--green); margin-bottom:12px;">
+            <svg class="svg-icon-lg" viewBox="0 0 24 24"><use href="#icon-map"/></svg>
+          </div>
           <h3 style="font-size:15px;">NITEL Estate Satellite Map</h3>
           <p class="muted" style="margin-top:6px; max-width:250px;">67 Hectares • 5 Avenues • 500+ Homes</p>
-          <button class="btn btn-emerald" style="width:auto; padding:8px 16px; font-size:11px; margin-top:16px;" onclick="toast('Centering on your house...')">Center on My Location</button>
+          <button class="btn btn-emerald" style="width:auto; padding:8px 16px; font-size:11px; margin-top:16px;" onclick="toast('Centering map on your property...')">Center on My Location</button>
         </div>
       </div>
 
       <!-- 4. MESSAGES -->
       <div id="messages" class="page">
-        <div class="section-title"><h3>Estate Chats</h3></div>
+        <div class="section-title"><h3>Estate Broadcasts & Chats</h3></div>
         <div class="card" onclick="toast('Opening Estate Management Chat...')">
           <div style="display:flex; align-items:center; gap:12px;">
             <div style="width:40px; height:40px; border-radius:50%; background:rgba(25,230,160,.2); display:flex; align-items:center; justify-content:center; color:var(--green); font-weight:900;">EM</div>
@@ -282,7 +305,7 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
       <!-- 5. PROFILE -->
       <div id="profile" class="page">
         <div class="card" style="text-align:center;">
-          <div style="width:72px; height:72px; border-radius:50%; background:rgba(25,230,160,.2); border:2px solid var(--green); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; color:var(--green);">TA</div>
+          <div style="width:72px; height:72px; border-radius:50%; background:rgba(25,230,160,.2); border:2px solid var(--green); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; color:var(--green);" id="profileInitials">TA</div>
           <h3 id="profileName">Tunde Adebanjo</h3>
           <p class="muted" style="margin-top:2px;">Block A, House 12</p>
           <p style="color:var(--green); font-size:11px; font-weight:700; margin-top:4px;">Resident (Verified)</p>
@@ -295,11 +318,21 @@ html, body{width:100%; height:100%; overflow:hidden; background:var(--bg); color
 
     <!-- BOTTOM NAVIGATION (5 TABS MATCHING MOCKUP) -->
     <nav class="nav">
-      <button data-page="home" class="active" onclick="go('home')"><span class="ico">🏠</span><span>Home</span></button>
-      <button data-page="access" onclick="go('access')"><span class="ico">🎫</span><span>Pass</span></button>
-      <button data-page="map" onclick="go('map')"><span class="ico">🗺️</span><span>Map</span></button>
-      <button data-page="messages" onclick="go('messages')"><span class="ico">💬</span><span>Chats</span></button>
-      <button data-page="profile" onclick="go('profile')"><span class="ico">👤</span><span>Profile</span></button>
+      <button data-page="home" class="active" onclick="go('home')">
+        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-home"/></svg><span>Home</span>
+      </button>
+      <button data-page="access" onclick="go('access')">
+        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-pass"/></svg><span>Pass</span>
+      </button>
+      <button data-page="map" onclick="go('map')">
+        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-map"/></svg><span>Map</span>
+      </button>
+      <button data-page="messages" onclick="go('messages')">
+        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-chat"/></svg><span>Chats</span>
+      </button>
+      <button data-page="profile" onclick="go('profile')">
+        <svg class="ico-svg" viewBox="0 0 24 24"><use href="#icon-user"/></svg><span>Profile</span>
+      </button>
     </nav>
   </div>
   <div id="toast"></div>
@@ -324,15 +357,18 @@ function setAuthMode(mode){
 function submitAuth(){
  const email = document.getElementById("authEmail").value.trim();
  const pass = document.getElementById("authPassword").value;
+ const name = document.getElementById("authName").value.trim();
  const err = document.getElementById("authError");
- if(!email || !pass){ err.textContent="Please enter your email and password."; return; }
  
- currentUser = { name: "Tunde Adebanjo", email };
+ if(!email || !pass){ err.textContent="Please enter your email/phone and password."; return; }
+ 
+ currentUser = { name: name || "Tunde Adebanjo", email };
  localStorage.setItem("nitel_user", JSON.stringify(currentUser));
  
  document.getElementById("auth").classList.add("hidden");
  document.getElementById("main").classList.remove("hidden");
  document.getElementById("main").style.display="flex";
+ updateProfileUI();
  toast("Welcome to NITEL Estate!");
 }
 
@@ -352,6 +388,14 @@ function toast(msg){
  setTimeout(()=>el.classList.remove("show"), 2500);
 }
 
+function updateProfileUI(){
+ if(!currentUser) return;
+ document.getElementById("profileName").textContent = currentUser.name;
+ document.getElementById("greetingName").textContent = "Good morning, " + currentUser.name.split(" ")[0];
+ const initials = currentUser.name.split(" ").map(n=>n[0]).join("").toUpperCase();
+ document.getElementById("profileInitials").textContent = initials;
+}
+
 function signOut(){
  localStorage.removeItem("nitel_user");
  location.reload();
@@ -364,6 +408,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   document.getElementById("splash").classList.add("hide");
   document.getElementById("main").classList.remove("hidden");
   document.getElementById("main").style.display="flex";
+  updateProfileUI();
  }
 });
 </script>
